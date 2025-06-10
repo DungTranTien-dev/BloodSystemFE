@@ -1,83 +1,88 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-const newsData = [
-  {
-    id: 1,
-    title: "Chiến dịch hiến máu mùa hè 2024",
-    excerpt: "Tham gia chiến dịch hiến máu lớn nhất trong năm để cứu sống nhiều người",
-    image: "https://images.unsplash.com/photo-1615461066841-6116e61058f4",
-    date: "2024-01-15",
-    readTime: "5",
-    content: "Chiến dịch hiến máu mùa hè 2024 là một trong những sự kiện quan trọng nhất của năm, nhằm đảm bảo nguồn máu dự trữ cho các bệnh viện trong mùa cao điểm. Chương trình được tổ chức với quy mô lớn, thu hút hàng nghìn người tham gia trên toàn quốc."
-  },
-  {
-    id: 2,
-    title: "Hành trình của một giọt máu",
-    excerpt: "Khám phá quá trình từ người hiến máu đến người nhận",
-    image: "https://images.unsplash.com/photo-1579154204601-01588f351e67",
-    date: "2024-01-14",
-    readTime: "8",
-    content: "Mỗi giọt máu hiến tặng đều trải qua một hành trình dài và kỹ lưỡng trước khi đến được với người cần. Từ khâu kiểm tra sức khỏe người hiến, quy trình lấy máu an toàn, đến việc bảo quản và vận chuyển đều được thực hiện theo tiêu chuẩn nghiêm ngặt."
-  },
-  {
-    id: 3,
-    title: "Những người hùng thầm lặng",
-    excerpt: "Câu chuyện về những người hiến máu thường xuyên",
-    image: "https://images.unsplash.com/photo-1584362917165-526a968579e8",
-    date: "2024-01-13",
-    readTime: "6",
-    content: "Họ là những người bình thường nhưng mang trong mình trái tim nhân ái. Các tình nguyện viên hiến máu thường xuyên đã góp phần quan trọng trong việc duy trì nguồn máu ổn định cho các bệnh viện."
-  },
-  {
-    id: 4,
-    title: "Công nghệ mới trong bảo quản máu",
-    excerpt: "Những tiến bộ mới nhất trong việc lưu trữ và bảo quản máu",
-    image: "https://images.unsplash.com/photo-1579154204601-01588f351e67",
-    date: "2024-01-12",
-    readTime: "7",
-    content: "Các phương pháp bảo quản máu hiện đại đang được áp dụng, giúp kéo dài thời gian sử dụng và đảm bảo chất lượng máu tốt nhất cho người nhận."
-  },
-  {
-    id: 5,
-    title: "Hiến máu an toàn mùa dịch",
-    excerpt: "Hướng dẫn hiến máu an toàn trong thời kỳ dịch bệnh",
-    image: "https://images.unsplash.com/photo-1615461066841-6116e61058f4",
-    date: "2024-01-11",
-    readTime: "5",
-    content: "Trong bối cảnh dịch bệnh, việc hiến máu vẫn được thực hiện với các biện pháp an toàn cao nhất, đảm bảo sức khỏe cho cả người hiến và người nhận máu."
-  }
-];
-
+import Header from "../../components/ui/Header";
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { newsData } from "./newsData";
 
 const NewsPage = () => {
   const navigate = useNavigate();
 
   return (
-      <div className="min-h-screen bg-background p-8">
+    <div className="bg-slate-50 text-slate-800">
+      <Header />
+
+      <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Latest News & Updates</h2>
+            <p className="text-lg text-slate-500">Stay informed with the newest stories and announcements.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {newsData.map((news) => (
               <div 
                 key={news.id} 
-                className="bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                 onClick={() => navigate(`/news/${news.id}`)}
               >
-                <img src={news.image} alt={news.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="font-bold mb-2">{news.title}</h3>
-                  <p className="text-accent text-sm mb-3">{news.excerpt}</p>
-                  <div className="flex items-center justify-between text-sm text-accent">
+                <img src={news.image} alt={news.title} className="w-full h-56 object-cover" />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">{news.title}</h3>
+                  <p className="text-slate-500 text-sm mb-3 line-clamp-3">{news.excerpt}</p>
+                  <div className="flex justify-between items-center text-sm text-slate-400">
                     <span>{news.date}</span>
-                    <span>{news.readTime} phút đọc</span>
+                    <span>{news.readTime} min read</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      <footer className="bg-slate-900 text-slate-300 py-16 px-4">
+        <div className="container mx-auto grid md:grid-cols-4 gap-12">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">LifeStream</h3>
+            <p className="text-sm">Connecting donors, saving lives. Your contribution matters.</p>
+            <div className="flex space-x-4 mt-6 text-xl">
+              <a href="#" className="hover:text-red-500 transition-colors"><FaFacebook /></a>
+              <a href="#" className="hover:text-red-500 transition-colors"><FaTwitter /></a>
+              <a href="#" className="hover:text-red-500 transition-colors"><FaInstagram /></a>
+              <a href="#" className="hover:text-red-500 transition-colors"><FaLinkedin /></a>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li><a href="/about-us" className="hover:text-red-500 hover:underline">About Us</a></li>
+              <li><a href="/donate" className="hover:text-red-500 hover:underline">Donate Blood</a></li>
+              <li><a href="/find-blood" className="hover:text-red-500 hover:underline">Find Blood</a></li>
+              <li><a href="/news" className="hover:text-red-500 hover:underline">News & Events</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
+            <ul className="space-y-2 text-sm">
+              <li>Email: info@lifestream.org</li>
+              <li>Phone: +1 (555) 123-4567</li>
+              <li>Address: 123 Health St, Medcity</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Newsletter</h3>
+            <p className="text-sm mb-4">Stay updated with our latest news and campaigns.</p>
+            <div className="flex overflow-hidden rounded-md shadow-sm border border-slate-300">
+              <input type="email" placeholder="Your email" className="w-full px-4 py-2 text-slate-800 focus:outline-none" />
+              <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 font-semibold">Subscribe</button>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-slate-700 mt-12 pt-8 text-center text-sm">
+          <p>© {new Date().getFullYear()} LifeStream. All rights reserved. Made with ❤️ for a better world.</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 
