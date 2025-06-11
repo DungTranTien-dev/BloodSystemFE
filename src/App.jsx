@@ -7,6 +7,7 @@ import LoginPage from './pages/login/login';
 import RegisterPage from './pages/register/register';
 import NewsPage from './pages/news/News';
 import NewsDetail from './pages/news/NewsDetail';
+import Dashboard from './pages/admin/Dashboard';
 
 function App() {
 
@@ -34,10 +35,13 @@ function App() {
      {
       path: "/register",
       element: <RegisterPage/>,
-    },
-     {
+    },     {
       path: "/news/:id",
       element: <NewsDetail/>,
+    },
+    {
+      path: "/admin/dashboard",
+      element: <Dashboard/>,
     },
   ]);
   return (
