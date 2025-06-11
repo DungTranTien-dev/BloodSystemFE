@@ -18,7 +18,6 @@ const NewsDetail = () => {
 
   return (
     <div className="bg-slate-50 text-slate-800">
-      <Header />
 
       <main className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto">
@@ -49,7 +48,6 @@ const NewsDetail = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };

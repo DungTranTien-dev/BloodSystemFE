@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import AboutUsPage from './pages/home/AboutUs';
 import Homepage from './pages/home/home';
 import FindBloodPage from './pages/home/FindBlood';
@@ -7,18 +7,37 @@ import LoginPage from './pages/login/login';
 import RegisterPage from './pages/register/register';
 import NewsPage from './pages/news/News';
 import NewsDetail from './pages/news/NewsDetail';
+import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 function App() {
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Homepage />,
+      element: (
+        <>
+          <Header />
+          <Outlet />
+          <Footer />
+        </>
+      ),
+      children: [
+        {
+          path: "/",
+          element: <Homepage />,
+        },
+        {
+          path: "/news",
+          element: <NewsPage />,
+        },
+        {
+          path: "/news/:id",
+          element: <NewsDetail />,
+        },
+      ],
     },
-    {
-      path: "/news",
-      element: <NewsPage />,
-    },
+
     {
       path: "/about-us",
       element: <AboutUsPage />,
@@ -27,18 +46,18 @@ function App() {
       path: "/find-blood",
       element: <FindBloodPage />,
     },
-     {
+    {
       path: "/login",
       element: <LoginPage />,
     },
-     {
+    {
       path: "/register",
-      element: <RegisterPage/>,
+      element: <RegisterPage />,
     },
-     {
-      path: "/news/:id",
-      element: <NewsDetail/>,
-    },
+    // {
+    //   path: "/news/:id",
+    //   element: <NewsDetail />,
+    // },
   ]);
   return (
     <RouterProvider router={router} />
