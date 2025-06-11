@@ -1,7 +1,7 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AboutUsPage from './pages/home/AboutUs';
-import Homepage from './pages/home/home';
+import Homepage from './pages/home/Home';
 import FindBloodPage from './pages/home/FindBlood';
 import LoginPage from './pages/login/login';
 import RegisterPage from './pages/register/register';
@@ -37,8 +37,7 @@ function App() {
       element: <RegisterPage/>,
     },     {
       path: "/news/:id",
-      element: <NewsDetail/>,
-    },
+      element: <NewsDetail/>,    },
     {
       path: "/admin/dashboard",
       element: <Dashboard/>,

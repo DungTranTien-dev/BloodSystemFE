@@ -1,16 +1,190 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { FaChevronRight } from 'react-icons/fa';
-
-// Import constants and utilities
-import { MENU_ITEMS, DEFAULT_STATISTICS, APP_CONFIG } from '../../constants/dashboardConstants';
 import { 
-  formatNumber, 
-  getTrendIndicator, 
-  storage, 
-  getTimeBasedGreeting,
-  formatDate 
-} from '../../utils/dashboardUtils';
+  FaChevronRight,
+  FaTachometerAlt, 
+  FaUsers, 
+  FaUser, 
+  FaSearch, 
+  FaEdit, 
+  FaEnvelope,
+  FaCog,
+  FaChartBar,
+  FaBell
+} from 'react-icons/fa';
+
+// Constants directly in component to avoid import issues
+const APP_CONFIG = {
+  name: 'BloodBank & Donor Management System',
+  version: '1.0.0',
+  description: 'Comprehensive blood bank management solution',
+  lastUpdated: '2024-12-11'
+};
+
+const MENU_ITEMS = [
+  { 
+    icon: FaTachometerAlt, 
+    label: 'Dashboard', 
+    path: '/admin/dashboard',
+    description: 'Main dashboard overview with key metrics',
+    category: 'main'
+  },
+  { 
+    icon: FaUsers, 
+    label: 'Blood Group', 
+    path: '/admin/blood-group',
+    description: 'Manage blood group types and categories',
+    category: 'main'
+  },
+  { 
+    icon: FaUser, 
+    label: 'Donor List', 
+    path: '/admin/donor-list',
+    description: 'View and manage registered donors',
+    category: 'main'
+  },
+  { 
+    icon: FaSearch, 
+    label: 'Manage Contactus Query', 
+    path: '/admin/contactus',
+    description: 'Handle contact form queries and support requests',
+    category: 'main'
+  },
+  { 
+    icon: FaEdit, 
+    label: 'Manage Pages', 
+    path: '/admin/pages',
+    description: 'Content management system for website pages',
+    category: 'main'
+  },
+  { 
+    icon: FaEdit, 
+    label: 'Update Contact Info', 
+    path: '/admin/contact-info',
+    description: 'Update organization contact details',
+    category: 'settings'
+  },
+  { 
+    icon: FaEnvelope, 
+    label: 'Request Received By Donar', 
+    path: '/admin/requests',
+    description: 'Manage blood donation requests from donors',
+    category: 'main'
+  },
+  { 
+    icon: FaCog, 
+    label: 'Settings', 
+    path: '/admin/settings',
+    description: 'System configuration and preferences',
+    category: 'settings'
+  }
+];
+
+const DEFAULT_STATISTICS = [
+  {
+    id: 'blood-groups',
+    number: '6',
+    title: 'LISTED BLOOD GROUPS',
+    bgColor: 'bg-gradient-to-br from-red-500 to-red-600',
+    fullDetailText: 'FULL DETAIL',
+    description: 'Total number of blood group types in system',
+    trend: '+2.5%',
+    trendDirection: 'up'
+  },
+  {
+    id: 'registered-groups',
+    number: '9',
+    title: 'REGISTERED BLOOD GROUP',
+    bgColor: 'bg-gradient-to-br from-pink-500 to-pink-600',
+    fullDetailText: 'FULL DETAIL',
+    description: 'Active registered blood groups',
+    trend: '+5.2%',
+    trendDirection: 'up'
+  },
+  {
+    id: 'total-queries',
+    number: '0',
+    title: 'TOTAL QUERIES',
+    bgColor: 'bg-gradient-to-br from-red-400 to-pink-500',
+    fullDetailText: 'FULL DETAIL',
+    description: 'Contact form queries received',
+    trend: '0%',
+    trendDirection: 'neutral'
+  },
+  {
+    id: 'blood-requests',
+    number: '5',
+    title: 'TOTAL BLOOD REQUEST RECEIVED',
+    bgColor: 'bg-gradient-to-br from-pink-400 to-red-500',
+    fullDetailText: 'FULL DETAIL',
+    description: 'Blood donation requests from donors',
+    trend: '+12.3%',
+    trendDirection: 'up'
+  }
+];
+
+// Simple utility functions
+const formatNumber = (num) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toString();
+};
+
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+};
+
+const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(new Date(date));
+};
+
+const getTrendIndicator = (direction) => {
+  if (direction > 0) {
+    return {
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+      symbol: '↗'
+    };
+  } else if (direction < 0) {
+    return {
+      color: 'text-red-600',
+      bgColor: 'bg-red-100',
+      symbol: '↘'
+    };
+  } else {
+    return {
+      color: 'text-gray-600',
+      bgColor: 'bg-gray-100',
+      symbol: '→'
+    };
+  }
+};
+
+const storage = {
+  get: (key, defaultValue = null) => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+      return defaultValue;
+    }
+  },
+  set: (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+};
 
 /**
  * Admin Dashboard Component
