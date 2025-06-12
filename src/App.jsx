@@ -1,7 +1,6 @@
 import React from 'react'
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import AboutUsPage from './pages/home/AboutUs';
-import FindBloodPage from './pages/home/FindBlood';
 import LoginPage from './pages/login/login';
 import RegisterPage from './pages/register/register';
 import NewsPage from './pages/news/News';
@@ -10,6 +9,7 @@ import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import BlogPage from './pages/blog/Blog';
 import Homepage from './pages/home/Home';
+import BloodTypePage from './pages/blood/blood';
 
 function App() {
 
@@ -40,16 +40,16 @@ function App() {
           path: "/blog",
           element: < BlogPage />
         },
+        {
+          path: "/bloodtype",
+          element: <BloodTypePage />
+        },
       ],
     },
 
     {
       path: "/about-us",
       element: <AboutUsPage />,
-    },
-    {
-      path: "/find-blood",
-      element: <FindBloodPage />,
     },
     {
       path: "/login",
