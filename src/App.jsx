@@ -8,6 +8,8 @@ import RegisterPage from './pages/register/register';
 import NewsPage from './pages/news/News';
 import NewsDetail from './pages/news/NewsDetail';
 import Dashboard from './pages/admin/Dashboard';
+import DonorList from './pages/admin/DonorList';
+import AddDonor from './pages/admin/AddDonor';
 
 function App() {
 
@@ -37,10 +39,16 @@ function App() {
       element: <RegisterPage/>,
     },     {
       path: "/news/:id",
-      element: <NewsDetail/>,    },
-    {
+      element: <NewsDetail/>,    },    {
       path: "/admin/dashboard",
       element: <Dashboard/>,
+    },    {
+      path: "/admin/donor-list",
+      element: <DonorList/>,
+    },
+    {
+      path: "/admin/add-donor",
+      element: <AddDonor/>,
     },
   ]);
   return (

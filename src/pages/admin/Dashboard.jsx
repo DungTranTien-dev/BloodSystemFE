@@ -1,4 +1,3 @@
-
 /**
  * ============================================
  * BLOODBANK & DONOR MANAGEMENT SYSTEM
@@ -37,6 +36,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import { 
   FaChevronRight,      // Arrow icon for navigation indicators
   FaTachometerAlt,     // Dashboard/speedometer icon
@@ -47,7 +47,9 @@ import {
   FaEnvelope,          // Email/envelope icon for messages
   FaCog,               // Settings/gear icon
   FaChartBar,          // Chart/analytics icon
-  FaBell               // Notification bell icon
+  FaBell,              // Notification bell icon
+  FaSignOutAlt,        // Logout icon
+  FaChevronDown        // Dropdown arrow icon
 } from 'react-icons/fa';
 
 // ============================================
@@ -426,10 +428,26 @@ const storage = {
  * <Dashboard />
  */
 const Dashboard = () => {
+  const navigate = useNavigate();
   
   // ============================================
   // STATE MANAGEMENT
   // ============================================
+  
+  /**
+   * USER STATE
+   * Gets user info from localStorage for display and authentication
+   */
+  const [userInfo, setUserInfo] = useState(() => ({
+    email: localStorage.getItem('userEmail') || 'admin@lifestream.com',
+    role: localStorage.getItem('userRole') || 'admin'
+  }));
+  
+  /**
+   * DROPDOWN STATE
+   * Controls the visibility of user dropdown menu
+   */
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   
   /**
    * ACTIVE MENU STATE
@@ -453,6 +471,21 @@ const Dashboard = () => {
    * In production, this would be fetched from an API
    */
   const [statisticsData, setStatisticsData] = useState(DEFAULT_STATISTICS);
+
+  // ============================================
+  // LOGOUT HANDLER
+  // ============================================
+  
+  /**
+   * LOGOUT FUNCTION
+   * Clears user authentication data and redirects to login
+   */
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('activeMenu');
+    navigate('/login');
+  }, [navigate]);
 
   // ============================================
   // MEMOIZED VALUES (PERFORMANCE OPTIMIZATION)
@@ -529,7 +562,26 @@ const Dashboard = () => {
    */
   useEffect(() => {
     storage.set('activeMenu', activeMenu);
-  }, [activeMenu]); // Run whenever activeMenu changes  // ============================================
+  }, [activeMenu]); // Run whenever activeMenu changes
+
+  /**
+   * CLOSE DROPDOWN ON OUTSIDE CLICK
+   * Handles clicking outside the user dropdown to close it
+   */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserDropdown && !event.target.closest('.user-dropdown')) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserDropdown]);
+
+  // ...existing code...
   // COMPONENT DEFINITIONS (NESTED COMPONENTS)
   // ============================================
 
@@ -681,31 +733,20 @@ const Dashboard = () => {
   // ============================================
   // EVENT HANDLERS
   // ============================================
-
   /**
    * HANDLE MENU ITEM CLICK
    * 
    * Updates the active menu state and handles navigation.
-   * In a production app, this would integrate with React Router
-   * for actual page navigation.
+   * Navigates to the appropriate page based on the menu item clicked.
    * 
    * @param {string} menuLabel - Display label of the clicked menu item
    * @param {string} path - URL path for navigation
-   * 
-   * FUTURE ENHANCEMENTS:
-   * - Integrate with React Router for actual navigation
-   * - Add loading states during navigation
-   * - Handle navigation errors
-   * - Add breadcrumb updates
    */
   const handleMenuClick = (menuLabel, path) => {
     setActiveMenu(menuLabel);
     
-    // TODO: Add React Router navigation
-    // navigate(path);
-    
-    // TODO: Add analytics tracking
-    // trackEvent('menu_click', { menu: menuLabel, path });
+    // Navigate to the specified path
+    navigate(path);
     
     console.log(`Navigating to: ${path}`);
   };
@@ -906,8 +947,7 @@ const Dashboard = () => {
         - Scrollable content area for long pages
       */}
       <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* TOP HEADER BAR */}
+          {/* TOP HEADER BAR */}
         <header className="bg-white shadow-lg border-b border-slate-200">
           <div className="flex items-center justify-between px-6 py-4">
             
@@ -922,15 +962,46 @@ const Dashboard = () => {
             </div>
             
             {/* USER ACCOUNT SECTION */}
-            <div className="flex items-center space-x-4">
-              <span className="text-slate-700 font-medium">Account</span>
-              <div className="flex items-center space-x-2 cursor-pointer hover:bg-red-50 rounded-lg p-2 transition-colors">
-                {/* USER AVATAR */}
-                <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">A</span>
-                </div>
-                {/* DROPDOWN INDICATOR */}
-                <FaChevronRight className="text-slate-400 text-xs" />
+            <div className="relative flex items-center space-x-4">
+              <span className="text-slate-700 font-medium">Welcome, {userInfo.role === 'admin' ? 'Admin' : 'User'}</span>
+                {/* USER DROPDOWN */}
+              <div className="relative user-dropdown">
+                <button
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  className="flex items-center space-x-2 cursor-pointer hover:bg-red-50 rounded-lg p-2 transition-colors"
+                >
+                  {/* USER AVATAR */}
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {userInfo.email.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  
+                  {/* USER EMAIL */}
+                  <span className="text-sm text-slate-600 hidden md:block">
+                    {userInfo.email}
+                  </span>
+                  
+                  {/* DROPDOWN INDICATOR */}
+                  <FaChevronDown className="text-slate-400 text-xs" />
+                </button>
+                
+                {/* DROPDOWN MENU */}
+                {showUserDropdown && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-sm font-medium text-slate-800">Signed in as</p>
+                      <p className="text-xs text-slate-600 truncate">{userInfo.email}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <FaSignOutAlt className="mr-2 text-xs" />
+                      Sign out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
