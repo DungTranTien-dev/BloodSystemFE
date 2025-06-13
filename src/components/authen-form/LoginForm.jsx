@@ -16,18 +16,41 @@ function LoginForm() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  // Sample accounts for testing
+  const sampleAccounts = {
+    admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
+    user: { email: "user@lifestream.com", password: "user123", role: "user" }
+  };
 
   const handleLogin = (values) => {
     console.log("Login values:", values);
     setLoading(true);
+    
     setTimeout(() => {
       setLoading(false);
-      if (values.email === "admin@test.com" && values.password === "password") {
-        message.success("Login successful! Redirecting...");
-      } else {
+      
+      // Check for admin account
+      if (values.email === sampleAccounts.admin.email && values.password === sampleAccounts.admin.password) {
+        message.success("Admin login successful! Redirecting to dashboard...");
+        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('userEmail', values.email);
+        setTimeout(() => {
+          navigate('/admin/dashboard');
+        }, 1000);
+      }
+      // Check for regular user account
+      else if (values.email === sampleAccounts.user.email && values.password === sampleAccounts.user.password) {
+        message.success("Login successful! Redirecting to home...");
+        localStorage.setItem('userRole', 'user');
+        localStorage.setItem('userEmail', values.email);
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
+      }
+      else {
         message.error("Invalid email or password!");
       }
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -102,9 +125,7 @@ function LoginForm() {
             >
               Sign In
             </Button>
-          </Form.Item>
-
-          <div className="text-center">
+          </Form.Item>          <div className="text-center">
             <p className="text-gray-700 text-base">
               Don't have an account?{" "}
               <span
@@ -114,6 +135,19 @@ function LoginForm() {
                 Create Account
               </span>
             </p>
+          </div>
+
+          {/* Demo Accounts Info */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">Demo Accounts:</h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>
+                <strong>Admin:</strong> admin@lifestream.com / admin123
+              </div>
+              <div>
+                <strong>User:</strong> user@lifestream.com / user123
+              </div>
+            </div>
           </div>
         </Form>
       </div>
