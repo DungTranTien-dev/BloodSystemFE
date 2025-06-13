@@ -1,7 +1,6 @@
 import React from "react";
 import { FaHospital, FaTruck, FaBuilding, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
-import Header from "../../components/ui/Header";
-import Footer from "../../components/ui/Footer";
+
 
 const FeatureCard = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-3 hover:bg-red-50 text-center">
@@ -42,7 +41,6 @@ const Homepage = () => {
 
   return (
     <div className="bg-slate-50 text-slate-800 font-sans antialiased">
-      <Header />
 
       <section className="relative h-[80vh] flex items-center justify-center text-white overflow-hidden">
         <img 
@@ -95,7 +93,6 @@ const Homepage = () => {
         </div>
       </section>
 
-      <Footer/>
     </div>
   );
 };
