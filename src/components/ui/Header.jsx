@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHeartbeat } from 'react-icons/fa'; // Sử dụng icon khác cho logo
+import { jwtDecode } from 'jwt-decode';
+
+
 
 const NavLink = ({ children, onClick }) => (
   <li
@@ -13,6 +16,29 @@ const NavLink = ({ children, onClick }) => (
 
 function Header() {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserName(decoded?.UserName || "User");
+      } catch (err) {
+        console.error("Invalid token:", err);
+        localStorage.removeItem("token"); // clear if invalid
+        setUserName(null);
+      }
+    }
+  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    message.success("Logged out successfully");
+    navigate("/login");
+  };
+  
+
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
@@ -41,19 +67,34 @@ function Header() {
 
           {/* === PHẦN THAY ĐỔI: THÊM NÚT REGISTER === */}
           {/* Auth Buttons */}
+          {/* Auth Buttons */}
           <div className="flex items-center space-x-3">
-            <button
-              className="px-6 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-            <button
-              className="px-3.5 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
-              onClick={() => navigate("/register")}
-            >
-              Register
-            </button>
+            {userName ? (
+              <>
+                <span className="text-slate-700 font-medium">Hi, {userName}</span>
+                <button
+                  className="px-4 py-2 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 transition"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="px-6 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+                <button
+                  className="px-3.5 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
+                  onClick={() => navigate("/register")}
+                >
+                  Register
+                </button>
+              </>
+            )}
           </div>
           {/* === KẾT THÚC PHẦN THAY ĐỔI === */}
           

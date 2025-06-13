@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Input, Form, Checkbox, message } from "antd";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Navigate, useNavigate } from 'react-router-dom';
+import api from '../../configs/axios';
 
 // THAY ĐỔI 1: Đổi màu chữ của Logo sang màu tối
 const Logo = () => (
@@ -17,17 +18,46 @@ function LoginForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (values) => {
-    console.log("Login values:", values);
+  // const handleLogin = (values) => {
+  //   console.log("Login values:", values);
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //     if (values.email === "admin@test.com" && values.password === "password") {
+  //       message.success("Login successful! Redirecting...");
+  //     } else {
+  //       message.error("Invalid email or password!");
+  //     }
+  //   }, 2000);
+  // };
+
+  const handleLogin = async (values) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (values.email === "admin@test.com" && values.password === "password") {
-        message.success("Login successful! Redirecting...");
-      } else {
+    try {
+      const response = await api.post('/Auth/login', {
+        email: values.email,
+        password: values.password
+      });
+
+      const { accessToken, refreshToken } = response.data.result;
+
+      // Lưu accessToken vào localStorage
+      localStorage.setItem("token", accessToken);
+      
+
+      message.success("Login successful!");
+      navigate('/'); // hoặc navigate đến dashboard hay trang chính
+
+    } catch (error) {
+      if (error.response?.status === 401) {
         message.error("Invalid email or password!");
+      } else {
+        message.error("Something went wrong. Please try again.");
       }
-    }, 2000);
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
