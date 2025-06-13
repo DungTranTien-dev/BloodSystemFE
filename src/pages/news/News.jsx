@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { newsData } from "./newsData";
+import { newsData } from "./NewsData";
 import Footer from "../../components/ui/Footer";
 
 const NewsPage = () => {

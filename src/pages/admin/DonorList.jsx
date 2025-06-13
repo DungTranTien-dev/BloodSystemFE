@@ -81,8 +81,9 @@ const DonorList = () => {
   const [donors, setDonors] = useState([]);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState('all');
-  const [isLoading, setIsLoading] = useState(false);  // Load donors from localStorage on component mount
+  const [filterBy, setFilterBy] = useState('all');  const [isLoading, setIsLoading] = useState(false);
+
+  // Load donors from localStorage on component mount
   useEffect(() => {
     const loadDonors = () => {
       const savedDonors = JSON.parse(localStorage.getItem('donors') || '[]');
