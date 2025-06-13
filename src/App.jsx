@@ -10,6 +10,7 @@ import Footer from './components/ui/Footer';
 import BlogPage from './pages/blog/Blog';
 import Homepage from './pages/home/Home';
 import BloodTypePage from './pages/blood/blood';
+import { persistor, store } from './redux/store';
 
 function App() {
 
@@ -59,14 +60,13 @@ function App() {
       path: "/register",
       element: <RegisterPage />,
     },
-
-    // {
-    //   path: "/news/:id",
-    //   element: <NewsDetail />,
-    // },
   ]);
   return (
-    <RouterProvider router={router} />
+     <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <RouterProvider router={router} />
+      </PersistGate>
+    </Provider>
   )
 }
 
