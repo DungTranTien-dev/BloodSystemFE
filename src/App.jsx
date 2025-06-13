@@ -1,6 +1,5 @@
 import React from 'react'
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
-import AboutUsPage from './pages/home/AboutUs';
 import LoginPage from './pages/login/login';
 import RegisterPage from './pages/register/register';
 import NewsPage from './pages/news/News';
@@ -9,8 +8,11 @@ import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import BlogPage from './pages/blog/Blog';
 import Homepage from './pages/home/Home';
+import AboutUsPage from './pages/home/AboutUs';
 import BloodTypePage from './pages/blood/blood';
 import { persistor, store } from './redux/store';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 function App() {
 
@@ -45,12 +47,11 @@ function App() {
           path: "/bloodtype",
           element: <BloodTypePage />
         },
+        {
+          path: "/about-us",
+          element: <AboutUsPage />,
+        },
       ],
-    },
-
-    {
-      path: "/about-us",
-      element: <AboutUsPage />,
     },
     {
       path: "/login",
@@ -62,7 +63,7 @@ function App() {
     },
   ]);
   return (
-     <Provider store={store}>
+    <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <RouterProvider router={router} />
       </PersistGate>
