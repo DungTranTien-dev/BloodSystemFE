@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { newsData } from "./newsData";
+import { newsData } from "./NewsData";
 import Footer from "../../components/ui/Footer";
 
 const NewsPage = () => {
@@ -10,6 +10,7 @@ const NewsPage = () => {
 
   return (
     <div className="bg-slate-50 text-slate-800">
+      <Header />
 
       <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
@@ -35,10 +36,11 @@ const NewsPage = () => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            ))}          </div>
         </div>
       </section>
+      
+      <Footer />
     </div>
   );
 };
