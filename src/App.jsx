@@ -13,6 +13,7 @@ import BloodTypePage from './pages/blood/blood';
 import { persistor, store } from './redux/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import Dashboard from './pages/admin/Dashboard';
 
 function App() {
 
@@ -60,6 +61,10 @@ function App() {
     {
       path: "/register",
       element: <RegisterPage />,
+    },
+     {
+      path: "/dashboard",
+      element: <Dashboard />,
     },
   ]);
   return (
