@@ -81,7 +81,8 @@ const DonorList = () => {
   const [donors, setDonors] = useState([]);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState('all');  const [isLoading, setIsLoading] = useState(false);
+  const [filterBy, setFilterBy] = useState('all');
+  // Đã xóa: const [isLoading, setIsLoading] = useState(false); vì không được sử dụng
 
   // Load donors from localStorage on component mount
   useEffect(() => {

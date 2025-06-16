@@ -14,6 +14,7 @@ import { persistor, store } from './redux/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import Dashboard from './pages/admin/Dashboard';
+import DonorBlood from './pages/DonorBlood/DonorBlood';
 
 function App() {
 
@@ -65,6 +66,10 @@ function App() {
      {
       path: "/dashboard",
       element: <Dashboard />,
+    },
+    {
+      path: "/donorblood",
+      element: <DonorBlood />,
     },
   ]);
   return (
