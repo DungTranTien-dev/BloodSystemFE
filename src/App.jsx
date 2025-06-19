@@ -15,6 +15,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import Dashboard from './pages/admin/Dashboard';
 import DonorBlood from './pages/DonorBlood/DonorBlood';
+import QAPage from './pages/Q&A/Q&A';
 
 function App() {
 
@@ -52,6 +53,10 @@ function App() {
         {
           path: "/about-us",
           element: <AboutUsPage />,
+        },
+        {
+          path: "/Q&A",
+          element: <QAPage />,
         },
       ],
     },
