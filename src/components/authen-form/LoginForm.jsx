@@ -21,21 +21,18 @@ function LoginForm() {
     admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
     user: { email: "user@lifestream.com", password: "user123", role: "user" }
   };
-
   const handleLogin = (values) => {
-    console.log("Login values:", values);
     setLoading(true);
     
     setTimeout(() => {
       setLoading(false);
-      
-      // Check for admin account
+        // Check for admin account
       if (values.email === sampleAccounts.admin.email && values.password === sampleAccounts.admin.password) {
-        message.success("Admin login successful! Redirecting to dashboard...");
+        message.success("Admin login successful! Redirecting to admin panel...");
         localStorage.setItem('userRole', 'admin');
         localStorage.setItem('userEmail', values.email);
         setTimeout(() => {
-          navigate('/admin/dashboard');
+          navigate('/admin');
         }, 1000);
       }
       // Check for regular user account

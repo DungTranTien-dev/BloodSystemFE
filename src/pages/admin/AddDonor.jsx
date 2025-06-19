@@ -135,11 +135,8 @@ const AddDonor = () => {
         id: Date.now(),
         donorNo,
         donationHistory: [],
-        deferralHistory: []
-      };
+        deferralHistory: []      };
 
-      console.log('New donor data:', newDonor);
-      
       // Save to localStorage (in real app, this would be API call)
       const updatedDonors = [...existingDonors, newDonor];
       localStorage.setItem('donors', JSON.stringify(updatedDonors));

@@ -29,15 +29,11 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 const RegisterForm = () => {
-    const [form] = Form.useForm();
-
-    const onFinish = (values) => {
-        console.log('Form values:', values);
+    const [form] = Form.useForm();    const onFinish = (values) => {
         message.success('Đăng ký thành công!');
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
         message.error('Vui lòng kiểm tra lại thông tin!');
     };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { FaHospital, FaTruck, FaBuilding, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import Header from "../../components/ui/Header";
 
 
 const FeatureCard = ({ icon, title, description }) => (
@@ -38,10 +39,10 @@ const Homepage = () => {
     { name: "NSS", description: "National Service Scheme", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop" },
     { name: "YMCA", description: "Young Men's Christian Association", image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2940&auto=format&fit=crop" },
   ];
-
   return (
     <div className="bg-slate-50 text-slate-800 font-sans antialiased">
-
+      <Header />
+      
       <section className="relative h-[80vh] flex items-center justify-center text-white overflow-hidden">
         <img 
           src="https://benhviennhitrunguong.gov.vn/wp-content/uploads/2014/05/82feb3b54937f356ae4a240a8710782b.jpeg"

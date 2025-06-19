@@ -131,9 +131,8 @@ const DonorList = () => {
   const handleBackToList = () => {
     setSelectedDonor(null);
   };
-
   const handleBackToDashboard = () => {
-    navigate('/admin/dashboard');
+    navigate('/admin');
   };
 
   const handleCollectBlood = (donor) => {
@@ -366,7 +365,7 @@ const DonorList = () => {
               className="flex items-center space-x-2 text-slate-600 hover:text-red-600 transition-colors"
             >
               <FaArrowLeft className="text-sm" />
-              <span className="font-medium">Back to Dashboard</span>
+              <span className="font-medium">Back to Admin Panel</span>
             </button>
             <h1 className="text-2xl font-bold text-slate-800">Donor List</h1>
           </div>

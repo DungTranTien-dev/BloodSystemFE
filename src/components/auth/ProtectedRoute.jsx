@@ -14,10 +14,17 @@ const ProtectedRoute = ({
   children, 
   requiredRole = null, 
   redirectTo = '/login' 
-}) => {
-  // Get authentication data from localStorage
+}) => {  // Get authentication data from localStorage
   const userRole = localStorage.getItem('userRole');
   const userEmail = localStorage.getItem('userEmail');
+
+  // FOR DEVELOPMENT: Can bypass authentication if VITE_BYPASS_AUTH is set
+  const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
+  
+  if (bypassAuth) {
+    // In development mode with bypass enabled, allow access without authentication
+    return children;
+  }
 
   // Check if user is authenticated
   const isAuthenticated = userRole && userEmail;
