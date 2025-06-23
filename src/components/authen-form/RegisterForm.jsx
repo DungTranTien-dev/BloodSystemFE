@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Form,
     Input,
@@ -29,8 +30,16 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 const RegisterForm = () => {
-    const [form] = Form.useForm();    const onFinish = (values) => {
-        message.success('Đăng ký thành công!');
+    const [form] = Form.useForm();
+    const navigate = useNavigate();
+
+    const onFinish = (values) => {
+        message.success('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+        
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+            navigate('/login');
+        }, 2000);
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -43,10 +52,27 @@ const RegisterForm = () => {
 
     return (
         // GIỮ NGUYÊN KHUNG FORM NỀN TRẮNG, BO GÓC, ĐỔ BÓNG
-        <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 md:p-12">
-            <div className="text-center bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-t-2xl -mt-8 md:-mt-12 -mx-8 md:-mx-12 mb-8 px-8 py-5">
+        <div className="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 md:p-12">            <div className="text-center bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-t-2xl -mt-8 md:-mt-12 -mx-8 md:-mx-12 mb-8 px-8 py-5">
                 <HeartOutlined className="text-6xl mb-3" />
                 <Title level={2} className="!text-white tracking-tight text-5xl">Đăng Ký tài khoản</Title>
+            </div>
+
+            {/* Prominent "Already have account?" notice */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-blue-800 font-semibold">Đã có tài khoản?</p>
+                        <p className="text-blue-600 text-sm">Đăng nhập ngay để truy cập hệ thống</p>
+                    </div>
+                    <Button 
+                        type="primary" 
+                        onClick={() => navigate('/login')}
+                        className="!bg-gradient-to-r !from-blue-500 !to-blue-600 !border-none !shadow-lg hover:!shadow-xl !transform hover:!scale-105 !transition-all !duration-300"
+                        icon={<UserOutlined />}
+                    >
+                        Đăng Nhập
+                    </Button>
+                </div>
             </div>
 
             <Form
@@ -102,12 +128,28 @@ const RegisterForm = () => {
                     </Row>
                     <Form.Item name="chronicDiseases" label="Bệnh mãn tính (nếu có)"><Checkbox.Group><Row>{chronicDiseaseOptions.map(i => <Col xs={24} sm={12} md={8} key={i}><Checkbox value={i}>{i}</Checkbox></Col>)}</Row></Checkbox.Group></Form.Item>
                     <Form.Item name="diseaseDescription" label="Mô tả chi tiết bệnh (nếu có)"><TextArea rows={3} placeholder="Mô tả chi tiết tình trạng sức khỏe..." /></Form.Item>
-                </div>
-
-                <div className="text-center mt-8">
-                    <Space size="large">
-                        <Button size="large" onClick={() => form.resetFields()} className="!h-12 !px-8">Làm mới</Button>
-                        <Button type="primary" htmlType="submit" size="large" className="!h-12 !bg-gradient-to-r !from-red-500 !to-pink-600 !text-white !font-bold hover:!opacity-90 !px-10 !border-none" icon={<HeartOutlined />}>Đăng Ký Hiến Máu</Button>
+                </div>                <div className="text-center mt-8">
+                    <Space size="large" direction="vertical" className="w-full">
+                        {/* Back to Login Button - Made prominent */}
+                        <Button 
+                            size="large" 
+                            onClick={() => navigate('/login')}
+                            className="!h-12 !px-8 !bg-gradient-to-r !from-blue-500 !to-blue-600 !text-white !font-bold hover:!opacity-90 !border-none !shadow-lg hover:!shadow-xl !transform hover:!scale-105 !transition-all !duration-300"
+                            icon={<UserOutlined />}
+                        >
+                            ← Về Trang Đăng Nhập
+                        </Button>
+                        
+                        {/* Submit button only */}
+                        <Button 
+                            type="primary" 
+                            htmlType="submit" 
+                            size="large" 
+                            className="!h-12 !bg-gradient-to-r !from-red-500 !to-pink-600 !text-white !font-bold hover:!opacity-90 !px-10 !border-none !shadow-lg hover:!shadow-xl !transform hover:!scale-105 !transition-all !duration-300" 
+                            icon={<HeartOutlined />}
+                        >
+                            Đăng Ký Hiến Máu
+                        </Button>
                     </Space>
                 </div>
             </Form>

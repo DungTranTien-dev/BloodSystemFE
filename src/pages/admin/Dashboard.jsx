@@ -45,8 +45,7 @@ import {
   FaSearch,            // Search/magnifying glass icon
   FaEdit,              // Edit/pencil icon for content management
   FaEnvelope,          // Email/envelope icon for messages
-  FaCog,               // Settings/gear icon
-  FaChartBar,          // Chart/analytics icon
+  FaCog,               // Settings/gear icon  FaChartBar,          // Chart/analytics icon
   FaBell,              // Notification bell icon
   FaSignOutAlt,        // Logout icon
   FaChevronDown        // Dropdown arrow icon
@@ -107,6 +106,12 @@ const MENU_ITEMS = [
     label: 'Donor List', 
     path: '/admin/donors',
     description: 'View and manage registered blood donors, their information and history',
+    category: 'main'  },
+  { 
+    icon: FaBell, 
+    label: 'Blood Requests', 
+    path: '/admin/blood-requests',
+    description: 'Manage incoming blood donation requests from patients',
     category: 'main'
   },
   { 

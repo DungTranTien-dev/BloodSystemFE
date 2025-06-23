@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaHeart, FaTint, FaInfoCircle, FaHospital, FaSearch, FaFilter, FaPlay } from "react-icons/fa";
-import Header from "../../components/ui/Header";
+import Layout from "../../components/ui/Layout";
 
 const BloodTypePage = () => {
   const [selectedType, setSelectedType] = useState(null);
@@ -78,11 +78,8 @@ const BloodTypePage = () => {
                          blood.description.toLowerCase().includes(searchTerm.toLowerCase());
     if (filterType === "all") return matchesSearch;
     return matchesSearch && blood.type.includes(filterType);
-  });
-  return (
-    <div className="min-h-screen bg-gradient-to-r from-red-500 to-pink-600">
-      <Header />
-      
+  });  return (
+    <Layout className="bg-gradient-to-r from-red-500 to-pink-600">
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -199,11 +196,10 @@ const BloodTypePage = () => {
         <div className="text-center">          <button className="bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center mx-auto">
             <FaHospital className="mr-2" />
             Find Local Donation Centers
-          </button>
-        </div>
+          </button>        </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

@@ -1,24 +1,23 @@
 import React from 'react';
-import {  useParams } from 'react-router-dom';
-import { newsData } from './newsData';
-import Header from '../../components/ui/Header';
-import Footer from '../../components/ui/Footer';
+import { useParams } from 'react-router-dom';
+import { newsData } from './NewsData';
+import Layout from '../../components/ui/Layout';
 
 const NewsDetail = () => {
   const { id } = useParams();
   const news = newsData.find((item) => item.id === parseInt(id));
-
   if (!news) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center text-xl font-semibold">
-        Không tìm thấy tin tức
-      </div>
+      <Layout>
+        <div className="min-h-screen bg-slate-100 flex items-center justify-center text-xl font-semibold">
+          Không tìm thấy tin tức
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="bg-slate-50 text-slate-800">
-
+    <Layout>
       <main className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto">
 
@@ -43,12 +42,10 @@ const NewsDetail = () => {
               <p className="text-lg leading-relaxed text-slate-600 whitespace-pre-line">
                 {news.content}
               </p>
-            </div>
-          </div>
+            </div>          </div>
         </div>
       </main>
-
-    </div>
+    </Layout>
   );
 };
 

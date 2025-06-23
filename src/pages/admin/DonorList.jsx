@@ -134,33 +134,27 @@ const DonorList = () => {
   const handleBackToDashboard = () => {
     navigate('/admin');
   };
-
   const handleCollectBlood = (donor) => {
-    console.log('Collect blood for donor:', donor.donorName);
     // TODO: Implement blood collection logic
   };
 
   const handleBillPayment = (donor) => {
-    console.log('Bill payment for donor:', donor.donorName);
     // TODO: Implement bill payment logic
   };
 
   const handleCertificate = (donor) => {
-    console.log('Generate certificate for donor:', donor.donorName);
     // TODO: Implement certificate generation
   };
 
   const handleDonorCard = (donor) => {
-    console.log('Generate donor card for donor:', donor.donorName);
     // TODO: Implement donor card generation
   };
+  
   const handleThanksLetter = (donor) => {
-    console.log('Generate thanks letter for donor:', donor.donorName);
     // TODO: Implement thanks letter generation
   };
 
   const handleEditDonor = (donor) => {
-    console.log('Edit donor:', donor.id);
     // TODO: Navigate to edit form with donor data
     // navigate(`/admin/edit-donor/${donor.id}`);
   };

@@ -17,6 +17,9 @@ const SimpleDashboard = React.lazy(() => import('./components/SimpleDashboard'))
 const DonorList = React.lazy(() => import('./pages/admin/DonorList'));
 const AddDonor = React.lazy(() => import('./pages/admin/AddDonor'));
 const DonorDetails = React.lazy(() => import('./pages/admin/DonorDetails'));
+const BloodRequest = React.lazy(() => import('./pages/blood/BloodRequest'));
+const BloodRequests = React.lazy(() => import('./pages/admin/BloodRequests'));
+// const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
 // Loading component for suspense fallback
 const LoadingSpinner = () => (
@@ -70,6 +73,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <BloodTypePage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/blood-request",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BloodRequest />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -143,6 +155,17 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
+      path: "/admin/blood-requests",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <BloodRequests />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
       path: "/admin/donor-details/:id",
       element: (
         <ProtectedRoute>
@@ -158,10 +181,18 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorDetails />
-        </Suspense>
-      ),
+        </Suspense>      ),
       errorElement: <SimpleErrorFallback />,
     },
+    // {
+    //   path: "/create-sample-data",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <SampleDataCreator />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
     // {
     //   path: "/debug",
     //   element: <DebugRoute />,

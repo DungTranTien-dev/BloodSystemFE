@@ -135,7 +135,7 @@ function LoginForm() {
           </div>
 
           {/* Demo Accounts Info */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+          {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Demo Accounts:</h3>
             <div className="text-xs text-gray-600 space-y-1">
               <div>
@@ -145,7 +145,7 @@ function LoginForm() {
                 <strong>User:</strong> user@lifestream.com / user123
               </div>
             </div>
-          </div>
+          </div> */}
         </Form>
       </div>
     </div>

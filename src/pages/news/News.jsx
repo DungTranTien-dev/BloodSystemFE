@@ -1,17 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/ui/Header";
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import Layout from "../../components/ui/Layout";
 import { newsData } from "./NewsData";
-import Footer from "../../components/ui/Footer";
 
 const NewsPage = () => {
   const navigate = useNavigate();
-
   return (
-    <div className="bg-slate-50 text-slate-800">
-      <Header />
-
+    <Layout>
       <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -39,9 +34,7 @@ const NewsPage = () => {
             ))}          </div>
         </div>
       </section>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

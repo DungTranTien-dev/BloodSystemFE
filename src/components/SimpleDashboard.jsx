@@ -44,20 +44,24 @@ const SimpleDashboard = () => {
                 className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors w-full"
               >
                 Add New Donor
-              </button>
-              <button 
+              </button>              <button 
                 onClick={() => navigate('/admin/donors')}
                 className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors w-full"
               >
                 View Donor List
+              </button>
+              <button 
+                onClick={() => navigate('/admin/blood-requests')}
+                className="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors w-full"
+              >
+                Blood Requests
               </button>
               <button className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors w-full">
                 Process Requests
               </button>
             </div>
           </div>          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Navigation</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Navigation</h3>            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
               <a href="/admin" className="text-blue-600 hover:underline font-semibold block text-center p-2 bg-white rounded border hover:bg-blue-50 transition-colors">
                 Admin Panel
               </a>
@@ -67,11 +71,11 @@ const SimpleDashboard = () => {
               <a href="/admin/donors" className="text-blue-600 hover:underline block text-center p-2 bg-white rounded border hover:bg-blue-50 transition-colors">
                 Donor List
               </a>
+              <a href="/admin/blood-requests" className="text-purple-600 hover:underline block text-center p-2 bg-white rounded border hover:bg-purple-50 transition-colors">
+                Blood Requests
+              </a>
               <a href="/admin/add-donor" className="text-blue-600 hover:underline block text-center p-2 bg-white rounded border hover:bg-blue-50 transition-colors">
                 Add Donor
-              </a>
-              <a href="/donor-details" className="text-blue-600 hover:underline block text-center p-2 bg-white rounded border hover:bg-blue-50 transition-colors">
-                Donor Details
               </a>
               <a href="/" className="text-blue-600 hover:underline block text-center p-2 bg-white rounded border hover:bg-blue-50 transition-colors">
                 Home
