@@ -61,7 +61,7 @@ const DonorBlood = () => {
           <div className="flex items-center justify-center mb-4">
             <Heart className="w-12 h-12 text-white mr-3 animate-pulse" />
             <h1 className="text-4xl md:text-5xl font-bold text-white">
-              Hiến Máu Cứu Người
+              Đăng ký hiến máu
             </h1>
           </div>
         </div>
