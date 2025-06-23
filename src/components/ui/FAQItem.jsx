@@ -1,37 +1,36 @@
 // File: FAQItem.jsx
 import React, { useState } from 'react';
-import PropTypes from 'prop-types'; // Bước 1: Import PropTypes
+import PropTypes from 'prop-types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-// Bước 2: Loại bỏ hoàn toàn "interface" của TypeScript
-// interface FAQItemProps { ... } -> Đã bị xóa
-
 const FAQItem = ({ question, answer, isOpen = false }) => {
-  // Bước 3: Loại bỏ type annotation ": FAQItemProps" khỏi props
   const [expanded, setExpanded] = useState(isOpen);
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-300">
+    <div className="bg-white shadow-md rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-300">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg"
+        className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-red-200 rounded-lg" // Thay đổi màu focus-ring cho hợp tone
       >
-        <h3 className="text-lg font-semibold text-white pr-4">{question}</h3>
+        {/* === DÒNG ĐƯỢC THAY ĐỔI === */}
+        <h3 className="text-lg font-semibold pr-4 bg-gradient-to-r from-red-700 to-pink-600 bg-clip-text text-transparent">
+          {question}
+        </h3>
+        {/* ========================== */}
+
         <div className="flex-shrink-0">
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-white/80" />
+            <ChevronUp className="w-5 h-5 text-gray-700" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-white/80" />
+            <ChevronDown className="w-5 h-5 text-gray-700" />
           )}
         </div>
       </button>
-      
-      {/* Animation `animate-accordion-down` là một custom animation trong tailwind.config.js,
-          nó vẫn sẽ hoạt động nếu bạn đã định nghĩa nó. */}
+
       {expanded && (
         <div className="px-6 pb-4 animate-accordion-down">
-          <div className="border-t border-white/20 pt-4">
-            <p className="text-white/90 leading-relaxed">{answer}</p>
+          <div className="border-t border-gray-200 pt-4">
+            <p className="text-gray-800 leading-relaxed whitespace-pre-line">{answer}</p>
           </div>
         </div>
       )}
@@ -39,15 +38,9 @@ const FAQItem = ({ question, answer, isOpen = false }) => {
   );
 };
 
-// Bước 4: Thêm PropTypes để thay thế cho interface
 FAQItem.propTypes = {
-  /** Câu hỏi sẽ được hiển thị */
   question: PropTypes.string.isRequired,
-  
-  /** Câu trả lời tương ứng, sẽ được ẩn/hiện */
   answer: PropTypes.string.isRequired,
-  
-  /** Trạng thái mở mặc định của item (không bắt buộc) */
   isOpen: PropTypes.bool
 };
 

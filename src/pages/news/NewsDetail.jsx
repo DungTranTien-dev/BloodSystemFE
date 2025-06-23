@@ -1,8 +1,8 @@
 import React from 'react';
 import {  useParams } from 'react-router-dom';
-import { newsData } from './newsData';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
+import { newsData } from './NewsData';
 
 const NewsDetail = () => {
   const { id } = useParams();

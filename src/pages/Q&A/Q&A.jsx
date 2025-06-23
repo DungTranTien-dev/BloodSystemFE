@@ -5,7 +5,7 @@ import FAQ from '../../components/ui/FAQ';
 const QAPage = () => {
   return (
     // Container chính của trang với background gradient và vị trí tương đối
-    <div className="min-h-screen bg-gradient-to-r from-red-500 to-pink-600 relative overflow-hidden">
+    <div className="min-h-screen bg-White relative overflow-hidden">
       
       {/* Các yếu tố trang trí nền (decorative background elements) */}
       {/* Chúng được đặt trong một div absolute để không ảnh hưởng đến layout của nội dung */}

@@ -64,43 +64,11 @@ const DonorBlood = () => {
               Hiến Máu Cứu Người
             </h1>
           </div>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Mỗi lần hiến máu của bạn có thể cứu sống đến 3 người. Hãy cùng chúng tôi lan tỏa yêu thương!
-          </p>
-        </div>
-
-        {/* Statistics Cards - <Card> được thay bằng <div> */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm border-white/20 text-white rounded-lg">
-            <div className="p-6 text-center">
-              <Heart className="w-8 h-8 mx-auto mb-2 text-red-200" />
-              <div className="text-2xl font-bold">15,000+</div>
-              <div className="text-sm text-white/80">Người đã hiến máu</div>
-            </div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm border-white/20 text-white rounded-lg">
-            <div className="p-6 text-center">
-              <Shield className="w-8 h-8 mx-auto mb-2 text-red-200" />
-              <div className="text-2xl font-bold">45,000+</div>
-              <div className="text-sm text-white/80">Mạng sống được cứu</div>
-            </div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm border-white/20 text-white rounded-lg">
-            <div className="p-6 text-center">
-              <Clock className="w-8 h-8 mx-auto mb-2 text-red-200" />
-              <div className="text-2xl font-bold">24/7</div>
-              <div className="text-sm text-white/80">Hỗ trợ khẩn cấp</div>
-            </div>
-          </div>
         </div>
 
         {/* Registration Form - <Card> và các thành phần con được thay bằng <div> */}
         <div className="bg-white/95 backdrop-blur-sm border-white/20 shadow-2xl rounded-lg">
           <div className="p-6 text-center">
-            <h2 className="text-3xl font-bold text-gray-800 flex items-center justify-center">
-              <Heart className="w-8 h-8 mr-3 text-red-500" />
-              Đăng Ký Hiến Máu
-            </h2>
             <p className="text-lg text-gray-600 mt-2">
               Vui lòng điền thông tin y tế để chúng tôi có thể hỗ trợ bạn tốt nhất
             </p>

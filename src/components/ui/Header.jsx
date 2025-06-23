@@ -34,6 +34,7 @@ function Header() {
             <ul className="flex items-center space-x-8 bold">
               <NavLink onClick={() => navigate("/")}>Home</NavLink>
               <NavLink onClick={() => navigate("/blog")}>Blog</NavLink>
+              <NavLink onClick={() => navigate("/Q&A")}>Q&A</NavLink>
               <NavLink onClick={() => navigate("/about-us")}>About Us</NavLink>
               <NavLink onClick={() => navigate("/bloodtype")}>Blood Group</NavLink>
             </ul>
