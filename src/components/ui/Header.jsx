@@ -33,8 +33,6 @@ function Header() {
               <NavLink onClick={() => navigate("/")}>Home</NavLink>
               <NavLink onClick={() => navigate("/blog")}>Blog</NavLink>
               <NavLink onClick={() => navigate("/about-us")}>About Us</NavLink>
-              <NavLink onClick={() => navigate("/bloodtype")}>Blood Group</NavLink>
-              <NavLink onClick={() => navigate("/blood-request")}>Request Blood</NavLink>
             </ul>
           </nav>
 

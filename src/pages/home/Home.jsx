@@ -52,24 +52,9 @@ const Homepage = () => {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />        <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4 drop-shadow-lg">
             Be a <span className="text-red-500">Hero</span>. Give <span className="text-pink-400">Blood</span>.
-          </h1>
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-8">
+          </h1>          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-8">
             Your blood can save lives. Join the movement today.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => navigate('/blood-request')}
-              className="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-red-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
-            >
-              Request Blood Now
-            </button>
-            <button 
-              onClick={() => navigate('/register')}
-              className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold rounded-full border-2 border-white/30 hover:bg-white/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
-            >
-              Become a Donor
-            </button>
-          </div>
         </div>
       </section>
 
