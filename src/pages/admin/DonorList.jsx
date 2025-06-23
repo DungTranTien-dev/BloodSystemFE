@@ -81,8 +81,7 @@ const DonorList = () => {
   const [donors, setDonors] = useState([]);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState('all');
-  // Đã xóa: const [isLoading, setIsLoading] = useState(false); vì không được sử dụng
+  const [filterBy, setFilterBy] = useState('all');  const [isLoading, setIsLoading] = useState(false);
 
   // Load donors from localStorage on component mount
   useEffect(() => {
@@ -132,37 +131,30 @@ const DonorList = () => {
   const handleBackToList = () => {
     setSelectedDonor(null);
   };
-
   const handleBackToDashboard = () => {
-    navigate('/admin/dashboard');
+    navigate('/admin');
   };
-
   const handleCollectBlood = (donor) => {
-    console.log('Collect blood for donor:', donor.donorName);
     // TODO: Implement blood collection logic
   };
 
   const handleBillPayment = (donor) => {
-    console.log('Bill payment for donor:', donor.donorName);
     // TODO: Implement bill payment logic
   };
 
   const handleCertificate = (donor) => {
-    console.log('Generate certificate for donor:', donor.donorName);
     // TODO: Implement certificate generation
   };
 
   const handleDonorCard = (donor) => {
-    console.log('Generate donor card for donor:', donor.donorName);
     // TODO: Implement donor card generation
   };
+  
   const handleThanksLetter = (donor) => {
-    console.log('Generate thanks letter for donor:', donor.donorName);
     // TODO: Implement thanks letter generation
   };
 
   const handleEditDonor = (donor) => {
-    console.log('Edit donor:', donor.id);
     // TODO: Navigate to edit form with donor data
     // navigate(`/admin/edit-donor/${donor.id}`);
   };
@@ -367,7 +359,7 @@ const DonorList = () => {
               className="flex items-center space-x-2 text-slate-600 hover:text-red-600 transition-colors"
             >
               <FaArrowLeft className="text-sm" />
-              <span className="font-medium">Back to Dashboard</span>
+              <span className="font-medium">Back to Admin Panel</span>
             </button>
             <h1 className="text-2xl font-bold text-slate-800">Donor List</h1>
           </div>

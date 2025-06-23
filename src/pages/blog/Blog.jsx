@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight, FaCalendarAlt, FaUser } from 'react-icons/fa';
+import Header from "../../components/ui/Header";
 
 // Dữ liệu mẫu cho các bài blog
 const blogPosts = [
@@ -75,9 +76,10 @@ const BlogPage = () => {
 
   // Hàm thay đổi trang
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   return (
     <div className="bg-slate-100">
+      <Header />
+      
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-20">
         <div className="container mx-auto px-6 text-center">
