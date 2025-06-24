@@ -2,10 +2,10 @@ import React, {  } from 'react';
 import { Button, Input, Form, Checkbox} from "antd";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Navigate, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { login } from '../../redux/features/userSlice';
 import { toast } from 'react-toastify';
+import api from '../../config/axios';
 
 // THAY ĐỔI 1: Đổi màu chữ của Logo sang màu tối
 const Logo = () => (
@@ -20,16 +20,11 @@ function LoginForm() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  // Sample accounts for testing
-  // const sampleAccounts = {
-  //   admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
-  //   user: { email: "user@lifestream.com", password: "user123", role: "user" }
-  // };
 
    const onFinish = async (values) => {
         console.log('Success:', values);
         try {
-            const response = await axios.post('http://localhost:5101/api/auth/login', values);
+            const response = await api.post('auth/login', values);
             console.log(response);
             toast.success("Login successful!");
 
