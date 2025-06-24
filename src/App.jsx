@@ -1,89 +1,215 @@
-import React from 'react'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
-import LoginPage from './pages/login/login';
-import RegisterPage from './pages/register/register';
-import NewsPage from './pages/news/News';
-import NewsDetail from './pages/news/NewsDetail';
-import Header from './components/ui/Header';
-import Footer from './components/ui/Footer';
-import BlogPage from './pages/blog/Blog';
-import Homepage from './pages/home/Home';
-import AboutUsPage from './pages/home/AboutUs';
-import BloodTypePage from './pages/blood/blood';
-import { persistor, store } from './redux/store';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import Dashboard from './pages/admin/Dashboard';
-import DonorBlood from './pages/DonorBlood/DonorBlood';
-import QAPage from './pages/Q&A/Q&A';
+import React, { Suspense } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import SimpleErrorFallback from './components/ui/SimpleErrorFallback';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+
+// Lazy load components for code splitting
+const Homepage = React.lazy(() => import('./pages/home/Home'));
+const NewsPage = React.lazy(() => import('./pages/news/News'));
+const NewsDetail = React.lazy(() => import('./pages/news/NewsDetail'));
+const BlogPage = React.lazy(() => import('./pages/blog/Blog'));
+const LoginPage = React.lazy(() => import('./pages/login/login'));
+const RegisterPage = React.lazy(() => import('./pages/register/register'));
+const AboutUs = React.lazy(() => import('./pages/home/AboutUs'));
+const BloodTypePage = React.lazy(() => import('./pages/blood/blood'));
+const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
+const SimpleDashboard = React.lazy(() => import('./components/SimpleDashboard'));
+const DonorList = React.lazy(() => import('./pages/admin/DonorList'));
+const AddDonor = React.lazy(() => import('./pages/admin/AddDonor'));
+const DonorDetails = React.lazy(() => import('./pages/admin/DonorDetails'));
+const BloodRequest = React.lazy(() => import('./pages/blood/BloodRequest'));
+const BloodRequests = React.lazy(() => import('./pages/admin/BloodRequests'));
+// const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
+
+// Loading component for suspense fallback
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p className="mt-4 text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
 
 function App() {
-
   const router = createBrowserRouter([
     {
       path: "/",
       element: (
-        <>
-          <Header />
-          <Outlet />
-          <Footer />
-        </>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Homepage />
+        </Suspense>
       ),
-      children: [
-        {
-          path: "/",
-          element: <Homepage />,
-        },
-        {
-          path: "/news",
-          element: <NewsPage />,
-        },
-        {
-          path: "/news/:id",
-          element: <NewsDetail />,
-        },
-        {
-          path: "/blog",
-          element: < BlogPage />
-        },
-        {
-          path: "/bloodtype",
-          element: <BloodTypePage />
-        },
-        {
-          path: "/about-us",
-          element: <AboutUsPage />,
-        },
-        {
-          path: "/Q&A",
-          element: <QAPage />,
-        },
-      ],
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/news",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <NewsPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/news/:id",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <NewsDetail />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/blog",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BlogPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },    {
+      path: "/bloodtype",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BloodTypePage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/blood-request",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BloodRequest />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/about-us",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <AboutUs />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
     },
     {
       path: "/login",
-      element: <LoginPage />,
-    },
-    {
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <LoginPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },    {
       path: "/register",
-      element: <RegisterPage />,
-    },
-     {
-      path: "/dashboard",
-      element: <Dashboard />,
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <RegisterPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/donorblood",
-      element: <DonorBlood />,
+      path: "/admin",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Dashboard />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/admin/dashboard",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <SimpleDashboard />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },    {
+      path: "/admin/donors",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <DonorList />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },    {
+      path: "/admin/add-donor",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <AddDonor />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/admin/blood-requests",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <BloodRequests />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/admin/donor-details/:id",
+      element: (
+        <ProtectedRoute>
+          <Suspense fallback={<LoadingSpinner />}>
+            <DonorDetails />
+          </Suspense>
+        </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/donor-details",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DonorDetails />
+        </Suspense>      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    // {
+    //   path: "/create-sample-data",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <SampleDataCreator />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/debug",
+    //   element: <DebugRoute />,
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/test",
+    //   element: <TestRoute />,
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    {
+      path: "*",
+      element: <SimpleErrorFallback />,
     },
   ]);
-  return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <RouterProvider router={router} />
-      </PersistGate>
-    </Provider>
-  )
+
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

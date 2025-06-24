@@ -5,7 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { login } from '../../redux/features/userSlice';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 // THAY ĐỔI 1: Đổi màu chữ của Logo sang màu tối
 const Logo = () => (
@@ -21,22 +21,18 @@ function LoginForm() {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   // Sample accounts for testing
-  const sampleAccounts = {
-    admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
-    user: { email: "user@lifestream.com", password: "user123", role: "user" }
-  };
+  // const sampleAccounts = {
+  //   admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
+  //   user: { email: "user@lifestream.com", password: "user123", role: "user" }
+  // };
 
    const onFinish = async (values) => {
         console.log('Success:', values);
         try {
-            //value thông tin người dùng nhập
             const response = await axios.post('http://localhost:5101/api/auth/login', values);
             console.log(response);
-            //lưu thông tin đăng nhập của ng dùng vào 1 chỗ nào đó mà bất kì đâu cũng có thể sử dụng
-            //cái đó được gọi là redux ==session bên môn prj)
+            toast.success("Login successful!");
 
-            //dispatch :gửi action đến redux store
-            //action: {type: 'user/login', payload: userData}
             dispatch(login(response.data.result));
             localStorage.setItem("token", response.data.result.accessToken);
             // const user = response.data.data;
@@ -49,7 +45,6 @@ function LoginForm() {
             navigate("/");
         } catch (e) {
             console.log(e);
-            //show ra màn hình cho người dùng biết lỗi
             toast.error(e.response.data);
         }
     };
@@ -138,7 +133,7 @@ function LoginForm() {
           </div>
 
           {/* Demo Accounts Info */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+          {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Demo Accounts:</h3>
             <div className="text-xs text-gray-600 space-y-1">
               <div>
@@ -148,7 +143,7 @@ function LoginForm() {
                 <strong>User:</strong> user@lifestream.com / user123
               </div>
             </div>
-          </div>
+          </div> */}
         </Form>
       </div>
     </div>

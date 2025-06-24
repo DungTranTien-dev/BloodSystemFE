@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
-import { MdMail, MdLocationOn, MdWork } from "react-icons/md";
 import { BiSolidQuoteLeft } from "react-icons/bi";
+import Layout from "../../components/ui/Layout";
 
 const AboutUsPage = () => {
   const [animatedNumbers, setAnimatedNumbers] = useState({
@@ -10,27 +10,26 @@ const AboutUsPage = () => {
     years: 0,
     awards: 0,
   });
-
   const teamMembers = [
     {
-      name: "Sarah Johnson",
-      role: "CEO & Founder",
+      name: "Dr. Sarah Johnson",
+      role: "Medical Director",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      quote: "Innovation drives our future",
+      quote: "Every donation saves three lives",
       social: { linkedin: "#", twitter: "#" },
     },
     {
       name: "Michael Chen",
-      role: "CTO",
+      role: "Operations Manager",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-      quote: "Technology shapes possibilities",
+      quote: "Efficiency in service saves time and lives",
       social: { linkedin: "#", github: "#" },
     },
     {
       name: "Emily Rodriguez",
-      role: "Design Director",
+      role: "Community Outreach Coordinator",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-      quote: "Design is storytelling",
+      quote: "Building bridges between donors and recipients",
       social: { twitter: "#", github: "#" },
     },
   ];
@@ -64,45 +63,39 @@ const AboutUsPage = () => {
       }));
     }, 50);
     return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-500 to-pink-600">
+  }, []);  return (
+    <Layout>
       {/* Hero Section */}
-      <section className="relative flex items-center justify-center text-center px-4 py-14.5 bg-gradient-to-r from-red-700 to-pink-600 text-white ">
+      <section className="relative flex items-center justify-center text-center px-4 py-20 bg-gradient-to-r from-red-700 to-pink-600 text-white">
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">Innovate & Create</h1>
+          <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">About Our Blood Bank</h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90 drop-shadow-md">
-            Transforming ideas into digital reality.
+            Saving lives through dedicated service and community support.
           </p>
         </div>
-      </section>
-
-      {/* Vision & Mission */}
+      </section>      {/* Vision & Mission */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
           <div className="bg-gradient-to-br from-red-500 to-pink-600 p-8 rounded-2xl shadow-xl text-white hover:scale-[1.03] transition-all duration-300">
             <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
             <p className="text-lg">
-              To revolutionize digital experiences through innovative solutions and creative excellence.
+              To create a world where no life is lost due to blood shortage by building a robust and efficient blood donation network.
             </p>
           </div>
           <div className="bg-gradient-to-br from-red-500 to-pink-600 p-8 rounded-2xl shadow-xl text-white hover:scale-[1.03] transition-all duration-300">
             <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
             <p className="text-lg">
-              Empowering businesses with cutting-edge technology and exceptional design solutions.
+              Connecting donors with those in need through innovative technology and compassionate service, ensuring safe and timely blood availability.
             </p>
           </div>
         </div>
-      </section>
-
-      {/* Origin Story */}
+      </section>      {/* Origin Story */}
       <section className="py-20 px-4 bg-white/10 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto text-center">
           <BiSolidQuoteLeft className="text-6xl mx-auto mb-6 text-white" />
           <p className="text-xl md:text-2xl mb-8 leading-relaxed text-white italic">
-            "Started in a small garage with big dreams, we've grown into a global creative powerhouse,
-            driven by passion and innovation."
+            "Founded by medical professionals who witnessed the critical need for efficient blood management, 
+            we've grown into a trusted platform serving thousands of lives across the community."
           </p>
         </div>
       </section>
@@ -140,26 +133,24 @@ const AboutUsPage = () => {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Metrics Section */}
+      </section>      {/* Metrics Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-red-500 to-pink-600 text-white">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
             <h3 className="text-4xl font-bold mb-2">{animatedNumbers.clients}+</h3>
-            <p>Happy Clients</p>
+            <p>Lives Saved</p>
           </div>
           <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
             <h3 className="text-4xl font-bold mb-2">{animatedNumbers.projects}+</h3>
-            <p>Projects Completed</p>
+            <p>Blood Donations</p>
           </div>
           <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
             <h3 className="text-4xl font-bold mb-2">{animatedNumbers.years}+</h3>
-            <p>Years Experience</p>
+            <p>Years of Service</p>
           </div>
           <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
             <h3 className="text-4xl font-bold mb-2">{animatedNumbers.awards}</h3>
-            <p>Awards Won</p>
+            <p>Hospital Partners</p>
           </div>
         </div>
       </section>
@@ -183,9 +174,7 @@ const AboutUsPage = () => {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Gratitude Section */}
+      </section>      {/* Gratitude Section */}
       <section className="py-20 px-4 text-center bg-gradient-to-br from-red-500 to-pink-600 text-white">
         <div className="max-w-3xl mx-auto bg-white/10 p-10 rounded-2xl backdrop-blur-sm">
           <h2 className="text-3xl font-bold mb-6">Thank You</h2>
@@ -195,7 +184,7 @@ const AboutUsPage = () => {
           </p>
         </div>
       </section>
-    </div>
+    </Layout>
   );
 };
 

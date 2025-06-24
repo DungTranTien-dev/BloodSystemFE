@@ -45,8 +45,7 @@ import {
   FaSearch,            // Search/magnifying glass icon
   FaEdit,              // Edit/pencil icon for content management
   FaEnvelope,          // Email/envelope icon for messages
-  FaCog,               // Settings/gear icon
-  FaChartBar,          // Chart/analytics icon
+  FaCog,               // Settings/gear icon  FaChartBar,          // Chart/analytics icon
   FaBell,              // Notification bell icon
   FaSignOutAlt,        // Logout icon
   FaChevronDown        // Dropdown arrow icon
@@ -95,8 +94,7 @@ const MENU_ITEMS = [
     path: '/admin/dashboard',
     description: 'Main dashboard overview with key metrics and system status',
     category: 'main'
-  },
-  { 
+  },  { 
     icon: FaUsers, 
     label: 'Blood Group', 
     path: '/admin/blood-group',
@@ -106,8 +104,14 @@ const MENU_ITEMS = [
   { 
     icon: FaUser, 
     label: 'Donor List', 
-    path: '/admin/donor-list',
+    path: '/admin/donors',
     description: 'View and manage registered blood donors, their information and history',
+    category: 'main'  },
+  { 
+    icon: FaBell, 
+    label: 'Blood Requests', 
+    path: '/admin/blood-requests',
+    description: 'Manage incoming blood donation requests from patients',
     category: 'main'
   },
   { 
@@ -473,7 +477,6 @@ const Dashboard = () => {
    * In production, this would be fetched from an API
    */
   const [statisticsData, setStatisticsData] = useState(DEFAULT_STATISTICS);
-
   // ============================================
   // LOGOUT HANDLER
   // ============================================
@@ -743,14 +746,9 @@ const Dashboard = () => {
    * 
    * @param {string} menuLabel - Display label of the clicked menu item
    * @param {string} path - URL path for navigation
-   */
-  const handleMenuClick = (menuLabel, path) => {
+   */  const handleMenuClick = (menuLabel, path) => {
     setActiveMenu(menuLabel);
-    
-    // Navigate to the specified path
     navigate(path);
-    
-    console.log(`Navigating to: ${path}`);
   };
 
   /**
@@ -766,20 +764,20 @@ const Dashboard = () => {
    * - Navigate to specific data views
    * - Export data functionality
    * - Real-time data refresh
-   */
-  const handleStatCardClick = (cardId) => {
-    // TODO: Implement card-specific actions
-    // switch(cardId) {
-    //   case 'blood-groups':
-    //     navigate('/admin/blood-groups');
-    //     break;
-    //   case 'registered-groups':
-    //     openModal('blood-group-details');
-    //     break;
-    //   // ... other cases
-    // }
+   */  const handleStatCardClick = (cardId) => {
+    // Navigate to specific sections based on card clicked
+    const cardRoutes = {
+      'total-donors': '/admin/donors',
+      'blood-groups': '/admin/blood-groups', 
+      'registered-groups': '/admin/blood-groups',
+      'total-queries': '/admin/queries',
+      'blood-requests': '/admin/requests'
+    };
     
-    console.log(`Clicked on stat card: ${cardId}`);
+    const route = cardRoutes[cardId];
+    if (route) {
+      navigate(route);
+    }
   };
 
   // ============================================
@@ -809,9 +807,8 @@ const Dashboard = () => {
   // ============================================
   // MAIN COMPONENT RENDER
   // ============================================
-
   return (
-    <div className="min-h-screen bg-slate-50 flex" role="main">
+    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row" role="main">
       
       {/* ==========================================
           SIDEBAR NAVIGATION SECTION
@@ -819,7 +816,7 @@ const Dashboard = () => {
       
       {/* 
         SIDEBAR CONTAINER
-        Fixed-width navigation panel containing:
+        Responsive navigation panel containing:
         - System branding and version info
         - Main navigation menu organized by categories
         - System information footer
@@ -830,7 +827,7 @@ const Dashboard = () => {
         - Semantic HTML structure with nav, header, ul elements
       */}
       <aside 
-        className="w-64 bg-white shadow-xl text-slate-800 flex flex-col border-r border-slate-200" 
+        className="w-full lg:w-64 bg-white shadow-xl text-slate-800 flex flex-col border-r border-slate-200" 
         role="navigation" 
         aria-label="Main navigation"
       >
@@ -1027,9 +1024,7 @@ const Dashboard = () => {
                 />
               ))}
             </div>
-          </section>
-
-          {/* ADDITIONAL CONTENT PLACEHOLDER */}
+          </section>          {/* ADDITIONAL CONTENT PLACEHOLDER */}
           <section className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
             <h3 className="text-2xl font-bold text-slate-800 mb-6">
               Recent Activities

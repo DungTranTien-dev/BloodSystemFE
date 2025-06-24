@@ -1,5 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaHospital, FaTruck, FaBuilding, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import Layout from "../../components/ui/Layout";
 
 
 const FeatureCard = ({ icon, title, description }) => (
@@ -27,6 +29,8 @@ const CollaboratorCard = ({ name, description, image }) => (
 );
 
 const Homepage = () => {
+  const navigate = useNavigate();
+  
   const donationMethods = [
     { title: "Direct Hospital Donation", icon: <FaHospital />, description: "Visit your nearest hospital to donate blood directly." },
     { title: "Mobile Blood Donation Camps", icon: <FaTruck />, description: "Find mobile camps in your area for convenient donation." },
@@ -36,26 +40,36 @@ const Homepage = () => {
   const collaborators = [
     { name: "NCC", description: "National Civic Council", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2940&auto=format&fit=crop" },
     { name: "NSS", description: "National Service Scheme", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop" },
-    { name: "YMCA", description: "Young Men's Christian Association", image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2940&auto=format&fit=crop" },
-  ];
-
+    { name: "YMCA", description: "Young Men's Christian Association", image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2940&auto=format&fit=crop" },  ];
   return (
-    <div className="bg-slate-50 text-slate-800 font-sans antialiased">
-
+    <Layout className="bg-slate-50 text-slate-800 font-sans antialiased">
       <section className="relative h-[80vh] flex items-center justify-center text-white overflow-hidden">
         <img 
           src="https://benhviennhitrunguong.gov.vn/wp-content/uploads/2014/05/82feb3b54937f356ae4a240a8710782b.jpeg"
           alt="Blood donation background"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-        <div className="relative z-10 text-center px-4">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />        <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4 drop-shadow-lg">
             Be a <span className="text-red-500">Hero</span>. Give <span className="text-pink-400">Blood</span>.
           </h1>
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-8">
             Your blood can save lives. Join the movement today.
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button 
+              onClick={() => navigate('/blood-request')}
+              className="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-red-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
+            >
+              Request Blood Now
+            </button>
+            <button 
+              onClick={() => navigate('/register')}
+              className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold rounded-full border-2 border-white/30 hover:bg-white/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
+            >
+              Become a Donor
+            </button>
+          </div>
         </div>
       </section>
 
@@ -90,10 +104,9 @@ const Homepage = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {collaborators.map((c) => <CollaboratorCard key={c.name} {...c} />)}
           </div>
-        </div>
-      </section>
+        </div>      </section>
 
-    </div>
+    </Layout>
   );
 };
 
