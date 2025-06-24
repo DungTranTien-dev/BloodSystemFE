@@ -21,6 +21,9 @@ import {
     HomeOutlined,
     HeartOutlined
 } from '@ant-design/icons';
+import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -28,9 +31,20 @@ const { Option } = Select;
 const RegisterForm = () => {
     const [form] = Form.useForm();
 
-    const onFinish = (values) => {
-        console.log('Form values:', values);
-        message.success('Đăng ký thành công!');
+    const onFinish = async (values) => {
+        console.log('Success:', values);
+        //400 : bad request
+        //200: success
+        try {
+            //value thông tin người dùng nhập
+            await axios.post('http://localhost:5101/api/auth/register', values);
+            toast.success("Successfully create new account!"); 
+            Navigate("/login");
+        } catch (e) {
+            console.log(e);
+            //show ra màn hình cho người dùng biết lỗi
+            toast.error(e.response.data);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {

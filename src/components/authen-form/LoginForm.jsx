@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Input, Form, Checkbox, message } from "antd";
+import React, {  } from 'react';
+import { Button, Input, Form, Checkbox} from "antd";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/features/userSlice';
+import { toast } from 'sonner';
 
 // THAY ĐỔI 1: Đổi màu chữ của Logo sang màu tối
 const Logo = () => (
@@ -15,43 +19,40 @@ const Logo = () => (
 function LoginForm() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   // Sample accounts for testing
   const sampleAccounts = {
     admin: { email: "admin@lifestream.com", password: "admin123", role: "admin" },
     user: { email: "user@lifestream.com", password: "user123", role: "user" }
   };
 
-  const handleLogin = (values) => {
-    console.log("Login values:", values);
-    setLoading(true);
-    
-    setTimeout(() => {
-      setLoading(false);
-      
-      // Check for admin account
-      if (values.email === sampleAccounts.admin.email && values.password === sampleAccounts.admin.password) {
-        message.success("Admin login successful! Redirecting to dashboard...");
-        localStorage.setItem('userRole', 'admin');
-        localStorage.setItem('userEmail', values.email);
-        setTimeout(() => {
-          navigate('/admin/dashboard');
-        }, 1000);
-      }
-      // Check for regular user account
-      else if (values.email === sampleAccounts.user.email && values.password === sampleAccounts.user.password) {
-        message.success("Login successful! Redirecting to home...");
-        localStorage.setItem('userRole', 'user');
-        localStorage.setItem('userEmail', values.email);
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
-      }
-      else {
-        message.error("Invalid email or password!");
-      }
-    }, 1500);
-  };
+   const onFinish = async (values) => {
+        console.log('Success:', values);
+        try {
+            //value thông tin người dùng nhập
+            const response = await axios.post('http://localhost:5101/api/auth/login', values);
+            console.log(response);
+            //lưu thông tin đăng nhập của ng dùng vào 1 chỗ nào đó mà bất kì đâu cũng có thể sử dụng
+            //cái đó được gọi là redux ==session bên môn prj)
+
+            //dispatch :gửi action đến redux store
+            //action: {type: 'user/login', payload: userData}
+            dispatch(login(response.data.result));
+            localStorage.setItem("token", response.data.result.accessToken);
+            // const user = response.data.data;
+            // if (user.role === 'ADMIN') {
+            //     navigate("/dashboard");
+            // }
+            // else if (user.role === 'USER') {
+            //     navigate("/");
+            // }
+            navigate("/");
+        } catch (e) {
+            console.log(e);
+            //show ra màn hình cho người dùng biết lỗi
+            toast.error(e.response.data);
+        }
+    };
 
   return (
     // Div này không cần thay đổi, nó chỉ dùng để căn giữa
@@ -63,7 +64,7 @@ function LoginForm() {
         <Logo />
         <Form
           form={form}
-          onFinish={handleLogin}
+          onFinish={onFinish}
           layout="vertical"
           className="space-y-6"
         >
@@ -120,7 +121,6 @@ function LoginForm() {
               type="primary"
               htmlType="submit"
               size="large"
-              loading={loading}
               className="w-full !bg-gradient-to-r !from-red-500 !to-pink-600 !text-white !font-bold hover:!opacity-90 transition-all duration-300 transform hover:scale-105 !h-14 !text-lg !border-none"
             >
               Sign In

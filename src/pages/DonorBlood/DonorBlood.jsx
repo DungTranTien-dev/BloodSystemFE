@@ -1,9 +1,10 @@
-
+// File: Index.jsx
 import { useState } from "react";
 import { Calendar, Heart, Clock, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 const Index = () => {
+  // -------------------- STATE --------------------
   const [formData, setFormData] = useState({
     age: "",
     bloodType: "",
@@ -15,29 +16,61 @@ const Index = () => {
     agreeHealth: false
   });
 
+  // Lưu field đang lỗi để tô viền đỏ
+  const [errors, setErrors] = useState({});
+
+  // -------------------- HANDLERS --------------------
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    // Cập nhật form
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Xoá lỗi của field đó (nếu có) khi người dùng đang sửa
+    setErrors(prev => {
+      if (!prev[field]) return prev;
+      const { [field]: _, ...rest } = prev;
+      return rest;
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!formData.age || !formData.bloodType || !formData.weight || !formData.preferredDate || !formData.preferredTime) {
-      toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc (*)");
-      return;
-    }
-    
-    if (!formData.agreeTerms || !formData.agreeHealth) {
-      toast.error("Vui lòng đồng ý với các điều khoản và cam kết sức khỏe");
+
+    // Kiểm tra lỗi
+    const newErrors = {};
+    if (!formData.age)           newErrors.age           = true;
+    if (!formData.bloodType)     newErrors.bloodType     = true;
+    if (!formData.weight)        newErrors.weight        = true;
+    if (!formData.preferredDate) newErrors.preferredDate = true;
+    if (!formData.preferredTime) newErrors.preferredTime = true;
+    if (!formData.agreeTerms)    newErrors.agreeTerms    = true;
+    if (!formData.agreeHealth)   newErrors.agreeHealth   = true;
+
+    // Nếu có lỗi ⇒ cập nhật state + hiện toast
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+
+      const missing = Object.keys(newErrors)
+        .map(key => {
+          switch (key) {
+            case "age":            return "Tuổi";
+            case "bloodType":      return "Nhóm máu";
+            case "weight":         return "Cân nặng";
+            case "preferredDate":  return "Ngày hiến máu";
+            case "preferredTime":  return "Khung giờ";
+            case "agreeTerms":     return "Đồng ý điều khoản";
+            case "agreeHealth":    return "Cam kết sức khỏe";
+            default: return key;
+          }
+        });
+      toast.error(`Vui lòng điền/đồng ý: ${missing.join(", ")}`);
       return;
     }
 
+    // Không lỗi ⇒ thành công
     toast.success("Đăng ký hiến máu thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.");
     console.log("Form submitted:", formData);
-    
+
+    // Reset
     setFormData({
       age: "",
       bloodType: "",
@@ -48,8 +81,10 @@ const Index = () => {
       agreeTerms: false,
       agreeHealth: false
     });
+    setErrors({});
   };
 
+  // -------------------- RENDER --------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-red-50 to-pink-50 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -70,7 +105,8 @@ const Index = () => {
               </div>
             </div>
           </div>
-          <h1 className="text-5xl md:text-5xl font-bold bg-gradient-to-r from-red-600 via-red-500 to-pink-500 bg-clip-text text-transparent mb-4">
+          {/* ➜ antialiased để không mất nét dọc */}
+          <h1 className="text-5xl md:text-5xl font-bold bg-gradient-to-r from-red-600 via-red-500 to-pink-500 bg-clip-text text-transparent mb-4 antialiased leading-tight">
             Đăng ký hiến máu
           </h1>
         </div>
@@ -95,6 +131,7 @@ const Index = () => {
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Tuổi */}
                   <div className="space-y-3 group">
                     <label htmlFor="age" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
                       Tuổi *
@@ -108,10 +145,12 @@ const Index = () => {
                       value={formData.age}
                       onChange={(e) => handleInputChange("age", e.target.value)}
                       required
-                      className="w-full h-14 rounded-xl border-2 border-gray-200 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md"
+                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
+                        ${errors.age ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
                     />
                   </div>
-                  
+
+                  {/* Nhóm máu */}
                   <div className="space-y-3 group">
                     <label htmlFor="bloodType" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
                       Nhóm máu *
@@ -121,7 +160,8 @@ const Index = () => {
                       value={formData.bloodType}
                       onChange={(e) => handleInputChange("bloodType", e.target.value)}
                       required
-                      className="w-full h-14 rounded-xl border-2 border-gray-200 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md"
+                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
+                        ${errors.bloodType ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
                     >
                       <option value="" disabled>Chọn nhóm máu</option>
                       <option value="A+">A+</option>
@@ -134,7 +174,8 @@ const Index = () => {
                       <option value="O-">O-</option>
                     </select>
                   </div>
-                  
+
+                  {/* Cân nặng */}
                   <div className="space-y-3 group">
                     <label htmlFor="weight" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
                       Cân nặng (kg) *
@@ -147,7 +188,8 @@ const Index = () => {
                       value={formData.weight}
                       onChange={(e) => handleInputChange("weight", e.target.value)}
                       required
-                      className="w-full h-14 rounded-xl border-2 border-gray-200 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md"
+                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
+                        ${errors.weight ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
                     />
                   </div>
                 </div>
@@ -161,6 +203,7 @@ const Index = () => {
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Ngày hiến máu */}
                   <div className="space-y-3 group">
                     <label htmlFor="preferredDate" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
                       Ngày muốn hiến máu *
@@ -173,12 +216,14 @@ const Index = () => {
                         value={formData.preferredDate}
                         onChange={(e) => handleInputChange("preferredDate", e.target.value)}
                         required
-                        className="w-full h-14 rounded-xl border-2 border-gray-200 pl-14 pr-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md"
                         min={new Date().toISOString().split('T')[0]}
+                        className={`w-full h-14 rounded-xl border-2 pl-14 pr-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
+                          ${errors.preferredDate ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
                       />
                     </div>
                   </div>
-                  
+
+                  {/* Khung giờ */}
                   <div className="space-y-3 group">
                     <label htmlFor="preferredTime" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
                       Khung giờ mong muốn *
@@ -188,7 +233,8 @@ const Index = () => {
                       value={formData.preferredTime}
                       onChange={(e) => handleInputChange("preferredTime", e.target.value)}
                       required
-                      className="w-full h-14 rounded-xl border-2 border-gray-200 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md"
+                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
+                        ${errors.preferredTime ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
                     >
                       <option value="" disabled>Chọn khung giờ</option>
                       <option value="morning">🌅 Sáng (8:00 - 12:00)</option>
@@ -219,26 +265,30 @@ const Index = () => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Cam kết và điều khoản</h3>
                 
                 <div className="space-y-4">
+                  {/* Điều khoản */}
                   <div className="flex items-start space-x-4 group">
                     <input
                       id="agreeTerms"
                       type="checkbox"
                       checked={formData.agreeTerms}
                       onChange={(e) => handleInputChange("agreeTerms", e.target.checked)}
-                      className="mt-1.5 h-5 w-5 rounded border-2 border-red-300 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200 hover:border-red-400"
+                      className={`mt-1.5 h-5 w-5 rounded border-2 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200
+                        ${errors.agreeTerms ? "border-red-500" : "border-red-300 hover:border-red-400"}`}
                     />
                     <label htmlFor="agreeTerms" className="text-gray-700 leading-6 group-hover:text-gray-800 transition-colors cursor-pointer">
                       Tôi đồng ý với các điều khoản và điều kiện của chương trình hiến máu. Tôi hiểu rằng việc hiến máu là hoàn toàn tự nguyện và không được trả tiền.
                     </label>
                   </div>
-                  
+
+                  {/* Cam kết sức khoẻ */}
                   <div className="flex items-start space-x-4 group">
                     <input
                       id="agreeHealth"
                       type="checkbox"
                       checked={formData.agreeHealth}
                       onChange={(e) => handleInputChange("agreeHealth", e.target.checked)}
-                      className="mt-1.5 h-5 w-5 rounded border-2 border-red-300 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200 hover:border-red-400"
+                      className={`mt-1.5 h-5 w-5 rounded border-2 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200
+                        ${errors.agreeHealth ? "border-red-500" : "border-red-300 hover:border-red-400"}`}
                     />
                     <label htmlFor="agreeHealth" className="text-gray-700 leading-6 group-hover:text-gray-800 transition-colors cursor-pointer">
                       Tôi cam kết tình trạng sức khỏe của mình ổn định, không mắc các bệnh truyền nhiễm và đã trung thực khai báo thông tin y tế.
@@ -261,8 +311,6 @@ const Index = () => {
             </form>
           </div>
         </div>
-
-
       </div>
     </div>
   );
