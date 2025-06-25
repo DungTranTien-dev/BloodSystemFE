@@ -1,319 +1,209 @@
-// File: Index.jsx
-import { useState } from "react";
-import { Calendar, Heart, Clock, Shield } from "lucide-react";
-import { toast } from "sonner";
+import React, { useState } from 'react';
+import { Form, Input, Select, Button, message, Card, DatePicker, InputNumber, Checkbox, Space } from 'antd';
+import { FaHeart, FaUserCheck } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
+import Layout from '../../components/ui/Layout'; // Giả sử Layout của bạn ở đây
 
-const Index = () => {
-  // -------------------- STATE --------------------
-  const [formData, setFormData] = useState({
-    age: "",
-    bloodType: "",
-    weight: "",
-    medicalHistory: "",
-    preferredDate: "",
-    preferredTime: "",
-    agreeTerms: false,
-    agreeHealth: false
-  });
+const { Option } = Select;
+const { TextArea } = Input;
 
-  // Lưu field đang lỗi để tô viền đỏ
-  const [errors, setErrors] = useState({});
+const DonorBlood = () => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // -------------------- HANDLERS --------------------
-  const handleInputChange = (field, value) => {
-    // Cập nhật form
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const bloodGroups = [
+    'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
+  ];
 
-    // Xoá lỗi của field đó (nếu có) khi người dùng đang sửa
-    setErrors(prev => {
-      if (!prev[field]) return prev;
-      const { [field]: _, ...rest } = prev;
-      return rest;
-    });
-  };
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const donationApplication = {
+        id: Date.now(),
+        age: values.age,
+        bloodGroup: values.bloodGroup,
+        weight: values.weight,
+        donationDate: values.donationDate.toISOString(),
+        medicalHistory: values.medicalHistory || 'Không có',
+        agreedToTerms: values.agreedToTerms,
+        submissionDate: new Date().toISOString(),
+        status: 'Pending Review',
+      };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+      const existingDonations = JSON.parse(localStorage.getItem('bloodDonations') || '[]');
+      existingDonations.push(donationApplication);
+      localStorage.setItem('bloodDonations', JSON.stringify(existingDonations));
 
-    // Kiểm tra lỗi
-    const newErrors = {};
-    if (!formData.age)           newErrors.age           = true;
-    if (!formData.bloodType)     newErrors.bloodType     = true;
-    if (!formData.weight)        newErrors.weight        = true;
-    if (!formData.preferredDate) newErrors.preferredDate = true;
-    if (!formData.preferredTime) newErrors.preferredTime = true;
-    if (!formData.agreeTerms)    newErrors.agreeTerms    = true;
-    if (!formData.agreeHealth)   newErrors.agreeHealth   = true;
-
-    // Nếu có lỗi ⇒ cập nhật state + hiện toast
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
-
-      const missing = Object.keys(newErrors)
-        .map(key => {
-          switch (key) {
-            case "age":            return "Tuổi";
-            case "bloodType":      return "Nhóm máu";
-            case "weight":         return "Cân nặng";
-            case "preferredDate":  return "Ngày hiến máu";
-            case "preferredTime":  return "Khung giờ";
-            case "agreeTerms":     return "Đồng ý điều khoản";
-            case "agreeHealth":    return "Cam kết sức khỏe";
-            default: return key;
-          }
-        });
-      toast.error(`Vui lòng điền/đồng ý: ${missing.join(", ")}`);
-      return;
+      message.success('Đăng ký hiến máu thành công! Chúng tôi sẽ liên hệ với bạn sớm.');
+      form.resetFields();
+      
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+      
+    } catch (error) {
+      message.error('Đăng ký thất bại. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
     }
-
-    // Không lỗi ⇒ thành công
-    toast.success("Đăng ký hiến máu thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.");
-    console.log("Form submitted:", formData);
-
-    // Reset
-    setFormData({
-      age: "",
-      bloodType: "",
-      weight: "",
-      medicalHistory: "",
-      preferredDate: "",
-      preferredTime: "",
-      agreeTerms: false,
-      agreeHealth: false
-    });
-    setErrors({});
   };
 
-  // -------------------- RENDER --------------------
+  const labelStyle = "text-sm font-medium text-purple-600";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-red-50 to-pink-50 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-red-100 rounded-full opacity-30 blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-pink-100 rounded-full opacity-30 blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-rose-100 rounded-full opacity-20 blur-2xl"></div>
-      </div>
-
-      <div className="relative container mx-auto max-w-5xl px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="flex items-center justify-center mb-6">
-            <div className="relative">
-              <Heart className="w-16 h-16 text-red-500 animate-pulse drop-shadow-lg" />
-              <div className="absolute inset-0 w-16 h-16 text-red-300 animate-ping opacity-20">
-                <Heart className="w-16 h-16" />
-              </div>
+    <Layout className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100">
+      <div className="container mx-auto px-4 py-8 lg:py-12">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
+              <FaHeart className="text-2xl text-white" />
             </div>
-          </div>
-          {/* ➜ antialiased để không mất nét dọc */}
-          <h1 className="text-5xl md:text-5xl font-bold bg-gradient-to-r from-red-600 via-red-500 to-pink-500 bg-clip-text text-transparent mb-4 antialiased leading-tight">
-            Đăng ký hiến máu
-          </h1>
-        </div>
-
-        {/* Registration Form */}
-        <div className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-3xl overflow-hidden animate-scale-in">
-          {/* Form Header */}
-          <div className="bg-gradient-to-r from-red-500 to-pink-500 p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">Thông tin đăng ký</h2>
-            <p className="text-red-100">
-              Vui lòng điền thông tin y tế để chúng tôi có thể hỗ trợ bạn tốt nhất
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+              Đăng Ký Hiến Máu
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Chung tay vì cộng đồng, mỗi giọt máu cho đi là một cuộc đời ở lại.
             </p>
           </div>
-          
-          <div className="p-10">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Medical Information */}
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                  <Shield className="w-6 h-6 text-red-500 mr-3" />
-                  Thông tin y tế
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Tuổi */}
-                  <div className="space-y-3 group">
-                    <label htmlFor="age" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                      Tuổi *
-                    </label>
-                    <input
-                      id="age"
-                      type="number"
-                      placeholder="18-65 tuổi"
-                      min="18"
-                      max="65"
-                      value={formData.age}
-                      onChange={(e) => handleInputChange("age", e.target.value)}
-                      required
-                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
-                        ${errors.age ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
-                    />
-                  </div>
 
-                  {/* Nhóm máu */}
-                  <div className="space-y-3 group">
-                    <label htmlFor="bloodType" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                      Nhóm máu *
-                    </label>
-                    <select
-                      id="bloodType"
-                      value={formData.bloodType}
-                      onChange={(e) => handleInputChange("bloodType", e.target.value)}
-                      required
-                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
-                        ${errors.bloodType ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
-                    >
-                      <option value="" disabled>Chọn nhóm máu</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
-                  </div>
-
-                  {/* Cân nặng */}
-                  <div className="space-y-3 group">
-                    <label htmlFor="weight" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                      Cân nặng (kg) *
-                    </label>
-                    <input
-                      id="weight"
-                      type="number"
-                      placeholder="Tối thiểu 45kg"
-                      min="45"
-                      value={formData.weight}
-                      onChange={(e) => handleInputChange("weight", e.target.value)}
-                      required
-                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
-                        ${errors.weight ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Scheduling Information */}
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                  <Clock className="w-6 h-6 text-red-500 mr-3" />
-                  Lịch hẹn
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Ngày hiến máu */}
-                  <div className="space-y-3 group">
-                    <label htmlFor="preferredDate" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                      Ngày muốn hiến máu *
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-red-400 transition-colors" />
-                      <input
-                        id="preferredDate"
-                        type="date"
-                        value={formData.preferredDate}
-                        onChange={(e) => handleInputChange("preferredDate", e.target.value)}
-                        required
-                        min={new Date().toISOString().split('T')[0]}
-                        className={`w-full h-14 rounded-xl border-2 pl-14 pr-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
-                          ${errors.preferredDate ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Khung giờ */}
-                  <div className="space-y-3 group">
-                    <label htmlFor="preferredTime" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                      Khung giờ mong muốn *
-                    </label>
-                    <select
-                      id="preferredTime"
-                      value={formData.preferredTime}
-                      onChange={(e) => handleInputChange("preferredTime", e.target.value)}
-                      required
-                      className={`w-full h-14 rounded-xl border-2 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:bg-white transition-all duration-300 hover:shadow-md
-                        ${errors.preferredTime ? "border-red-500 focus:border-red-500 hover:border-red-500" : "border-gray-200 focus:border-red-400 hover:border-red-300"}`}
-                    >
-                      <option value="" disabled>Chọn khung giờ</option>
-                      <option value="morning">🌅 Sáng (8:00 - 12:00)</option>
-                      <option value="afternoon">🌤️ Chiều (13:00 - 17:00)</option>
-                      <option value="evening">🌙 Tối (18:00 - 20:00)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Medical History */}
-              <div className="space-y-3 group">
-                <label htmlFor="medicalHistory" className="block text-sm font-semibold text-gray-700 group-focus-within:text-red-500 transition-colors">
-                  Tiền sử bệnh lý (nếu có)
-                </label>
-                <textarea
-                  id="medicalHistory"
-                  placeholder="Vui lòng mô tả chi tiết các bệnh lý hiện tại hoặc đã từng mắc phải..."
-                  value={formData.medicalHistory}
-                  onChange={(e) => handleInputChange("medicalHistory", e.target.value)}
-                  rows={4}
-                  className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:border-red-400 focus:bg-white transition-all duration-300 hover:border-red-300 shadow-sm hover:shadow-md resize-none"
-                />
-              </div>
-
-              {/* Agreements */}
-              <div className="space-y-6 p-8 bg-gradient-to-r from-red-50/80 to-pink-50/80 rounded-2xl border border-red-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Cam kết và điều khoản</h3>
-                
-                <div className="space-y-4">
-                  {/* Điều khoản */}
-                  <div className="flex items-start space-x-4 group">
-                    <input
-                      id="agreeTerms"
-                      type="checkbox"
-                      checked={formData.agreeTerms}
-                      onChange={(e) => handleInputChange("agreeTerms", e.target.checked)}
-                      className={`mt-1.5 h-5 w-5 rounded border-2 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200
-                        ${errors.agreeTerms ? "border-red-500" : "border-red-300 hover:border-red-400"}`}
-                    />
-                    <label htmlFor="agreeTerms" className="text-gray-700 leading-6 group-hover:text-gray-800 transition-colors cursor-pointer">
-                      Tôi đồng ý với các điều khoản và điều kiện của chương trình hiến máu. Tôi hiểu rằng việc hiến máu là hoàn toàn tự nguyện và không được trả tiền.
-                    </label>
-                  </div>
-
-                  {/* Cam kết sức khoẻ */}
-                  <div className="flex items-start space-x-4 group">
-                    <input
-                      id="agreeHealth"
-                      type="checkbox"
-                      checked={formData.agreeHealth}
-                      onChange={(e) => handleInputChange("agreeHealth", e.target.checked)}
-                      className={`mt-1.5 h-5 w-5 rounded border-2 text-red-600 focus:ring-red-500 focus:ring-2 transition-all duration-200
-                        ${errors.agreeHealth ? "border-red-500" : "border-red-300 hover:border-red-400"}`}
-                    />
-                    <label htmlFor="agreeHealth" className="text-gray-700 leading-6 group-hover:text-gray-800 transition-colors cursor-pointer">
-                      Tôi cam kết tình trạng sức khỏe của mình ổn định, không mắc các bệnh truyền nhiễm và đã trung thực khai báo thông tin y tế.
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full h-16 inline-flex items-center justify-center rounded-2xl text-xl font-bold bg-gradient-to-r from-red-500 via-red-600 to-pink-600 hover:from-red-600 hover:via-red-700 hover:to-pink-700 text-white shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-red-500/30 group"
+          <Card 
+            className="shadow-2xl border-0 rounded-2xl overflow-hidden"
+            style={{ backgroundColor: 'white' }}
+          >
+            <div className="p-6 lg:p-8">
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                className="space-y-6"
+                size="large"
               >
-                <Heart className="w-7 h-7 mr-3 group-hover:animate-pulse" />
-                Đăng Ký Hiến Máu
-                <div className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  ❤️
-                </div>
-              </button>
-            </form>
-          </div>
+                {/* Tuổi */}
+                <Form.Item
+                  name="age"
+                  label={<span className={labelStyle}>Tuổi của bạn*</span>}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập tuổi của bạn!' },
+                    { type: 'number', min: 18, max: 60, message: 'Tuổi hiến máu phải từ 18 đến 60!' }
+                  ]}
+                >
+                  <InputNumber
+                    placeholder="Nhập tuổi (từ 18-60)"
+                    className="h-12 !rounded-lg"
+                    style={{ width: '100%', fontSize: '16px' }} // SỬA Ở ĐÂY
+                  />
+                </Form.Item>
+
+                {/* Nhóm máu */}
+                <Form.Item
+                  name="bloodGroup"
+                  label={<span className={labelStyle}>Nhóm máu*</span>}
+                  rules={[{ required: true, message: 'Vui lòng chọn nhóm máu!' }]}
+                >
+                  <Select placeholder="Chọn nhóm máu của bạn" className="h-12" style={{ fontSize: '16px' }}>
+                    {bloodGroups.map(group => (
+                      <Option key={group} value={group}>{group}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+
+                {/* Cân nặng */}
+                <Form.Item
+                  name="weight"
+                  label={<span className={labelStyle}>Cân nặng (kg)*</span>}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập cân nặng!' },
+                    { type: 'number', min: 45, message: 'Cân nặng tối thiểu để hiến máu là 45kg!' }
+                  ]}
+                >
+                  <InputNumber
+                    placeholder="Nhập cân nặng (tối thiểu 45kg)"
+                    className="h-12 !rounded-lg"
+                    addonAfter="kg"
+                    style={{ width: '100%', fontSize: '16px' }} // SỬA Ở ĐÂY
+                  />
+                </Form.Item>
+
+                {/* Ngày muốn hiến máu */}
+                <Form.Item
+                  name="donationDate"
+                  label={<span className={labelStyle}>Ngày dự kiến hiến máu*</span>}
+                  rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}
+                >
+                  <DatePicker
+                    className="w-full h-12"
+                    format="DD/MM/YYYY"
+                    placeholder="Chọn ngày bạn muốn hiến máu"
+                    style={{ fontSize: '16px' }}
+                  />
+                </Form.Item>
+
+                {/* Tiền sử bệnh lý */}
+                <Form.Item
+                  name="medicalHistory"
+                  label={<span className={labelStyle}>Tiền sử bệnh lý (nếu có)</span>}
+                >
+                  <TextArea
+                    rows={4}
+                    placeholder="Liệt kê các bệnh mãn tính hoặc tình trạng sức khỏe đặc biệt... Ghi 'Không' nếu không có."
+                    style={{ fontSize: '16px', borderRadius: '8px' }}
+                  />
+                </Form.Item>
+
+                {/* Cam kết và điều khoản - Đã được cấu trúc lại */}
+                <Form.Item
+                  name="agreedToTerms"
+                  valuePropName="checked"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value ? Promise.resolve() : Promise.reject(new Error('Bạn phải đồng ý với các điều khoản để tiếp tục!')),
+                    },
+                  ]}
+                  className="mb-0" // Bỏ margin-bottom mặc định
+                >
+                  <Space align="start"> {/* SỬA Ở ĐÂY: Dùng Space để căn chỉnh */}
+                    <Checkbox />
+                    <div className="text-gray-600 text-sm leading-relaxed -mt-1">
+                      <p className="font-semibold mb-2">
+                        Tôi đồng ý với các điều khoản và điều kiện của chương trình hiến máu.
+                      </p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Tôi hiểu rằng việc hiến máu là hoàn toàn tự nguyện và không được trả tiền.</li>
+                        <li>Tôi cam kết tình trạng sức khỏe của mình ổn định, không mắc các bệnh truyền nhiễm và đã trung thực khai báo thông tin y tế.</li>
+                      </ul>
+                    </div>
+                  </Space>
+                </Form.Item>
+
+                {/* Submit Button */}
+                <Form.Item className="mb-0 pt-4">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    className="w-full h-14 text-lg font-semibold rounded-lg border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                    style={{
+                      background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)', // Giống trang mẫu
+                    }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <FaUserCheck className="mr-2" />
+                      {loading ? 'Đang gửi đăng ký...' : 'Xác Nhận Đăng Ký'}
+                    </div>
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
+          </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
-export default Index;
+export default DonorBlood;
