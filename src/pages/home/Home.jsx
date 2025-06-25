@@ -54,7 +54,7 @@ const Homepage = () => {
     searchParams.set("startDate", format(startDate, "yyyy-MM-dd"));
     searchParams.set("endDate", format(endDate, "yyyy-MM-dd"));
 
-    navigate(`/hospitals?${searchParams.toString()}`);
+    navigate(`/hospital?${searchParams.toString()}`);
   };
   const donationMethods = [
     {

@@ -4,6 +4,8 @@ import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
+import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
+import TrackDonation from "./pages/DonorBlood/TrackDonation";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -91,6 +93,24 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
+     {
+      path: "/donation-confirmation",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DonateConfirm />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+     {
+      path: "/track-donation",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <TrackDonation />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
     {
       path: "/bloodtype",
       element: (
@@ -136,6 +156,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
+    
     {
       path: "/admin",
       element: (

@@ -22,13 +22,13 @@ import {
 import { format, parseISO } from "date-fns";
 import dayjs from "dayjs"; // Cần dayjs để làm việc với AntD DatePicker
 import { getHospitals } from "../../service/hospitalApi";
+import { useSelector } from "react-redux";
+import Header from "../../components/ui/Header";
+import Footer from "../../components/ui/Footer";
 
 const { RangePicker } = DatePicker;
-
 // --- Component Card cho mỗi bệnh viện ---
 const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
- 
-
   // Lấy giờ hoạt động dựa trên ngày tìm kiếm
   const getOperatingHoursForDate = () => {
     // Nếu không có ngày tìm kiếm, hiển thị lịch đầu tiên có
@@ -80,7 +80,6 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
     return "0/0";
   };
 
-
   return (
     <Card
       hoverable
@@ -104,7 +103,6 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
             <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">
               {hospital.name}
             </h3>
-
           </div>
 
           <div className="space-y-2 mb-4">
@@ -157,7 +155,7 @@ const Hospitals = () => {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const user = useSelector((state) => state.user);
   // State cho RangePicker, sử dụng mảng [startDate, endDate]
   const [dateRange, setDateRange] = useState(() => {
     const startDateParam = searchParams.get("startDate");
@@ -191,7 +189,18 @@ const Hospitals = () => {
   };
 
   const handleBookAppointment = (hospital) => {
-    navigate("/register", {
+    if (!user) {
+      navigate("/login", {
+        state: {
+          redirectTo: "/donorblood",
+          selectedHospital: hospital,
+          availableDates: hospital.donationDays,
+        },
+      });
+      return;
+    }
+
+    navigate("/donorblood", {
       state: {
         selectedHospital: hospital,
         availableDates: hospital.donationDays,
@@ -225,6 +234,8 @@ const Hospitals = () => {
   };
 
   return (
+    <>
+    <Header/>
     <Layout className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
@@ -321,6 +332,8 @@ const Hospitals = () => {
         </Spin>
       </div>
     </Layout>
+    <Footer/>
+    </>
   );
 };
 
