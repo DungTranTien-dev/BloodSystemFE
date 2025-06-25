@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
+import Hospitals from "./pages/hospital/hospital";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -72,11 +73,20 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-       {
+    {
       path: "/donorblood",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/hospital",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Hospitals />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
