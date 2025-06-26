@@ -164,16 +164,16 @@ const DonorBlood = () => {
               >
                 {/* Tuổi & Cân nặng */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Form.Item name="age" label={<span className="text-sm font-medium text-purple-600">Tuổi của bạn*</span>} rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }, { type: 'number', min: 18, max: 60, message: 'Tuổi hiến máu phải từ 18 đến 60!' }]}>
+                  <Form.Item name="age" label={<span className="text-sm font-medium text-red-500">Tuổi của bạn*</span>} rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }, { type: 'number', min: 18, max: 60, message: 'Tuổi hiến máu phải từ 18 đến 60!' }]}>
                     <InputNumber type="number" placeholder="18-60" className="w-full h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" style={{ fontSize: '16px', width: '100%' }}/>
                   </Form.Item>
-                  <Form.Item name="weight" label={<span className="text-sm font-medium text-purple-600">Cân nặng (kg)*</span>} rules={[{ required: true, message: 'Vui lòng nhập cân nặng!' }, { type: 'number', min: 45, message: 'Cân nặng tối thiểu là 45kg!' }]}>
+                  <Form.Item name="weight" label={<span className="text-sm font-medium text-red-500">Cân nặng (kg)*</span>} rules={[{ required: true, message: 'Vui lòng nhập cân nặng!' }, { type: 'number', min: 45, message: 'Cân nặng tối thiểu là 45kg!' }]}>
                     <InputNumber type="number" placeholder="Tối thiểu 45kg" className="w-full h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" style={{ fontSize: '16px', width: '100%' }} />
                   </Form.Item>
                 </div>
                 
                 {/* Nhóm máu */}
-                <Form.Item name="bloodGroup" label={<span className="text-sm font-medium text-purple-600">Nhóm máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn nhóm máu!' }]}>
+                <Form.Item name="bloodGroup" label={<span className="text-sm font-medium text-red-500">Nhóm máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn nhóm máu!' }]}>
                   <Select placeholder="Chọn nhóm máu của bạn" className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
                     {bloodGroups.map(group => (
                       <Option key={group} value={group}>
@@ -184,18 +184,18 @@ const DonorBlood = () => {
                 </Form.Item>
 
                 {/* Ngày hiến máu */}
-                <Form.Item name="donationDate" label={<span className="text-sm font-medium text-purple-600">Ngày dự kiến hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
+                <Form.Item name="donationDate" label={<span className="text-sm font-medium text-red-500">Ngày dự kiến hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
                   <DatePicker style={{ width: '100%' }} placeholder="Chọn ngày bạn muốn hiến máu" format="DD/MM/YYYY" disabledDate={disabledDate} onChange={handleDateChange} className="h-12 rounded-lg" suffixIcon={<CalendarOutlined />} />
                 </Form.Item>
                 
                 {/* Địa chỉ & Giờ hiến máu */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Form.Item name="hospitalAddress" label={<span className="text-sm font-medium text-purple-600">Địa chỉ bệnh viện*</span>} rules={[{ required: true, message: 'Vui lòng chọn bệnh viện!' }]}>
+                  <Form.Item name="hospitalAddress" label={<span className="text-sm font-medium text-red-500">Địa chỉ bệnh viện*</span>} rules={[{ required: true, message: 'Vui lòng chọn bệnh viện!' }]}>
                     <Select placeholder="Chọn địa chỉ" onChange={handleHospitalAddressChange} disabled={!form.getFieldValue('donationDate')} className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
                       {availableHospitals.map(hospital => (<Option key={hospital.id} value={hospital.address}><Text strong>{hospital.name}</Text></Option>))}
                     </Select>
                   </Form.Item>
-                  <Form.Item name="donationTime" label={<span className="text-sm font-medium text-purple-600">Giờ hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn giờ!' }]}>
+                  <Form.Item name="donationTime" label={<span className="text-sm font-medium text-red-500">Giờ hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn giờ!' }]}>
                     <Select placeholder="Chọn khung giờ" disabled={timeSlots.length === 0} className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
                       {timeSlots.map(slot => (<Option key={slot} value={slot}><div className="flex items-center"><Clock size={14} className="mr-2"/>{slot}</div></Option>))}
                     </Select>
@@ -203,7 +203,7 @@ const DonorBlood = () => {
                 </div>
 
                 {/* Tiền sử hiến máu */}
-                <Form.Item name="previousDonations" label={<span className="text-sm font-medium text-purple-600">Bạn đã từng hiến máu chưa?*</span>} rules={[{ required: true, message: 'Vui lòng chọn!' }]}>
+                <Form.Item name="previousDonations" label={<span className="text-sm font-medium text-red-500">Bạn đã từng hiến máu chưa?*</span>} rules={[{ required: true, message: 'Vui lòng chọn!' }]}>
                   <Select placeholder="Chọn..." className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
                     <Option value="no">Chưa bao giờ</Option>
                     <Option value="yes">Đã hiến máu</Option>
@@ -212,20 +212,20 @@ const DonorBlood = () => {
 
                 <Form.Item noStyle shouldUpdate={(prev, curr) => prev.previousDonations !== curr.previousDonations}>
                   {({ getFieldValue }) => getFieldValue('previousDonations') === 'yes' ? (
-                    <Form.Item name="donationCount" label={<span className="text-sm font-medium text-purple-600">Bạn đã hiến máu bao nhiêu lần?*</span>} rules={[{ required: true, message: 'Vui lòng nhập số lần!' }]}>
+                    <Form.Item name="donationCount" label={<span className="text-sm font-medium text-red-500">Bạn đã hiến máu bao nhiêu lần?*</span>} rules={[{ required: true, message: 'Vui lòng nhập số lần!' }]}>
                       <InputNumber placeholder="Nhập số lần" className="w-full h-12 rounded-lg" style={{ fontSize: '16px', width: '100%' }} min={1} />
                     </Form.Item>
                   ) : null}
                 </Form.Item>
 
                 {/* Tiền sử bệnh lý */}
-                <Form.Item name="medicalHistory" label={<span className="text-sm font-medium text-purple-600">Tiền sử bệnh lý (nếu có)</span>}>
+                <Form.Item name="medicalHistory" label={<span className="text-sm font-medium text-red-500">Tiền sử bệnh lý (nếu có)</span>}>
                   <Input.TextArea rows={3} placeholder="Liệt kê các bệnh mãn tính hoặc tình trạng sức khỏe đặc biệt..." className="rounded-lg" />
                 </Form.Item>
                 
                 {/* Cam kết */}
                 <Form.Item name="agreedToTerms" valuePropName="checked" rules={[{ validator: (_, v) => v ? Promise.resolve() : Promise.reject(new Error('Bạn phải đồng ý với các điều khoản!')) }]}>
-                  <Checkbox><span className="font-semibold">Tôi đồng ý với các điều khoản và điều kiện.</span></Checkbox>
+                  <Checkbox><span className="font-semibold text-red-500">Tôi đồng ý với các điều khoản và điều kiện.</span></Checkbox>
                 </Form.Item>
                 <Paragraph type="secondary" className="-mt-4 ml-6 text-xs">
                   <ul className="list-disc list-inside space-y-1">

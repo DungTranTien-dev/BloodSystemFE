@@ -27,6 +27,7 @@ import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
 
 const { RangePicker } = DatePicker;
+
 // --- Component Card cho mỗi bệnh viện ---
 const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
   // Lấy giờ hoạt động dựa trên ngày tìm kiếm
@@ -100,7 +101,8 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
         {/* Thông tin chính */}
         <div className="flex-1 p-4 pt-0 sm:pt-4 text-center sm:text-left">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">
+            {/* SỬA: Thay đổi màu tên bệnh viện */}
+            <h3 className="text-xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent cursor-pointer">
               {hospital.name}
             </h3>
           </div>
@@ -130,18 +132,22 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
               <TeamOutlined className="mr-1" />
               <span className="text-sm">Số lượng đăng ký</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">
-              {getAvailableSlots()}{" "}
+            {/* SỬA: Thay đổi màu số lượng đăng ký */}
+            <div className="text-2xl font-bold">
+              <span className="bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
+                {getAvailableSlots()}
+              </span>{" "}
               <span className="text-sm font-normal text-gray-500">Người</span>
             </div>
           </div>
-          <Button
-            type="primary"
+          {/* SỬA: Thay đổi màu nút Đặt lịch */}
+          <button
             onClick={() => onBookAppointment(hospital)}
-            className="w-full font-semibold rounded-lg"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl text-white bg-gradient-to-r from-red-500 to-pink-600 border-none shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
           >
-            Đặt lịch
-          </Button>
+            <CalendarOutlined className="text-white text-base" />
+            <span className="text-sm">Đặt lịch</span>
+          </button>
         </div>
       </div>
     </Card>
@@ -235,104 +241,110 @@ const Hospitals = () => {
 
   return (
     <>
-    <Header/>
-    <Layout className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <CalendarOutlined className="text-2xl text-gray-600" />
-            <h1 className="text-2xl font-bold text-gray-800">
-              Kết quả tìm kiếm bệnh viện
-            </h1>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <div className="text-lg font-medium text-blue-800">
-              Thời gian đã chọn: {getSearchDateRange()}
+      <Header />
+      <Layout className="bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-4 mb-4">
+              <CalendarOutlined className="text-2xl text-gray-600" />
+              <h1 className="text-2xl font-bold text-gray-800">
+                Kết quả tìm kiếm bệnh viện
+              </h1>
             </div>
-          </div>
 
-          <Card className="p-4 mb-6">
-            <div className="flex flex-col md:flex-row gap-4 items-end">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Tìm kiếm theo ngày khác
-                </label>
-                <RangePicker
-                  value={dateRange}
-                  onChange={setDateRange}
-                  format="DD-MM-YYYY"
-                  className="h-10 w-full"
-                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                />
-              </div>
-              <div className="md:w-auto w-full">
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={handleDateSearch}
-                  className="w-full md:w-auto h-10"
-                >
-                  Tìm kiếm
-                </Button>
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <div className="text-lg font-medium text-blue-800">
+                Thời gian đã chọn: {getSearchDateRange()}
               </div>
             </div>
-          </Card>
-        </div>
 
-        <div className="mb-6">
-          <Input
-            placeholder="Tìm kiếm bệnh viện theo tên hoặc địa chỉ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={
-              <SearchOutlined className="site-form-item-icon text-gray-400" />
-            }
-            size="large"
-          />
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-600">
-            {loading ? "Đang tải..." : `${filteredHospitals.length} Kết quả`}
-          </h2>
-        </div>
-
-        <Spin
-          spinning={loading}
-          indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
-        >
-          <div className="space-y-4 min-h-[200px]">
-            {!loading && filteredHospitals.length > 0 ? (
-              filteredHospitals.map((hospital) => (
-                <HospitalCard
-                  key={hospital.id}
-                  hospital={hospital}
-                  onBookAppointment={handleBookAppointment}
-                  searchDate={searchParams.get("startDate")}
-                />
-              ))
-            ) : !loading ? (
-              <div className="flex justify-center items-center h-full pt-16">
-                <Empty
-                  description={
-                    <div>
-                      <p className="font-semibold text-base">
-                        Không tìm thấy bệnh viện
-                      </p>
-                      <span className="text-gray-500">
-                        Vui lòng thử lại với tiêu chí tìm kiếm khác.
-                      </span>
-                    </div>
-                  }
-                />
+            <Card className="p-4 mb-6">
+              <div className="flex flex-col md:flex-row gap-4 items-end">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Tìm kiếm theo ngày khác
+                  </label>
+                  <RangePicker
+                    value={dateRange}
+                    onChange={setDateRange}
+                    format="DD-MM-YYYY"
+                    className="h-10 w-full"
+                    placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                  />
+                </div>
+                <div className="md:w-auto w-full">
+                  <button
+                    onClick={handleDateSearch}
+                    className="w-full md:w-auto h-10 px-5 flex items-center justify-center gap-2 font-semibold rounded-xl text-white bg-gradient-to-r from-red-500 to-pink-600 shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
+                  >
+                    <SearchOutlined className="text-white text-base" />
+                    <span className="text-sm">Tìm kiếm</span>
+                  </button>
+                </div>
               </div>
-            ) : null}
+            </Card>
           </div>
-        </Spin>
-      </div>
-    </Layout>
-    <Footer/>
+
+          <div className="mb-6">
+            <Input
+              placeholder="Tìm kiếm bệnh viện theo tên hoặc địa chỉ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              prefix={
+                <SearchOutlined className="site-form-item-icon text-gray-400" />
+              }
+              size="large"
+            />
+          </div>
+
+          <div className="mb-6">
+            {/* SỬA: Thay đổi màu số kết quả tìm kiếm */}
+            <h2 className="text-xl font-bold">
+              {loading ? (
+                "Đang tải..."
+              ) : (
+                <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
+  {filteredHospitals.length} Kết quả
+</span>
+              )}
+            </h2>
+          </div>
+
+          <Spin
+            spinning={loading}
+            indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
+          >
+            <div className="space-y-4 min-h-[200px]">
+              {!loading && filteredHospitals.length > 0 ? (
+                filteredHospitals.map((hospital) => (
+                  <HospitalCard
+                    key={hospital.id}
+                    hospital={hospital}
+                    onBookAppointment={handleBookAppointment}
+                    searchDate={searchParams.get("startDate")}
+                  />
+                ))
+              ) : !loading ? (
+                <div className="flex justify-center items-center h-full pt-16">
+                  <Empty
+                    description={
+                      <div>
+                        <p className="font-semibold text-base">
+                          Không tìm thấy bệnh viện
+                        </p>
+                        <span className="text-gray-500">
+                          Vui lòng thử lại với tiêu chí tìm kiếm khác.
+                        </span>
+                      </div>
+                    }
+                  />
+                </div>
+              ) : null}
+            </div>
+          </Spin>
+        </div>
+      </Layout>
+      <Footer />
     </>
   );
 };

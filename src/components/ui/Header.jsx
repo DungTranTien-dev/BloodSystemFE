@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { logout } from "../../redux/features/userSlice";
 import { toast } from "react-toastify";
+import navigation from "./Navigation";
 
 // Component NavLink không thay đổi
 const NavLink = ({ children, onClick }) => (
@@ -27,7 +28,16 @@ function Header() {
 
   // Lấy thông tin user từ Redux store
   const user = useSelector((state) => state.user);
+  const role = user?.role || "user";
+  let navItems = navigation[role] || navigation["user"];
 
+  if (!user && role === "user") {
+    navItems = navItems.filter(
+      (item) =>
+        item.label !== "Lịch sử đặt hẹn" &&
+        item.label !== "Request Blood"
+    );
+  }
   const handleLogout = () => {
     dispatch(logout());
     toast.success("Đăng xuất thành công!");
@@ -68,22 +78,13 @@ function Header() {
           </div>
 
           {/* Desktop Navigation (Giữ nguyên) */}
-          <nav className="hidden md:flex">
+             <nav className="hidden md:flex">
             <ul className="flex items-center space-x-8 bold">
-              <NavLink onClick={() => navigate("/")}>Home</NavLink>
-              {user && (
-                <NavLink onClick={() => navigate("/track-donation")}>
-                  Lịch sử đặt hẹn
+              {navItems.map((item) => (
+                <NavLink key={item.path} onClick={() => navigate(item.path)}>
+                  {item.label}
                 </NavLink>
-              )}
-              <NavLink onClick={() => navigate("/blog")}>Blog</NavLink>
-              <NavLink onClick={() => navigate("/Q&A")}>Q&A</NavLink>
-              <NavLink onClick={() => navigate("/bloodtype")}>
-                Blood Group
-              </NavLink>
-              <NavLink onClick={() => navigate("/blood-request")}>
-                Request Blood
-              </NavLink>
+              ))}
             </ul>
           </nav>
 

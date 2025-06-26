@@ -6,6 +6,10 @@ import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
 import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
 import TrackDonation from "./pages/DonorBlood/TrackDonation";
+import QAPage from "./pages/Q&A/Q&A";
+import StaffManagement from "./pages/staff/StaffManagement";
+import StaffBloodRequests from "./pages/staff/StaffBloodRequests";
+import StaffDonorRequests from "./pages/staff/StaffDonorRequests";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -53,6 +57,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <NewsPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/Q&A",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <QAPage />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -156,7 +169,42 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    
+    {
+      path: "/staff-request-blood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffBloodRequests />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff-request-donor",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffDonorRequests />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffManagement />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffManagement />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
     {
       path: "/admin",
       element: (

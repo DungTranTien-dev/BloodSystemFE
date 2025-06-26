@@ -1,10 +1,14 @@
 // File: Q&A.jsx
 import React from 'react';
 import FAQ from '../../components/ui/FAQ';
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 
 const QAPage = () => {
   return (
-    // Container chính của trang với background gradient và vị trí tương đối
+    <>
+    <Header/>
+
     <div className="min-h-screen bg-White relative overflow-hidden">
       
       {/* Các yếu tố trang trí nền (decorative background elements) */}
@@ -21,6 +25,8 @@ const QAPage = () => {
       </div>
       
     </div>
+    <Footer/>
+    </>
   );
 };
 
