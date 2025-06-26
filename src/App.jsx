@@ -1,24 +1,30 @@
-import React, { Suspense } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import SimpleErrorFallback from './components/ui/SimpleErrorFallback';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import React, { Suspense } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import DonorBlood from "./pages/DonorBlood/DonorBlood";
+import Hospitals from "./pages/hospital/hospital";
+import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
+import TrackDonation from "./pages/DonorBlood/TrackDonation";
 
 // Lazy load components for code splitting
-const Homepage = React.lazy(() => import('./pages/home/Home'));
-const NewsPage = React.lazy(() => import('./pages/news/News'));
-const NewsDetail = React.lazy(() => import('./pages/news/NewsDetail'));
-const BlogPage = React.lazy(() => import('./pages/blog/Blog'));
-const LoginPage = React.lazy(() => import('./pages/login/login'));
-const RegisterPage = React.lazy(() => import('./pages/register/register'));
-const AboutUs = React.lazy(() => import('./pages/home/AboutUs'));
-const BloodTypePage = React.lazy(() => import('./pages/blood/blood'));
-const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
-const SimpleDashboard = React.lazy(() => import('./components/SimpleDashboard'));
-const DonorList = React.lazy(() => import('./pages/admin/DonorList'));
-const AddDonor = React.lazy(() => import('./pages/admin/AddDonor'));
-const DonorDetails = React.lazy(() => import('./pages/admin/DonorDetails'));
-const BloodRequest = React.lazy(() => import('./pages/blood/BloodRequest'));
-const BloodRequests = React.lazy(() => import('./pages/admin/BloodRequests'));
+const Homepage = React.lazy(() => import("./pages/home/Home"));
+const NewsPage = React.lazy(() => import("./pages/news/News"));
+const NewsDetail = React.lazy(() => import("./pages/news/NewsDetail"));
+const BlogPage = React.lazy(() => import("./pages/blog/Blog"));
+const LoginPage = React.lazy(() => import("./pages/login/login"));
+const RegisterPage = React.lazy(() => import("./pages/register/register"));
+const AboutUs = React.lazy(() => import("./pages/home/AboutUs"));
+const BloodTypePage = React.lazy(() => import("./pages/blood/blood"));
+const Dashboard = React.lazy(() => import("./pages/admin/Dashboard"));
+const SimpleDashboard = React.lazy(() =>
+  import("./components/SimpleDashboard")
+);
+const DonorList = React.lazy(() => import("./pages/admin/DonorList"));
+const AddDonor = React.lazy(() => import("./pages/admin/AddDonor"));
+const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
+const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
+const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
 // Loading component for suspense fallback
@@ -68,7 +74,44 @@ function App() {
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
-    },    {
+    },
+    {
+      path: "/donorblood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DonorBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/hospital",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Hospitals />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+     {
+      path: "/donation-confirmation",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DonateConfirm />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+     {
+      path: "/track-donation",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <TrackDonation />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
       path: "/bloodtype",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -103,7 +146,8 @@ function App() {
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
-    },    {
+    },
+    {
       path: "/register",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -112,6 +156,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
+    
     {
       path: "/admin",
       element: (
@@ -133,7 +178,8 @@ function App() {
         </ProtectedRoute>
       ),
       errorElement: <SimpleErrorFallback />,
-    },    {
+    },
+    {
       path: "/admin/donors",
       element: (
         <ProtectedRoute>
@@ -143,7 +189,8 @@ function App() {
         </ProtectedRoute>
       ),
       errorElement: <SimpleErrorFallback />,
-    },    {
+    },
+    {
       path: "/admin/add-donor",
       element: (
         <ProtectedRoute>
@@ -181,7 +228,8 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorDetails />
-        </Suspense>      ),
+        </Suspense>
+      ),
       errorElement: <SimpleErrorFallback />,
     },
     // {

@@ -440,12 +440,14 @@ const Dashboard = () => {
   
   /**
    * USER STATE
-   * Gets user info from localStorage for display and authentication
+   * Gets user info from localStorage for display.
+   * // FIXED: Replaced useState with useMemo as setUserInfo was never used.
+   * This is more efficient for read-only data derived on component mount.
    */
-  const [userInfo, setUserInfo] = useState(() => ({
+  const userInfo = useMemo(() => ({
     email: localStorage.getItem('userEmail') || 'admin@lifestream.com',
     role: localStorage.getItem('userRole') || 'admin'
-  }));
+  }), []);
   
   /**
    * DROPDOWN STATE
@@ -800,7 +802,9 @@ const Dashboard = () => {
       categories[category].push(item);
     });
     return categories;
-  }, []); // Empty dependency array since MENU_ITEMS is constant  // ============================================
+  }, []); // Empty dependency array since MENU_ITEMS is constant
+
+  // ============================================
   // MAIN COMPONENT RENDER
   // ============================================
   return (
@@ -838,58 +842,25 @@ const Dashboard = () => {
           </p>
         </header>
         
-        {/* MAIN NAVIGATION MENU */}
+        {/* 
+          MAIN NAVIGATION MENU
+          // FIXED: Replaced duplicated filter/map logic with a single loop over the 'menuCategories' object.
+          // This fixes the 'menuCategories' unused variable error and makes the code cleaner and more efficient.
+        */}
         <nav className="flex-1 py-4">
-          
-          {/* MAIN MENU SECTION HEADER */}
-          <div className="px-4 mb-4">
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">
-              MAIN
-            </span>
-          </div>
-          
-          {/* MAIN MENU ITEMS LIST */}
-          <ul className="space-y-1">
-            {MENU_ITEMS.filter(item => item.category === 'main').map((item, index) => (
-              <li key={`${item.label}-${index}`}>
-                <button
-                  onClick={() => handleMenuClick(item.label, item.path)}
-                  className={`w-full flex items-center px-6 py-3 text-left hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-colors duration-200 rounded-r-full mr-4 ${
-                    activeMenu === item.label 
-                      ? 'bg-gradient-to-r from-red-100 to-pink-100 border-r-4 border-red-500 text-red-700' 
-                      : 'text-slate-600 hover:text-red-600'
-                  }`}
-                  aria-current={activeMenu === item.label ? 'page' : undefined}
-                  title={item.description}
-                >
-                  {/* MENU ITEM ICON */}
-                  <item.icon 
-                    className="mr-3 text-sm flex-shrink-0" 
-                    aria-hidden="true" 
-                  />
-                  {/* MENU ITEM LABEL */}
-                  <span className="text-sm font-medium truncate">
-                    {item.label}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          {/* SETTINGS SECTION (if settings items exist) */}
-          {MENU_ITEMS.filter(item => item.category === 'settings').length > 0 && (
-            <>
-              {/* SETTINGS SECTION HEADER */}
-              <div className="px-4 mb-4 mt-6">
+          {Object.entries(menuCategories).map(([category, items]) => (
+            <div key={category}>
+              {/* CATEGORY HEADER */}
+              <div className="px-4 mb-4 mt-2">
                 <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">
-                  SETTINGS
+                  {category.toUpperCase()}
                 </span>
               </div>
               
-              {/* SETTINGS MENU ITEMS */}
+              {/* MENU ITEMS LIST */}
               <ul className="space-y-1">
-                {MENU_ITEMS.filter(item => item.category === 'settings').map((item, index) => (
-                  <li key={`settings-${item.label}-${index}`}>
+                {items.map((item, index) => (
+                  <li key={`${item.label}-${index}`}>
                     <button
                       onClick={() => handleMenuClick(item.label, item.path)}
                       className={`w-full flex items-center px-6 py-3 text-left hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-colors duration-200 rounded-r-full mr-4 ${
@@ -900,12 +871,12 @@ const Dashboard = () => {
                       aria-current={activeMenu === item.label ? 'page' : undefined}
                       title={item.description}
                     >
-                      {/* SETTINGS ITEM ICON */}
+                      {/* MENU ITEM ICON */}
                       <item.icon 
                         className="mr-3 text-sm flex-shrink-0" 
                         aria-hidden="true" 
                       />
-                      {/* SETTINGS ITEM LABEL */}
+                      {/* MENU ITEM LABEL */}
                       <span className="text-sm font-medium truncate">
                         {item.label}
                       </span>
@@ -913,8 +884,8 @@ const Dashboard = () => {
                   </li>
                 ))}
               </ul>
-            </>
-          )}
+            </div>
+          ))}
         </nav>
         
         {/* SIDEBAR FOOTER WITH SYSTEM INFORMATION */}
