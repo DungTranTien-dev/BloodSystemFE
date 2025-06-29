@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Button, Tag, Table, Modal, notification, Typography, Space, Row, Col } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, EyeOutlined, ExperimentOutlined } from '@ant-design/icons';
-import Header from '../../components/ui/Header';
-import Footer from '../../components/ui/Footer';
 
 const { Title, Text } = Typography;
 
@@ -154,88 +152,74 @@ const StaffBloodRequests = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-orange-50">
-      <Header/>
-      <div className="container mx-auto p-6">
-        {/* Header Section */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
-            <ExperimentOutlined className="text-2xl text-white" />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Quản lý yêu cầu cần máu
-          </h1>
-          <p className="text-gray-600 text-lg">Xử lý và phê duyệt các yêu cầu cần máu từ bệnh viện</p>
+    <div className="container mx-auto p-6">
+      {/* Stats Cards */}
+      <Row gutter={[24, 24]} className="mb-8">
+        <Col xs={12} md={6}>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('all')}>
+            <div className="text-center">
+              <Title level={2} className="!text-blue-700 !mb-1">{counts.total}</Title>
+              <Text className="text-blue-600 font-medium">Tổng số</Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} md={6}>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('pending')}>
+            <div className="text-center">
+              <Title level={2} className="!text-yellow-700 !mb-1">{counts.pending}</Title>
+              <Text className="text-yellow-600 font-medium">Chờ duyệt</Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} md={6}>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('accepted')}>
+            <div className="text-center">
+              <Title level={2} className="!text-green-700 !mb-1">{counts.accepted}</Title>
+              <Text className="text-green-600 font-medium">Đã duyệt</Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} md={6}>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-red-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('rejected')}>
+            <div className="text-center">
+              <Title level={2} className="!text-red-700 !mb-1">{counts.rejected}</Title>
+              <Text className="text-red-600 font-medium">Bị từ chối</Text>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Filter Tabs */}
+      <Card className="border-0 shadow-lg mb-6">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {[
+            { key: 'all', label: 'Tất cả', color: 'blue' },
+            { key: 'pending', label: 'Chờ duyệt', color: 'yellow' },
+            { key: 'accepted', label: 'Đã duyệt', color: 'green' },
+            { key: 'rejected', label: 'Bị từ chối', color: 'red' }
+          ].map(tab => (
+            <Button
+              key={tab.key}
+              type={activeTab === tab.key ? 'primary' : 'default'}
+              onClick={() => setActiveTab(tab.key)}
+              className={activeTab === tab.key ? 'bg-gradient-to-r from-red-500 to-pink-600 border-0' : ''}
+            >
+              {tab.label}
+            </Button>
+          ))}
         </div>
+      </Card>
 
-        {/* Stats Cards */}
-        <Row gutter={[24, 24]} className="mb-8">
-          <Col xs={12} md={6}>
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('all')}>
-              <div className="text-center">
-                <Title level={2} className="!text-blue-700 !mb-1">{counts.total}</Title>
-                <Text className="text-blue-600 font-medium">Tổng số</Text>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={12} md={6}>
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('pending')}>
-              <div className="text-center">
-                <Title level={2} className="!text-yellow-700 !mb-1">{counts.pending}</Title>
-                <Text className="text-yellow-600 font-medium">Chờ duyệt</Text>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={12} md={6}>
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('accepted')}>
-              <div className="text-center">
-                <Title level={2} className="!text-green-700 !mb-1">{counts.accepted}</Title>
-                <Text className="text-green-600 font-medium">Đã duyệt</Text>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={12} md={6}>
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-red-100 cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setActiveTab('rejected')}>
-              <div className="text-center">
-                <Title level={2} className="!text-red-700 !mb-1">{counts.rejected}</Title>
-                <Text className="text-red-600 font-medium">Bị từ chối</Text>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Filter Tabs */}
-        <Card className="border-0 shadow-lg mb-6">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {[
-              { key: 'all', label: 'Tất cả', color: 'blue' },
-              { key: 'pending', label: 'Chờ duyệt', color: 'yellow' },
-              { key: 'accepted', label: 'Đã duyệt', color: 'green' },
-              { key: 'rejected', label: 'Bị từ chối', color: 'red' }
-            ].map(tab => (
-              <Button
-                key={tab.key}
-                type={activeTab === tab.key ? 'primary' : 'default'}
-                onClick={() => setActiveTab(tab.key)}
-                className={activeTab === tab.key ? 'bg-gradient-to-r from-red-500 to-pink-600 border-0' : ''}
-              >
-                {tab.label}
-              </Button>
-            ))}
-          </div>
-        </Card>
-
-        {/* Table */}
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-          <Table 
-            columns={columns} 
-            dataSource={filteredRequests} 
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-            className="overflow-hidden"
-          />
-        </Card>
-      </div>
+      {/* Table */}
+      <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <Table 
+          columns={columns} 
+          dataSource={filteredRequests} 
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          className="overflow-hidden"
+        />
+      </Card>
 
       {/* Modal */}
       {isModalVisible && selectedRequest && (
@@ -259,7 +243,6 @@ const StaffBloodRequests = () => {
           </Space>
         </Modal>
       )}
-      <Footer/>
     </div>
   );
 };

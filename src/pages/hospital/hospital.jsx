@@ -21,7 +21,7 @@ import {
 } from "@ant-design/icons";
 import { format, parseISO } from "date-fns";
 import dayjs from "dayjs"; // Cần dayjs để làm việc với AntD DatePicker
-import { getHospitals } from "../../service/hospitalApi";
+import { getHospitalsNew } from "../../service/hospitalApi";
 import { useSelector } from "react-redux";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
@@ -29,56 +29,23 @@ import Footer from "../../components/ui/Footer";
 const { RangePicker } = DatePicker;
 
 // --- Component Card cho mỗi bệnh viện ---
-const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
-  // Lấy giờ hoạt động dựa trên ngày tìm kiếm
-  const getOperatingHoursForDate = () => {
-    // Nếu không có ngày tìm kiếm, hiển thị lịch đầu tiên có
-    if (!searchDate) {
-      const firstSchedule = hospital.operatingSchedule?.[0];
-      if (firstSchedule) {
-        return `${format(parseISO(firstSchedule.date), "dd-MM-yyyy")} - ${
-          firstSchedule.hours
-        }`;
-      }
-      return hospital.workingHours || "Chưa có thông tin";
-    }
-
-    // Tìm lịch cho ngày đã chọn
-    const schedule = hospital.operatingSchedule?.find(
-      (s) => s.date === searchDate
-    );
-    if (schedule) {
-      return `${format(parseISO(schedule.date), "dd-MM-yyyy")} - ${
-        schedule.hours
-      }`;
-    }
-
-    return `${format(parseISO(searchDate), "dd-MM-yyyy")} - Không hoạt động`;
+const HospitalCard = ({ hospital, onBookAppointment }) => {
+  const formatTime = (isoString) => {
+    return format(parseISO(isoString), "HH:mm");
   };
 
-  // Lấy số lượng suất đăng ký
-  const getAvailableSlots = () => {
-    // Nếu không có ngày tìm kiếm, tính tổng tất cả các ngày
-    if (!searchDate) {
-      const totalSlots = hospital.donationDays.reduce(
-        (total, day) => total + day.timeSlots.length,
-        0
-      );
-      const bookedSlots = Math.floor(totalSlots * 0.3); // Giả lập đã đặt
-      return `${totalSlots - bookedSlots}/${totalSlots}`;
-    }
+  const formatDate = (isoString) => {
+    return format(parseISO(isoString), "dd/MM/yyyy");
+  };
 
-    // Tính cho ngày đã chọn
-    const daySchedule = hospital.donationDays.find(
-      (day) => day.date === searchDate
-    );
-    if (daySchedule) {
-      const totalSlots = daySchedule.timeSlots.length;
-      const bookedSlots = Math.floor(totalSlots * 0.3); // Giả lập đã đặt
-      return `${totalSlots - bookedSlots}/${totalSlots}`;
-    }
+  const getOperatingHours = () => {
+    const startTime = formatTime(hospital.startTime);
+    const endTime = formatTime(hospital.endTime);
+    return `${startTime} - ${endTime}`;
+  };
 
-    return "0/0";
+  const getOperatingDate = () => {
+    return formatDate(hospital.startTime);
   };
 
   return (
@@ -101,26 +68,30 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
         {/* Thông tin chính */}
         <div className="flex-1 p-4 pt-0 sm:pt-4 text-center sm:text-left">
           <div className="flex justify-between items-start mb-2">
-            {/* SỬA: Thay đổi màu tên bệnh viện */}
             <h3 className="text-xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent cursor-pointer">
-              {hospital.name}
+              {hospital.title}
             </h3>
           </div>
 
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-gray-600">
               <EnvironmentOutlined className="mr-2 text-gray-400" />
-              <span className="text-sm">Địa chỉ: {hospital.address}</span>
+              <span className="text-sm">Địa chỉ: {hospital.location}</span>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <CalendarOutlined className="mr-2 text-gray-400" />
+              <span className="text-sm">
+                Ngày hoạt động: {getOperatingDate()}
+              </span>
             </div>
             <div className="flex items-center text-gray-600">
               <ClockCircleOutlined className="mr-2 text-gray-400" />
               <span className="text-sm">
-                Thời gian hoạt động: {getOperatingHoursForDate()}
+                Thời gian hoạt động: {getOperatingHours()}
               </span>
             </div>
-            <div className="flex items-center text-gray-600">
-              <PhoneOutlined className="mr-2 text-gray-400" />
-              <span className="text-sm">Số điện thoại: {hospital.phone}</span>
+            <div className="text-gray-600">
+              <span className="text-sm">{hospital.description}</span>
             </div>
           </div>
         </div>
@@ -130,17 +101,14 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
           <div className="text-right mb-4 sm:mb-0">
             <div className="flex items-center text-gray-500 mb-1">
               <TeamOutlined className="mr-1" />
-              <span className="text-sm">Số lượng đăng ký</span>
+              <span className="text-sm">Trạng thái</span>
             </div>
-            {/* SỬA: Thay đổi màu số lượng đăng ký */}
             <div className="text-2xl font-bold">
               <span className="bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
-                {getAvailableSlots()}
-              </span>{" "}
-              <span className="text-sm font-normal text-gray-500">Người</span>
+                Mở cửa
+              </span>
             </div>
           </div>
-          {/* SỬA: Thay đổi màu nút Đặt lịch */}
           <button
             onClick={() => onBookAppointment(hospital)}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl text-white bg-gradient-to-r from-red-500 to-pink-600 border-none shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
@@ -156,34 +124,20 @@ const HospitalCard = ({ hospital, onBookAppointment, searchDate }) => {
 
 // --- Component Trang chính ---
 const Hospitals = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const user = useSelector((state) => state.user);
-  // State cho RangePicker, sử dụng mảng [startDate, endDate]
-  const [dateRange, setDateRange] = useState(() => {
-    const startDateParam = searchParams.get("startDate");
-    const endDateParam = searchParams.get("endDate");
-    if (startDateParam && endDateParam) {
-      return [dayjs(startDateParam), dayjs(endDateParam)];
-    }
-    return null;
-  });
 
   useEffect(() => {
     fetchHospitals();
-  }, [searchParams]);
+  }, []);
 
   const fetchHospitals = async () => {
     setLoading(true);
     try {
-      const params = {
-        startDate: searchParams.get("startDate"),
-        endDate: searchParams.get("endDate"),
-      };
-      const response = await getHospitals(params);
+      const response = await getHospitalsNew();
       if (response.success) {
         setHospitals(response.data);
       }
@@ -200,7 +154,6 @@ const Hospitals = () => {
         state: {
           redirectTo: "/donorblood",
           selectedHospital: hospital,
-          availableDates: hospital.donationDays,
         },
       });
       return;
@@ -209,35 +162,15 @@ const Hospitals = () => {
     navigate("/donorblood", {
       state: {
         selectedHospital: hospital,
-        availableDates: hospital.donationDays,
       },
     });
   };
 
-  // Xử lý khi nhấn nút tìm kiếm theo ngày
-  const handleDateSearch = () => {
-    if (dateRange && dateRange[0] && dateRange[1]) {
-      const newSearchParams = new URLSearchParams();
-      newSearchParams.set("startDate", dateRange[0].format("YYYY-MM-DD"));
-      newSearchParams.set("endDate", dateRange[1].format("YYYY-MM-DD"));
-      setSearchParams(newSearchParams);
-    }
-  };
-
   const filteredHospitals = hospitals.filter(
     (hospital) =>
-      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.address.toLowerCase().includes(searchTerm.toLowerCase())
+      hospital.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hospital.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getSearchDateRange = () => {
-    if (dateRange) {
-      return `${dateRange[0].format("DD-MM-YYYY")} - ${dateRange[1].format(
-        "DD-MM-YYYY"
-      )}`;
-    }
-    return "Chưa chọn thời gian";
-  };
 
   return (
     <>
@@ -248,41 +181,15 @@ const Hospitals = () => {
             <div className="flex items-center gap-4 mb-4">
               <CalendarOutlined className="text-2xl text-gray-600" />
               <h1 className="text-2xl font-bold text-gray-800">
-                Kết quả tìm kiếm bệnh viện
+                Danh sách bệnh viện hiến máu
               </h1>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg mb-4">
               <div className="text-lg font-medium text-blue-800">
-                Thời gian đã chọn: {getSearchDateRange()}
+                Tìm kiếm và đặt lịch hiến máu tại các bệnh viện
               </div>
             </div>
-
-            <Card className="p-4 mb-6">
-              <div className="flex flex-col md:flex-row gap-4 items-end">
-                <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Tìm kiếm theo ngày khác
-                  </label>
-                  <RangePicker
-                    value={dateRange}
-                    onChange={setDateRange}
-                    format="DD-MM-YYYY"
-                    className="h-10 w-full"
-                    placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                  />
-                </div>
-                <div className="md:w-auto w-full">
-                  <button
-                    onClick={handleDateSearch}
-                    className="w-full md:w-auto h-10 px-5 flex items-center justify-center gap-2 font-semibold rounded-xl text-white bg-gradient-to-r from-red-500 to-pink-600 shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
-                  >
-                    <SearchOutlined className="text-white text-base" />
-                    <span className="text-sm">Tìm kiếm</span>
-                  </button>
-                </div>
-              </div>
-            </Card>
           </div>
 
           <div className="mb-6">
@@ -298,14 +205,13 @@ const Hospitals = () => {
           </div>
 
           <div className="mb-6">
-            {/* SỬA: Thay đổi màu số kết quả tìm kiếm */}
             <h2 className="text-xl font-bold">
               {loading ? (
                 "Đang tải..."
               ) : (
                 <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
-  {filteredHospitals.length} Kết quả
-</span>
+                  {filteredHospitals.length} Bệnh viện
+                </span>
               )}
             </h2>
           </div>
@@ -321,7 +227,6 @@ const Hospitals = () => {
                     key={hospital.id}
                     hospital={hospital}
                     onBookAppointment={handleBookAppointment}
-                    searchDate={searchParams.get("startDate")}
                   />
                 ))
               ) : !loading ? (

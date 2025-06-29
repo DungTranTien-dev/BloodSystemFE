@@ -10,6 +10,8 @@ import QAPage from "./pages/Q&A/Q&A";
 import StaffManagement from "./pages/staff/StaffManagement";
 import StaffBloodRequests from "./pages/staff/StaffBloodRequests";
 import StaffDonorRequests from "./pages/staff/StaffDonorRequests";
+import CreateHospital from "./pages/staff/CreateHospital";
+import DashboardS from "./components/dashboard";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -88,15 +90,15 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    {
-      path: "/donorblood",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <DonorBlood />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
+    // {
+    //   path: "/donorblood",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <DonorBlood />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
     {
       path: "/hospital",
       element: (
@@ -106,7 +108,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
+    {
       path: "/donation-confirmation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -115,7 +117,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
+    {
       path: "/track-donation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -302,6 +304,40 @@ function App() {
     {
       path: "*",
       element: <SimpleErrorFallback />,
+    },
+    {
+      path: "/DashboardS",
+      element: <DashboardS />,
+      children: [
+        {
+          path: "", // Default route - overview
+          element: <div>Trang tổng quan</div>,
+        },
+        {
+          path: "overview",
+          element: <div>Trang tổng quan</div>,
+        },
+        {
+          path: "donor-blood",
+          element: <StaffDonorRequests />,
+        },
+        {
+          path: "blood-request",
+          element: <StaffBloodRequests />,
+        },
+        {
+          path: "user",
+          element: <div>Quản lý người dùng</div>,
+        },
+        {
+          path: "create-hospital",
+          element: <CreateHospital />,
+        },
+        {
+          path: "create-user",
+          element: <div>Tạo user</div>,
+        }
+      ],
     },
   ]);
 
