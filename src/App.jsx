@@ -7,11 +7,10 @@ import Hospitals from "./pages/hospital/hospital";
 import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
 import TrackDonation from "./pages/DonorBlood/TrackDonation";
 import QAPage from "./pages/Q&A/Q&A";
-import StaffManagement from "./pages/staff/StaffManagement";
-import StaffBloodRequests from "./pages/staff/StaffBloodRequests";
-import StaffDonorRequests from "./pages/staff/StaffDonorRequests";
-import CreateHospital from "./pages/staff/CreateHospital";
+import StaffBloodRequests from "./pages/dashboard-staff/StaffBloodRequests";
+import StaffDonorRequests from "./pages/dashboard-staff/StaffDonorRequests";
 import DashboardS from "./components/dashboard";
+import CreateHospital from "./pages/dashboard-staff/CreateHospital";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -185,24 +184,6 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <StaffDonorRequests />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <StaffManagement />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <StaffManagement />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,

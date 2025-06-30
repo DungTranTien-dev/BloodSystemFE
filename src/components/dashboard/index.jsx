@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -9,7 +9,7 @@ import {
   ExperimentOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 const { Header, Content, Footer, Sider } = Layout;
 
 function getItem(label, key, icon) {
@@ -41,9 +41,33 @@ const items = [
 const DashboardS = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("overview");
+  const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  // Extract the current page from URL and set selectedKey
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    const currentPage = pathSegments[pathSegments.length - 1];
+    
+    // Map URL segments to menu keys
+    const pageToKeyMap = {
+      'overview': 'overview',
+      'donor-blood': 'donor-blood', 
+      'blood-request': 'blood-request',
+      'user': 'user',
+      'create-hospital': 'create-hospital',
+      'create-user': 'create-user'
+    };
+    
+    if (pageToKeyMap[currentPage]) {
+      setSelectedKey(pageToKeyMap[currentPage]);
+    } else {
+      // Default to overview if no valid page found
+      setSelectedKey('overview');
+    }
+  }, [location.pathname]);
 
   const handleMenuClick = (e) => {
     setSelectedKey(e.key);
@@ -203,7 +227,7 @@ const DashboardS = () => {
               </div>
             )}
 
-            <Outlet />
+            {selectedKey !== "overview" && <Outlet />}
             {/* đây la body */}
           </div>
         </Content>

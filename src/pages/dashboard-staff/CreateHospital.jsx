@@ -38,7 +38,6 @@ import {
 } from '../../service/hospitalApi';
 import dayjs from 'dayjs';
 import { format, parseISO } from 'date-fns';
-import { toast } from 'react-toastify';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -101,7 +100,10 @@ const CreateHospital = () => {
       const response = await createHospital(hospitalData);
       
       if (response.success) {
-        toast.success("Bệnh viện đã được tạo thành công!");
+        notification.success({
+          message: 'Thành công',
+          description: response.message || 'Bệnh viện đã được tạo thành công!',
+        });
         form.resetFields();
         setIsAddModalVisible(false);
         fetchHospitals();
@@ -109,7 +111,10 @@ const CreateHospital = () => {
         throw new Error(response.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
-      toast.error("Không thể tạo bệnh viện. Vui lòng thử lại.");
+      notification.error({
+        message: 'Lỗi',
+        description: error.message || 'Không thể tạo bệnh viện. Vui lòng thử lại.',
+      });
     } finally {
       setLoading(false);
     }
@@ -135,7 +140,10 @@ const CreateHospital = () => {
       const response = await updateHospital(editingHospital.donationEventId, hospitalData);
       
       if (response.success) {
-        toast.success("Bệnh viện đã được cập nhật thành công!");
+        notification.success({
+          message: 'Thành công',
+          description: response.message || 'Bệnh viện đã được cập nhật thành công!',
+        });
         editForm.resetFields();
         setIsEditModalVisible(false);
         setEditingHospital(null);
@@ -144,7 +152,10 @@ const CreateHospital = () => {
         throw new Error(response.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
-      toast.error("Không thể cập nhật bệnh viện. Vui lòng thử lại.");
+      notification.error({
+        message: 'Lỗi',
+        description: error.message || 'Không thể cập nhật bệnh viện. Vui lòng thử lại.',
+      });
     } finally {
       setLoadingEdit(false);
     }
@@ -155,13 +166,22 @@ const CreateHospital = () => {
       const response = await deleteHospital(donationEventId);
       
       if (response.success) {
-        toast.success("Bệnh viện đã được xóa thành công!");
+        notification.success({
+          message: 'Thành công',
+          description: response.message || 'Bệnh viện đã được xóa thành công!',
+        });
         fetchHospitals();
       } else {
-        toast.error("Không thể xóa bệnh viện");
+        notification.error({
+          message: 'Lỗi',
+          description: response.error || 'Không thể xóa bệnh viện',
+        });
       }
     } catch (error) {
-      toast.error('Không thể xóa bệnh viện. Vui lòng thử lại.');
+      notification.error({
+        message: 'Lỗi',
+        description: 'Không thể xóa bệnh viện. Vui lòng thử lại.',
+      });
     }
   };
 
@@ -301,11 +321,11 @@ const CreateHospital = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Xem chi tiết">
-          <Button
-            icon={<EyeOutlined />}
-            size="small"
+            <Button
+              icon={<EyeOutlined />}
+              size="small"
               type="text"
-            onClick={() => showModal(record)}
+              onClick={() => showModal(record)}
               style={{ color: '#3b82f6' }}
             />
           </Tooltip>
@@ -345,52 +365,21 @@ const CreateHospital = () => {
       {/* Header with Statistics */}
       <div className="mb-8">
         <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
-          <BankOutlined className="text-2xl text-white" />
-        </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
-          Quản lý bệnh viện
-        </h1>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
+            <BankOutlined className="text-2xl text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            Quản lý bệnh viện
+          </h1>
           <p className="text-gray-600 text-lg">Quản lý và theo dõi tất cả bệnh viện trong hệ thống</p>
-        </div>
-
-        {/* Statistics Cards */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={8}>
-            <Card className="text-center border-0 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600">
-              <Statistic
-                title={<span style={{ color: 'white', fontSize: '16px' }}>Tổng số bệnh viện</span>}
-                value={hospitals.length}
-                valueStyle={{ color: 'white', fontSize: '32px', fontWeight: 'bold' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card className="text-center border-0 shadow-lg bg-gradient-to-r from-green-500 to-green-600">
-              <Statistic
-                title={<span style={{ color: 'white', fontSize: '16px' }}>Đang hoạt động</span>}
-                value={hospitals.filter(h => getStatusColor(h.startTime, h.endTime) === 'green').length}
-                valueStyle={{ color: 'white', fontSize: '32px', fontWeight: 'bold' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card className="text-center border-0 shadow-lg bg-gradient-to-r from-orange-500 to-orange-600">
-              <Statistic
-                title={<span style={{ color: 'white', fontSize: '16px' }}>Sắp diễn ra</span>}
-                value={hospitals.filter(h => getStatusColor(h.startTime, h.endTime) === 'blue').length}
-                valueStyle={{ color: 'white', fontSize: '32px', fontWeight: 'bold' }}
-              />
-            </Card>
-          </Col>
-        </Row>
+        </div>   
       </div>
 
       {/* Main Content - Hospital List */}
-          <Card 
-            title={
+      <Card 
+        title={
           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <BankOutlined className="text-red-500" />
               <span className="font-semibold text-lg">Danh sách bệnh viện</span>
             </div>
@@ -413,9 +402,9 @@ const CreateHospital = () => {
                 Thêm bệnh viện
               </Button>
             </Space>
-              </div>
-            }
-            className="border-0 shadow-xl bg-white/80 backdrop-blur-sm"
+          </div>
+        }
+        className="border-0 shadow-xl bg-white/80 backdrop-blur-sm"
       >
         <Table 
           columns={columns} 
@@ -472,148 +461,152 @@ const CreateHospital = () => {
         onCancel={handleAddModalCancel}
         footer={null}
         width={800}
-        destroyOnHidden
-          >
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                date: dayjs(),
-                startTime: dayjs().hour(8).minute(0),
-                endTime: dayjs().hour(17).minute(0),
-              }}
-            >
-              <Row gutter={[16, 0]}>
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    label={<Text strong>Tên bệnh viện</Text>}
-                    name="title"
-                    rules={[
-                      { required: true, message: 'Vui lòng nhập tên bệnh viện!' },
-                      { min: 3, message: 'Tên bệnh viện phải có ít nhất 3 ký tự!' }
-                    ]}
-                  >
-                    <Input 
-                      size="large" 
-                      placeholder="Nhập tên bệnh viện"
-                      prefix={<BankOutlined className="text-gray-400" />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    label={<Text strong>Địa chỉ</Text>}
-                    name="location"
-                    rules={[
-                      { required: true, message: 'Vui lòng nhập địa chỉ!' },
-                      { min: 10, message: 'Địa chỉ phải có ít nhất 10 ký tự!' }
-                    ]}
-                  >
-                    <Input 
-                      size="large" 
-                      placeholder="Nhập địa chỉ bệnh viện"
-                  prefix={<EnvironmentOutlined className="text-gray-400" />}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Row gutter={[16, 0]}>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label={<Text strong>Ngày hoạt động</Text>}
-                    name="date"
-                    rules={[
-                      { required: true, message: 'Vui lòng chọn ngày!' }
-                    ]}
-                  >
-                    <DatePicker 
-                      size="large" 
-                      style={{ width: '100%' }}
-                      format="DD/MM/YYYY"
-                      placeholder="Chọn ngày"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label={<Text strong>Giờ bắt đầu</Text>}
-                    name="startTime"
-                    rules={[
-                      { required: true, message: 'Vui lòng chọn giờ bắt đầu!' }
-                    ]}
-                  >
-                    <TimePicker 
-                      size="large" 
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="Chọn giờ bắt đầu"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label={<Text strong>Giờ kết thúc</Text>}
-                    name="endTime"
-                    rules={[
-                      { required: true, message: 'Vui lòng chọn giờ kết thúc!' }
-                    ]}
-                  >
-                    <TimePicker 
-                      size="large" 
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="Chọn giờ kết thúc"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
+        destroyOnClose
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={{
+            date: dayjs(),
+            startTime: dayjs().hour(8).minute(0),
+            endTime: dayjs().hour(17).minute(0),
+          }}
+        >
+          <Row gutter={[16, 0]}>
+            <Col xs={24} md={12}>
               <Form.Item
-                label={<Text strong>Mô tả</Text>}
-                name="description"
+                label={<Text strong>Tên bệnh viện</Text>}
+                name="title"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập tên bệnh viện!' },
+                  { min: 3, message: 'Tên bệnh viện phải có ít nhất 3 ký tự!' }
+                ]}
               >
-                <TextArea 
-                  rows={3}
-                  placeholder="Nhập mô tả chi tiết về bệnh viện, dịch vụ hiến máu, quy trình..."
-                  showCount
-                  maxLength={500}
+                <Input 
+                  size="large" 
+                  placeholder="Nhập tên bệnh viện"
+                  prefix={<BankOutlined className="text-gray-400" />}
                 />
               </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item
+                label={<Text strong>Địa chỉ</Text>}
+                name="location"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập địa chỉ!' },
+                  { min: 10, message: 'Địa chỉ phải có ít nhất 10 ký tự!' }
+                ]}
+              >
+                <Input 
+                  size="large" 
+                  placeholder="Nhập địa chỉ bệnh viện"
+                  prefix={<EnvironmentOutlined className="text-gray-400" />}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-              <Form.Item className="mb-0">
+          <Row gutter={[16, 0]}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label={<Text strong>Ngày hoạt động</Text>}
+                name="date"
+                rules={[
+                  { required: true, message: 'Vui lòng chọn ngày!' }
+                ]}
+              >
+                <DatePicker 
+                  size="large" 
+                  style={{ width: '100%' }}
+                  format="DD/MM/YYYY"
+                  placeholder="Chọn ngày"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label={<Text strong>Giờ bắt đầu</Text>}
+                name="startTime"
+                rules={[
+                  { required: true, message: 'Vui lòng chọn giờ bắt đầu!' }
+                ]}
+              >
+                <TimePicker 
+                  size="large" 
+                  style={{ width: '100%' }}
+                  format="HH:mm"
+                  placeholder="Chọn giờ bắt đầu"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label={<Text strong>Giờ kết thúc</Text>}
+                name="endTime"
+                rules={[
+                  { required: true, message: 'Vui lòng chọn giờ kết thúc!' }
+                ]}
+              >
+                <TimePicker 
+                  size="large" 
+                  style={{ width: '100%' }}
+                  format="HH:mm"
+                  placeholder="Chọn giờ kết thúc"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label={<Text strong>Mô tả</Text>}
+            name="description"
+            rules={[
+              { min: 20, message: 'Mô tả phải có ít nhất 20 ký tự!' }
+            ]}
+          >
+            <TextArea 
+              rows={3}
+              placeholder="Nhập mô tả chi tiết về bệnh viện, dịch vụ hiến máu, quy trình..."
+              showCount
+              maxLength={500}
+            />
+          </Form.Item>
+
+          <Form.Item className="mb-0">
             <div className="flex justify-end gap-2">
               <Button onClick={handleAddModalCancel}>
                 Hủy
               </Button>
-                  <Button
-                    type="primary"
-                    size="large"
-                    htmlType="submit"
-                    loading={loading}
-                    icon={<SaveOutlined />}
+              <Button
+                type="primary"
+                size="large"
+                htmlType="submit"
+                loading={loading}
+                icon={<SaveOutlined />}
                 className="bg-gradient-to-r from-red-500 to-pink-600 border-0 hover:from-red-600 hover:to-pink-700"
-                  >
-                    Tạo bệnh viện
-                  </Button>
-                </div>
-              </Form.Item>
-            </Form>
+              >
+                Tạo bệnh viện
+              </Button>
+            </div>
+          </Form.Item>
+        </Form>
       </Modal>
 
       {/* Modal chỉnh sửa bệnh viện */}
       <Modal
-            title={
-                <div className="flex items-center gap-2">
+        title={
+          <div className="flex items-center gap-2">
             <EditOutlined className="text-orange-500" />
             <span className="font-semibold text-lg">Chỉnh sửa bệnh viện</span>
-              </div>
-            }
+          </div>
+        }
         open={isEditModalVisible}
         onCancel={handleEditModalCancel}
         footer={null}
         width={800}
+        destroyOnClose
       >
         <Form
           form={editForm}
@@ -701,14 +694,17 @@ const CreateHospital = () => {
                   style={{ width: '100%' }}
                   format="HH:mm"
                   placeholder="Chọn giờ kết thúc"
-            />
+                />
               </Form.Item>
-        </Col>
-      </Row>
+            </Col>
+          </Row>
 
           <Form.Item
             label={<Text strong>Mô tả</Text>}
             name="description"
+            rules={[
+              { min: 20, message: 'Mô tả phải có ít nhất 20 ký tự!' }
+            ]}
           >
             <TextArea 
               rows={3}
@@ -736,7 +732,7 @@ const CreateHospital = () => {
             </div>
           </Form.Item>
         </Form>
-        </Modal>
+      </Modal>
     </div>
   );
 };
