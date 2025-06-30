@@ -19,49 +19,26 @@ export const getHospitals = async (filters = {}) => {
 // New API function for the new hospital structure
 export const getHospitalsNew = async () => {
   try {
-    // TODO: Replace with actual API call
-    // const response = await axios.get('/api/hospitals');
-    // return response.data;
+    const response = await api.get('Event/all');
     
-    // Mock data for new structure
-    const mockHospitals = [
-      {
-        id: 1,
-        title: "Bệnh viện Bạch Mai",
-        location: "78 Giải Phóng, Đông Da, Hà Nội",
-        startTime: "2025-06-29T07:00:00.000Z",
-        endTime: "2025-06-29T17:00:00.000Z",
-        description: "Bệnh viện hạng đặc biệt với đầy đủ trang thiết bị hiện đại"
-      },
-      {
-        id: 2,
-        title: "Bệnh viện Việt Đức",
-        location: "40 Tràng Thi, Hoàn Kiếm, Hà Nội",
-        startTime: "2025-06-29T07:30:00.000Z",
-        endTime: "2025-06-29T17:30:00.000Z",
-        description: "Bệnh viện chuyên khoa ngoại hàng đầu Việt Nam"
-      },
-      {
-        id: 3,
-        title: "Bệnh viện Vinmec Times City",
-        location: "458 Minh Khai, Hai Bà Trưng, Hà Nội",
-        startTime: "2025-06-29T08:00:00.000Z",
-        endTime: "2025-06-29T20:00:00.000Z",
-        description: "Bệnh viện tư nhân với dịch vụ chất lượng cao"
-      }
-    ];
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    if (response.data && response.data.isSuccess && Array.isArray(response.data.result)) {
+      return {
+        success: true,
+        data: response.data.result,
+        total: response.data.result.length
+      };
+    } else {
     return {
       success: true,
-      data: mockHospitals,
-      total: mockHospitals.length
+        data: [],
+        total: 0
     };
+    }
   } catch (error) {
     return {
       success: false,
-      error: error.message
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy danh sách bệnh viện',
+      data: []
     };
   }
 };
@@ -73,11 +50,11 @@ export const createHospital = async (hospitalData) => {
     
     // Handle the actual API response structure
     if (response.data && response.data.isSuccess) {
-      return {
-        success: true,
+    return {
+      success: true,
         data: response.data.result || response.data,
         message: response.data.message || 'Bệnh viện đã được tạo thành công'
-      };
+    };
     } else {
       return {
         success: false,
@@ -95,10 +72,10 @@ export const createHospital = async (hospitalData) => {
 export const getHospitalById = async (donationEventId) => {
   try {
     const response = await api.get(`Event/${donationEventId}`);
-    
+  
     if (response.data && response.data.isSuccess && response.data.result) {
-      return {
-        success: true,
+  return {
+    success: true,
         data: response.data.result
       };
     } else {
@@ -111,7 +88,7 @@ export const getHospitalById = async (donationEventId) => {
     return {
       success: false,
       error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy thông tin bệnh viện'
-    };
+  };
   }
 };
 
@@ -165,8 +142,8 @@ export const updateHospital = async (donationEventId, hospitalData) => {
     const response = await api.put('Event/update', hospitalData);
 
     if (response.data && response.data.isSuccess) {
-      return {
-        success: true,
+    return {
+      success: true,
         data: response.data.result || response.data,
         message: response.data.message || 'Bệnh viện đã được cập nhật thành công'
       };

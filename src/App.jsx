@@ -89,15 +89,15 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    // {
-    //   path: "/donorblood",
-    //   element: (
-    //     <Suspense fallback={<LoadingSpinner />}>
-    //       <DonorBlood />
-    //     </Suspense>
-    //   ),
-    //   errorElement: <SimpleErrorFallback />,
-    // },
+    {
+      path: "/donor-blood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DonorBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
     {
       path: "/hospital",
       element: (

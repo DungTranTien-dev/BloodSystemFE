@@ -321,11 +321,11 @@ const CreateHospital = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Xem chi tiết">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
+          <Button
+            icon={<EyeOutlined />}
+            size="small"
               type="text"
-              onClick={() => showModal(record)}
+            onClick={() => showModal(record)}
               style={{ color: '#3b82f6' }}
             />
           </Tooltip>
@@ -365,12 +365,12 @@ const CreateHospital = () => {
       {/* Header with Statistics */}
       <div className="mb-8">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
-            <BankOutlined className="text-2xl text-white" />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Quản lý bệnh viện
-          </h1>
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
+          <BankOutlined className="text-2xl text-white" />
+        </div>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          Quản lý bệnh viện
+        </h1>
           <p className="text-gray-600 text-lg">Quản lý và theo dõi tất cả bệnh viện trong hệ thống</p>
         </div>   
       </div>
@@ -562,15 +562,10 @@ const CreateHospital = () => {
           <Form.Item
             label={<Text strong>Mô tả</Text>}
             name="description"
-            rules={[
-              { min: 20, message: 'Mô tả phải có ít nhất 20 ký tự!' }
-            ]}
           >
-            <TextArea 
-              rows={3}
-              placeholder="Nhập mô tả chi tiết về bệnh viện, dịch vụ hiến máu, quy trình..."
-              showCount
-              maxLength={500}
+            <Input.TextArea
+              rows={4}
+              placeholder="Nhập mô tả chi tiết về sự kiện hiến máu"
             />
           </Form.Item>
 
@@ -702,15 +697,10 @@ const CreateHospital = () => {
           <Form.Item
             label={<Text strong>Mô tả</Text>}
             name="description"
-            rules={[
-              { min: 20, message: 'Mô tả phải có ít nhất 20 ký tự!' }
-            ]}
           >
-            <TextArea 
-              rows={3}
-              placeholder="Nhập mô tả chi tiết về bệnh viện, dịch vụ hiến máu, quy trình..."
-              showCount
-              maxLength={500}
+            <Input.TextArea
+              rows={4}
+              placeholder="Nhập mô tả chi tiết về sự kiện hiến máu"
             />
           </Form.Item>
 

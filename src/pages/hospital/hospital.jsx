@@ -125,9 +125,19 @@ const HospitalCard = ({ hospital, onBookAppointment }) => {
 // --- Component Trang chính ---
 const Hospitals = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState(() => {
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    if (startDate && endDate) {
+      return [dayjs(startDate), dayjs(endDate)];
+    }
+    return null;
+  });
+  const [tempDateRange, setTempDateRange] = useState(dateRange);
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -148,29 +158,63 @@ const Hospitals = () => {
     }
   };
 
+  const handleDateSearch = () => {
+    setDateRange(tempDateRange);
+    if (tempDateRange && tempDateRange[0] && tempDateRange[1]) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("startDate", tempDateRange[0].format("YYYY-MM-DD"));
+      newSearchParams.set("endDate", tempDateRange[1].format("YYYY-MM-DD"));
+      setSearchParams(newSearchParams, { replace: true });
+    } else {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete("startDate");
+      newSearchParams.delete("endDate");
+      setSearchParams(newSearchParams, { replace: true });
+    }
+  };
+
   const handleBookAppointment = (hospital) => {
     if (!user) {
       navigate("/login", {
         state: {
-          redirectTo: "/donorblood",
+          redirectTo: "/donor-blood",
           selectedHospital: hospital,
         },
       });
       return;
     }
 
-    navigate("/donorblood", {
+    navigate("/donor-blood", {
       state: {
         selectedHospital: hospital,
       },
     });
   };
 
-  const filteredHospitals = hospitals.filter(
-    (hospital) =>
+  const filteredHospitals = hospitals.filter((hospital) => {
+    // Do not show any hospitals if no date range is selected
+    if (!dateRange || !dateRange[0] || !dateRange[1]) {
+      return false;
+    }
+
+    const searchMatch =
       hospital.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      hospital.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const [filterStart, filterEnd] = dateRange;
+    const hospitalStart = dayjs(hospital.startTime);
+
+    // Format dates to strings for robust comparison
+    const hospitalDateStr = hospitalStart.format("YYYY-MM-DD");
+    const filterStartDateStr = filterStart.format("YYYY-MM-DD");
+    const filterEndDateStr = filterEnd.format("YYYY-MM-DD");
+
+    const isWithinRange =
+      hospitalDateStr >= filterStartDateStr &&
+      hospitalDateStr <= filterEndDateStr;
+
+    return searchMatch && isWithinRange;
+  });
 
   return (
     <>
@@ -181,18 +225,36 @@ const Hospitals = () => {
             <div className="flex items-center gap-4 mb-4">
               <CalendarOutlined className="text-2xl text-gray-600" />
               <h1 className="text-2xl font-bold text-gray-800">
-                Danh sách bệnh viện hiến máu
+                Bạn cần đặt lịch vào thời gian nào?
               </h1>
-            </div>
-
-            <div className="bg-blue-50 p-4 rounded-lg mb-4">
-              <div className="text-lg font-medium text-blue-800">
-                Tìm kiếm và đặt lịch hiến máu tại các bệnh viện
-              </div>
             </div>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-6 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <RangePicker
+                value={tempDateRange}
+                size="large"
+                onChange={(dates) => setTempDateRange(dates)}
+                placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                format="DD/MM/YYYY"
+                className="flex-grow"
+              />
+              <Button
+                size="large"
+                icon={<SearchOutlined />}
+                onClick={handleDateSearch}
+                style={{
+                  background:
+                    "linear-gradient(to right, #ef4444, #db2777)",
+                  color: "white",
+                  border: "none",
+                }}
+                className="shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
+              >
+                Tìm kiếm
+              </Button>
+            </div>
             <Input
               placeholder="Tìm kiếm bệnh viện theo tên hoặc địa chỉ..."
               value={searchTerm}
@@ -201,6 +263,7 @@ const Hospitals = () => {
                 <SearchOutlined className="site-form-item-icon text-gray-400" />
               }
               size="large"
+              className="w-full"
             />
           </div>
 
@@ -233,14 +296,25 @@ const Hospitals = () => {
                 <div className="flex justify-center items-center h-full pt-16">
                   <Empty
                     description={
-                      <div>
-                        <p className="font-semibold text-base">
-                          Không tìm thấy bệnh viện
-                        </p>
-                        <span className="text-gray-500">
-                          Vui lòng thử lại với tiêu chí tìm kiếm khác.
-                        </span>
-                      </div>
+                      !dateRange ? (
+                        <div>
+                          <p className="font-semibold text-base">
+                            Vui lòng chọn khoảng thời gian
+                          </p>
+                          <span className="text-gray-500">
+                            Để tìm kiếm, hãy chọn ngày bắt đầu và kết thúc.
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="font-semibold text-base">
+                            Không tìm thấy bệnh viện
+                          </p>
+                          <span className="text-gray-500">
+                            Vui lòng thử lại với tiêu chí tìm kiếm khác.
+                          </span>
+                        </div>
+                      )
                     }
                   />
                 </div>

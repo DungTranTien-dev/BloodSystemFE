@@ -15,7 +15,6 @@ import {
 import { Clock, Heart as HeartLucide, MapPin, UserCheck, Droplet, Activity, Smile } from 'lucide-react';
 import dayjs from 'dayjs';
 import Layout from '../../components/ui/Layout';
-import { getHospitalsByDate } from '../../service/hospitalApi';
 import { CalendarOutlined } from '@ant-design/icons';
 import { submitDonationRequest } from '../../service/donationApi';
 
@@ -25,62 +24,29 @@ const { Option } = Select;
 const DonorBlood = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [availableHospitals, setAvailableHospitals] = useState([]);
-  const [timeSlots, setTimeSlots] = useState([]);
+  const [operatingHours, setOperatingHours] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-  const selectedHospital = location.state?.selectedHospital;
-  const availableDates = location.state?.availableDates || [];
-
-  const loadHospitalsForDate = async (date) => {
-    if (!date) return;
-    const dateString = dayjs(date).format('YYYY-MM-DD');
-    try {
-      const response = await getHospitalsByDate(dateString);
-      if (response.success) {
-        setAvailableHospitals(response.data);
-        const hospital = response.data.find(h => h.id === selectedHospital?.id);
-        if (hospital) {
-          setTimeSlots(hospital.availableSlots);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading hospitals:', error);
-      message.error('Không thể tải danh sách bệnh viện.');
-    }
-  };
+  const { selectedHospital } = location.state || {};
 
   useEffect(() => {
-    if (selectedHospital && availableDates.length > 0) {
-      const firstAvailableDate = dayjs(availableDates[0].date);
+    if (selectedHospital) {
+      const eventDate = dayjs(selectedHospital.startTime);
       form.setFieldsValue({
-        donationDate: firstAvailableDate,
-        hospitalAddress: selectedHospital.address,
+        donationDate: eventDate,
+        hospitalAddress: selectedHospital.location,
       });
-      loadHospitalsForDate(firstAvailableDate);
+
+      const start = dayjs(selectedHospital.startTime);
+      const end = dayjs(selectedHospital.endTime);
+      setOperatingHours(`${start.format("HH:mm")} - ${end.format("HH:mm")}`);
     }
-  }, [selectedHospital, availableDates, form]);
+  }, [selectedHospital, form]);
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  const handleDateChange = (date) => {
-    form.setFieldsValue({ hospitalAddress: undefined, donationTime: undefined });
-    setTimeSlots([]);
-    if (date) {
-      loadHospitalsForDate(date);
-    }
-  };
-  
-  const handleHospitalAddressChange = (address) => {
-    const selected = availableHospitals.find(h => h.address === address);
-    if (selected) {
-      setTimeSlots(selected.availableSlots);
-      form.setFieldsValue({ donationTime: undefined });
-    }
-  };
-
-    const onFinish = async (values) => {
+  const onFinish = async (values) => {
     setLoading(true);
     message.loading({ content: 'Đang gửi đăng ký...', key: 'submit' });
 
@@ -114,17 +80,6 @@ const DonorBlood = () => {
     }
   };
 
-  const disabledDate = (current) => {
-    if (!current) return false;
-    const today = dayjs().startOf('day');
-    if (current < today) return true;
-    if (availableDates.length > 0) {
-      const availableDateStrings = availableDates.map(d => dayjs(d.date).format('YYYY-MM-DD'));
-      return !availableDateStrings.includes(current.format('YYYY-MM-DD'));
-    }
-    return false;
-  };
-  
   return (
     <Layout className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100">
       <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -143,7 +98,7 @@ const DonorBlood = () => {
             {selectedHospital && (
               <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
                 <p className="text-blue-800 font-semibold">
-                  Bạn đang đăng ký hiến máu tại: {selectedHospital.name}
+                  Bạn đang đăng ký hiến máu tại: {selectedHospital.title}
                 </p>
               </div>
             )}
@@ -185,20 +140,27 @@ const DonorBlood = () => {
 
                 {/* Ngày hiến máu */}
                 <Form.Item name="donationDate" label={<span className="text-sm font-medium text-red-500">Ngày dự kiến hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
-                  <DatePicker style={{ width: '100%' }} placeholder="Chọn ngày bạn muốn hiến máu" format="DD/MM/YYYY" disabledDate={disabledDate} onChange={handleDateChange} className="h-12 rounded-lg" suffixIcon={<CalendarOutlined />} />
+                  <DatePicker style={{ width: '100%' }} placeholder="Chọn ngày bạn muốn hiến máu" format="DD/MM/YYYY" disabled className="h-12 rounded-lg" suffixIcon={<CalendarOutlined />} />
                 </Form.Item>
                 
                 {/* Địa chỉ & Giờ hiến máu */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Form.Item name="hospitalAddress" label={<span className="text-sm font-medium text-red-500">Địa chỉ bệnh viện*</span>} rules={[{ required: true, message: 'Vui lòng chọn bệnh viện!' }]}>
-                    <Select placeholder="Chọn địa chỉ" onChange={handleHospitalAddressChange} disabled={!form.getFieldValue('donationDate')} className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
-                      {availableHospitals.map(hospital => (<Option key={hospital.id} value={hospital.address}><Text strong>{hospital.name}</Text></Option>))}
-                    </Select>
+                    <Input placeholder="Địa chỉ bệnh viện" disabled className="h-12" />
                   </Form.Item>
-                  <Form.Item name="donationTime" label={<span className="text-sm font-medium text-red-500">Giờ hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn giờ!' }]}>
-                    <Select placeholder="Chọn khung giờ" disabled={timeSlots.length === 0} className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
-                      {timeSlots.map(slot => (<Option key={slot} value={slot}><div className="flex items-center"><Clock size={14} className="mr-2"/>{slot}</div></Option>))}
-                    </Select>
+                  <Form.Item
+                    label={
+                      <span className="text-sm font-medium text-red-500">
+                        Giờ hoạt động
+                      </span>
+                    }
+                  >
+                    <Input
+                      value={operatingHours}
+                      disabled
+                      className="h-12"
+                      prefix={<Clock size={14} className="mr-2 text-gray-400" />}
+                    />
                   </Form.Item>
                 </div>
 
