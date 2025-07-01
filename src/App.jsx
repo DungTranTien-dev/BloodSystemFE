@@ -4,13 +4,6 @@ import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
-import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
-import TrackDonation from "./pages/DonorBlood/TrackDonation";
-import QAPage from "./pages/Q&A/Q&A";
-import StaffBloodRequests from "./pages/dashboard-staff/StaffBloodRequests";
-import StaffDonorRequests from "./pages/dashboard-staff/StaffDonorRequests";
-import DashboardS from "./components/dashboard";
-import CreateHospital from "./pages/dashboard-staff/CreateHospital";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -31,6 +24,29 @@ const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
 const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
 const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
+
+//DOCTOR
+const DoctorPage = React.lazy(() => import("./pages/doctor/DoctorPage"));
+const ManageBlood = React.lazy(() => import("./pages/doctor/ManageBlood"));
+const ManageMedical = React.lazy(() => import("./pages/doctor/ManageUserMedical"));
+const ManageSeparated = React.lazy(() => import("./pages/doctor/ManageSeparatedBlood"));
+
+//Donate
+const DonateConfirm = React.lazy(() => import("./pages/DonorBlood/DonateConfirm"));
+const TrackDonation = React.lazy(() => import("./pages/DonorBlood/TrackDonation"));
+
+
+
+
+
+//STAFF
+const StaffPage = React.lazy(() => import("./pages/staff/StaffPage"));
+const ManageEvent = React.lazy(() => import("./pages/staff/ManageEvent"));
+const ManageNews = React.lazy(() => import("./pages/staff/ManageNews"));
+const ManageBloodRequest = React.lazy(() => import("./pages/staff/ManageBloodRequest"));
+
+//PAYMENT
+const CallBackVNPay = React.lazy(() => import("./pages/payment/CallBackVNPay"));
 
 // Loading component for suspense fallback
 const LoadingSpinner = () => (
@@ -54,19 +70,19 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/news",
+      path: "payment/callBackVNPay",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
-          <NewsPage />
+          <CallBackVNPay />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/Q&A",
+      path: "/news",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
-          <QAPage />
+          <NewsPage />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -90,7 +106,7 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/donor-blood",
+      path: "/donorblood",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorBlood />
@@ -98,16 +114,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    {
-      path: "/hospital",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <Hospitals />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
+     {
       path: "/donation-confirmation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -121,6 +128,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <TrackDonation />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/hospitals",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Hospitals />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -166,24 +182,6 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <RegisterPage />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff-request-blood",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <StaffBloodRequests />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff-request-donor",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <StaffDonorRequests />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -263,6 +261,80 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
+    //DOCTOR
+    {
+      path: "/doctor",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DoctorPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-blood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-medical",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageMedical />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-separated",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageSeparated />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    //STAFF
+    {
+      path: "/staff",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff/manage-event",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageEvent />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff/manage-news",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageNews />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+        {
+      path: "/staff/manage-blood-requests",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBloodRequest />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
     // {
     //   path: "/create-sample-data",
     //   element: (
@@ -285,40 +357,6 @@ function App() {
     {
       path: "*",
       element: <SimpleErrorFallback />,
-    },
-    {
-      path: "/DashboardS",
-      element: <DashboardS />,
-      children: [
-        {
-          path: "", // Default route - overview
-          element: <div>Trang tổng quan</div>,
-        },
-        {
-          path: "overview",
-          element: <div>Trang tổng quan</div>,
-        },
-        {
-          path: "donor-blood",
-          element: <StaffDonorRequests />,
-        },
-        {
-          path: "blood-request",
-          element: <StaffBloodRequests />,
-        },
-        {
-          path: "user",
-          element: <div>Quản lý người dùng</div>,
-        },
-        {
-          path: "create-hospital",
-          element: <CreateHospital />,
-        },
-        {
-          path: "create-user",
-          element: <div>Tạo user</div>,
-        }
-      ],
     },
   ]);
 

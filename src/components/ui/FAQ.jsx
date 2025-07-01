@@ -85,17 +85,15 @@ const FAQ = () => {
     },
   ];
     return (
-    <div className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100 min-h-screen">
-      {/* Section tiêu đề */}
-      <section className="text-white py-10">
+    <>
+      {/* Section tiêu đề với gradient */}
+      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-black">
-            Lưu ý quan trọng    
-          </h1>
+          <h1 className="text-5xl font-extrabold tracking-tight">Lưu ý quan trọng</h1>
         </div>
       </section>
 
-      {/* Danh sách FAQ */}
+      {/* Danh sách các câu hỏi FAQ */}
       <div className="max-w-7xl mx-auto px-6 py-10 space-y-4">
         {faqData.map((faq, index) => (
           <FAQItem
@@ -106,7 +104,7 @@ const FAQ = () => {
           />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

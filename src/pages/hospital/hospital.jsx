@@ -1,60 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import {
-  Card,
-  Button,
-  Input,
-  Tag,
-  DatePicker,
-  Spin,
-  Empty,
-  Layout,
-} from "antd";
-import {
+import { DatePicker, Form, Card, Button, Input, Spin, Empty, Layout } from "antd";
+import RegistrationPopup from "../../components/RegistrationPopup";
+import { 
   EnvironmentOutlined,
-  ClockCircleOutlined,
-  PhoneOutlined,
   CalendarOutlined,
   SearchOutlined,
-  TeamOutlined,
   LoadingOutlined,
+  InfoCircleOutlined
 } from "@ant-design/icons";
-import { format, parseISO } from "date-fns";
-import dayjs from "dayjs"; // Cần dayjs để làm việc với AntD DatePicker
-import { getHospitalsNew } from "../../service/hospitalApi";
-import { useSelector } from "react-redux";
-import Header from "../../components/ui/Header";
-import Footer from "../../components/ui/Footer";
+import dayjs from "dayjs";
+import api from "../../config/axios";
 
 const { RangePicker } = DatePicker;
 
-// --- Component Card cho mỗi bệnh viện ---
-const HospitalCard = ({ hospital, onBookAppointment }) => {
-  const formatTime = (isoString) => {
-    return format(parseISO(isoString), "HH:mm");
+const EventCard = ({ event, onRegisterEvent }) => {
+  const formatDateTime = (dateString) => {
+    return new Date(dateString).toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
-  const formatDate = (isoString) => {
-    return format(parseISO(isoString), "dd/MM/yyyy");
+  const getDaysLeft = () => {
+    const now = new Date();
+    const end = new Date(event.endTime);
+    const diffTime = end - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return "Đã kết thúc";
+    if (diffDays === 0) return "Kết thúc hôm nay";
+    if (diffDays === 1) return "Còn 1 ngày";
+    return `Còn ${diffDays} ngày`;
   };
 
-  const getOperatingHours = () => {
-    const startTime = formatTime(hospital.startTime);
-    const endTime = formatTime(hospital.endTime);
-    return `${startTime} - ${endTime}`;
-  };
-
-  const getOperatingDate = () => {
-    return formatDate(hospital.startTime);
+  const getEventStatus = () => {
+    const now = new Date();
+    const start = new Date(event.startTime);
+    const end = new Date(event.endTime);
+    if (now < start) return "Sắp diễn ra";
+    if (now >= start && now <= end) return "Đang diễn ra";
+    return "Đã kết thúc";
   };
 
   return (
-    <Card
-      hoverable
-      className="mb-6 rounded-2xl overflow-hidden !border-slate-200"
-    >
+    <Card hoverable className="mb-6 rounded-2xl overflow-hidden !border-slate-200">
       <div className="flex flex-col sm:flex-row">
-        {/* Logo */}
         <div className="w-24 h-24 m-4 mx-auto sm:mx-4 flex-shrink-0">
           <div className="w-full h-full bg-red-100 rounded-full flex items-center justify-center">
             <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
@@ -65,266 +58,348 @@ const HospitalCard = ({ hospital, onBookAppointment }) => {
           </div>
         </div>
 
-        {/* Thông tin chính */}
         <div className="flex-1 p-4 pt-0 sm:pt-4 text-center sm:text-left">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent cursor-pointer">
-              {hospital.title}
+            <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">
+              {event.title}
             </h3>
           </div>
 
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-gray-600">
               <EnvironmentOutlined className="mr-2 text-gray-400" />
-              <span className="text-sm">Địa chỉ: {hospital.location}</span>
+              <span className="text-sm">Địa điểm: {event.location}</span>
             </div>
             <div className="flex items-center text-gray-600">
               <CalendarOutlined className="mr-2 text-gray-400" />
               <span className="text-sm">
-                Ngày hoạt động: {getOperatingDate()}
+                Thời gian: {formatDateTime(event.startTime)} - {formatDateTime(event.endTime)}
               </span>
             </div>
             <div className="flex items-center text-gray-600">
-              <ClockCircleOutlined className="mr-2 text-gray-400" />
-              <span className="text-sm">
-                Thời gian hoạt động: {getOperatingHours()}
-              </span>
-            </div>
-            <div className="text-gray-600">
-              <span className="text-sm">{hospital.description}</span>
+              <InfoCircleOutlined className="mr-2 text-gray-400" />
+              <span className="text-sm">Mô tả: {event.description}</span>
             </div>
           </div>
         </div>
 
-        {/* Đặt lịch */}
         <div className="sm:w-48 p-4 flex flex-col items-center sm:items-end justify-between border-t sm:border-t-0 sm:border-l border-slate-100">
           <div className="text-right mb-4 sm:mb-0">
-            <div className="flex items-center text-gray-500 mb-1">
-              <TeamOutlined className="mr-1" />
-              <span className="text-sm">Trạng thái</span>
+            <div className="flex items-center text-blue-500 mb-1">
+              <CalendarOutlined className="mr-1" />
+              <span className="text-sm font-medium">{getDaysLeft()}</span>
             </div>
-            <div className="text-2xl font-bold">
-              <span className="bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
-                Mở cửa
-              </span>
+            <div className="text-base font-semibold text-green-600">
+              {getEventStatus()}
             </div>
           </div>
-          <button
-            onClick={() => onBookAppointment(hospital)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 font-semibold rounded-xl text-white bg-gradient-to-r from-red-500 to-pink-600 border-none shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
+          <Button
+            type="primary"
+            onClick={() => onRegisterEvent(event)}
+            className="w-full font-semibold rounded-lg"
           >
-            <CalendarOutlined className="text-white text-base" />
-            <span className="text-sm">Đặt lịch</span>
-          </button>
+            Đăng ký tham gia
+          </Button>
         </div>
       </div>
     </Card>
   );
 };
 
-// --- Component Trang chính ---
 const Hospitals = () => {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [hospitals, setHospitals] = useState([]);
+  const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const [form] = Form.useForm();
+
+  // State cho RangePicker
   const [dateRange, setDateRange] = useState(() => {
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-    if (startDate && endDate) {
-      return [dayjs(startDate), dayjs(endDate)];
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
+    if (startDateParam && endDateParam) {
+      return [dayjs(startDateParam), dayjs(endDateParam)];
     }
     return null;
   });
-  const [tempDateRange, setTempDateRange] = useState(dateRange);
-  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    fetchHospitals();
-  }, []);
+    fetchEvents();
 
-  const fetchHospitals = async () => {
+  }, [searchParams]);
+
+  const fetchEvents = async () => {
     setLoading(true);
     try {
-      const response = await getHospitalsNew();
-      if (response.success) {
-        setHospitals(response.data);
+      const response = await api.get("Event/range", {
+        params: {
+          start: searchParams.get("startDate"),
+          end: searchParams.get("endDate"),
+        },
+      });
+
+      if (response.data && response.data.isSuccess) {
+        setEvents(response.data.result || []);
+        setFilteredEvents(response.data.result || []);
+      } else {
+        setEvents([]);
+        setFilteredEvents([]);
+        window.toast?.error(response.data?.message || "Không tìm thấy sự kiện");
       }
     } catch (error) {
-      console.error("Error fetching hospitals:", error);
+      setEvents([]);
+      setFilteredEvents([]);
+      if (error.response) {
+        window.toast?.error(error.response.data?.message || "Lỗi khi tải dữ liệu");
+      } else if (error.request) {
+        window.toast?.error("Không kết nối được với máy chủ");
+      } else {
+        window.toast?.error("Lỗi không xác định");
+      }
+      console.error("Lỗi khi tải sự kiện:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDateSearch = () => {
-    setDateRange(tempDateRange);
-    if (tempDateRange && tempDateRange[0] && tempDateRange[1]) {
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set("startDate", tempDateRange[0].format("YYYY-MM-DD"));
-      newSearchParams.set("endDate", tempDateRange[1].format("YYYY-MM-DD"));
-      setSearchParams(newSearchParams, { replace: true });
-    } else {
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete("startDate");
-      newSearchParams.delete("endDate");
-      setSearchParams(newSearchParams, { replace: true });
-    }
-  };
+  
 
-  const handleBookAppointment = (hospital) => {
-    if (!user) {
-      navigate("/login", {
-        state: {
-          redirectTo: "/donor-blood",
-          selectedHospital: hospital,
-        },
-      });
+const handleRegisterEvent = async (event) => {
+  try {
+    const res = await api.get("UserMedical/check");
+
+    if (res.data?.isSuccess) {
+      const registerRes = await api.post(`BloodRegistrations/${event.donationEventId}`);
+      if (registerRes.data?.isSuccess) {
+        window.toast?.success("Đăng ký thành công!");
+        navigate("/donation-confirmation?status=success");
+      } else {
+        window.toast?.error(registerRes.data?.message || "Đăng ký thất bại!");
+        navigate("/donation-confirmation?status=error");
+      }
+    } else {
+      console.log("Không có hồ sơ - cần tạo mới");
+      setSelectedEvent(event);
+      setShowPopup(true);
+    }
+  } catch (err) {
+    if (
+      err.response?.status === 400 &&
+      err.response?.data?.message?.toLowerCase() === "khong co ho so"
+    ) {
+      console.log("Bắt lỗi 400 - không có hồ sơ");
+      setSelectedEvent(event);
+      setShowPopup(true);
+    } else {
+      console.error("Lỗi khác:", err);
+      window.toast?.error(
+        err.response?.data?.message || "Lỗi hệ thống khi kiểm tra hồ sơ y tế!"
+      );
+      navigate("/donation-confirmation?status=error");
+    }
+  }
+};
+
+
+
+ const handlePopupFinish = async (values) => {
+  try {
+    const genderMap = {
+      Male: 0,
+      Female: 1,
+      Other: 2,
+    };
+
+    const payload = {
+      fullName: values.fullName,
+      dateOfBirth: values.birthDate
+        ? dayjs(values.birthDate).toISOString()
+        : null,
+      gender: genderMap[values.gender],
+      citizenId: values.idNumber,
+      bloodName: values.bloodName,
+      phoneNumber: values.phoneNumber,
+      email: values.email,
+
+      currentAddress: values.address,
+      hasDonatedBefore: values.hasDonatedBefore ?? false,
+      donationCount: values.donationCount,
+      diseaseDescription: values.diseaseDescription,
+      chronicDiseaseIds: values.chronicDiseaseIds ?? [],
+      latitude: values.latitude ?? 0,
+      longitude: values.longitude ?? 0,
+    };
+
+    // Tạo hồ sơ
+    const createMedicalRes = await api.post("UserMedical/create", payload);
+
+    if (!createMedicalRes.data?.isSuccess) {
+      window.toast?.error(createMedicalRes.data?.message || "Tạo hồ sơ thất bại");
       return;
     }
 
-    navigate("/donor-blood", {
-      state: {
-        selectedHospital: hospital,
-      },
+
+
+    // Đăng ký sự kiện
+    const registerRes = await api.post(`BloodRegistrations/${selectedEvent.donationEventId}`);
+
+    if (registerRes.data?.isSuccess) {
+      window.toast?.success("Đăng ký thành công!");
+      setShowPopup(false);
+      navigate("/donation-confirmation?status=success");
+    } else {
+      window.toast?.error(registerRes.data?.message || "Đăng ký thất bại");
+    }
+  } catch (err) {
+    console.error("Lỗi khi tạo hồ sơ và đăng ký sự kiện:", err);
+    window.toast?.error("Đã xảy ra lỗi! Vui lòng thử lại.");
+    navigate("/donation-confirmation?status=error");
+  }
+};
+
+
+
+  const handleDateSearch = () => {
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const newSearchParams = new URLSearchParams();
+      newSearchParams.set("startDate", dateRange[0].format("YYYY-MM-DD"));
+      newSearchParams.set("endDate", dateRange[1].format("YYYY-MM-DD"));
+      setSearchParams(newSearchParams);
+    }
+  };
+
+  useEffect(() => {
+    const filtered = events.filter(
+      (event) =>
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredEvents(filtered);
+  }, [searchTerm, events]);
+
+  const getSearchDateRange = () => {
+    const start = searchParams.get("startDate");
+    const end = searchParams.get("endDate");
+    if (!start || !end) return "Chưa chọn khoảng thời gian";
+    return `${formatDate(start)} đến ${formatDate(end)}`;
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
   };
 
-  const filteredHospitals = hospitals.filter((hospital) => {
-    // Do not show any hospitals if no date range is selected
-    if (!dateRange || !dateRange[0] || !dateRange[1]) {
-      return false;
-    }
-
-    const searchMatch =
-      hospital.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.location.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const [filterStart, filterEnd] = dateRange;
-    const hospitalStart = dayjs(hospital.startTime);
-
-    // Format dates to strings for robust comparison
-    const hospitalDateStr = hospitalStart.format("YYYY-MM-DD");
-    const filterStartDateStr = filterStart.format("YYYY-MM-DD");
-    const filterEndDateStr = filterEnd.format("YYYY-MM-DD");
-
-    const isWithinRange =
-      hospitalDateStr >= filterStartDateStr &&
-      hospitalDateStr <= filterEndDateStr;
-
-    return searchMatch && isWithinRange;
-  });
-
   return (
-    <>
-      <Header />
-      <Layout className="bg-gray-50 min-h-screen">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-6">
-            <div className="flex items-center gap-4 mb-4">
-              <CalendarOutlined className="text-2xl text-gray-600" />
-              <h1 className="text-2xl font-bold text-gray-800">
-                Bạn cần đặt lịch vào thời gian nào?
-              </h1>
+    <Layout className="bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <CalendarOutlined className="text-2xl text-gray-600" />
+            <h1 className="text-2xl font-bold text-gray-800">
+              Kết quả tìm kiếm sự kiện
+            </h1>
+          </div>
+
+          <div className="bg-blue-50 p-4 rounded-lg mb-4">
+            <div className="text-lg font-medium text-blue-800">
+              Thời gian đã chọn: {getSearchDateRange()}
             </div>
           </div>
 
-          <div className="mb-6 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <RangePicker
-                value={tempDateRange}
-                size="large"
-                onChange={(dates) => setTempDateRange(dates)}
-                placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                format="DD/MM/YYYY"
-                className="flex-grow"
-              />
-              <Button
-                size="large"
-                icon={<SearchOutlined />}
-                onClick={handleDateSearch}
-                style={{
-                  background:
-                    "linear-gradient(to right, #ef4444, #db2777)",
-                  color: "white",
-                  border: "none",
-                }}
-                className="shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
-              >
-                Tìm kiếm
-              </Button>
+          <Card className="p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Tìm kiếm theo ngày khác
+                </label>
+                <RangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  format="DD-MM-YYYY"
+                  className="h-10 w-full"
+                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                />
+              </div>
+              <div className="md:w-auto w-full">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={handleDateSearch}
+                  className="w-full md:w-auto h-10"
+                >
+                  Tìm kiếm
+                </Button>
+              </div>
             </div>
-            <Input
-              placeholder="Tìm kiếm bệnh viện theo tên hoặc địa chỉ..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              prefix={
-                <SearchOutlined className="site-form-item-icon text-gray-400" />
-              }
-              size="large"
-              className="w-full"
-            />
-          </div>
-
-          <div className="mb-6">
-            <h2 className="text-xl font-bold">
-              {loading ? (
-                "Đang tải..."
-              ) : (
-                <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
-                  {filteredHospitals.length} Bệnh viện
-                </span>
-              )}
-            </h2>
-          </div>
-
-          <Spin
-            spinning={loading}
-            indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
-          >
-            <div className="space-y-4 min-h-[200px]">
-              {!loading && filteredHospitals.length > 0 ? (
-                filteredHospitals.map((hospital) => (
-                  <HospitalCard
-                    key={hospital.id}
-                    hospital={hospital}
-                    onBookAppointment={handleBookAppointment}
-                  />
-                ))
-              ) : !loading ? (
-                <div className="flex justify-center items-center h-full pt-16">
-                  <Empty
-                    description={
-                      !dateRange ? (
-                        <div>
-                          <p className="font-semibold text-base">
-                            Vui lòng chọn khoảng thời gian
-                          </p>
-                          <span className="text-gray-500">
-                            Để tìm kiếm, hãy chọn ngày bắt đầu và kết thúc.
-                          </span>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="font-semibold text-base">
-                            Không tìm thấy bệnh viện
-                          </p>
-                          <span className="text-gray-500">
-                            Vui lòng thử lại với tiêu chí tìm kiếm khác.
-                          </span>
-                        </div>
-                      )
-                    }
-                  />
-                </div>
-              ) : null}
-            </div>
-          </Spin>
+          </Card>
         </div>
-      </Layout>
-      <Footer />
-    </>
+
+        <div className="mb-6">
+          <Input
+            placeholder="Tìm kiếm sự kiện theo tên hoặc địa điểm..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            prefix={<SearchOutlined className="site-form-item-icon text-gray-400" />}
+            size="large"
+          />
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-blue-600">
+            {loading ? "Đang tải..." : `${filteredEvents.length} Kết quả`}
+          </h2>
+        </div>
+
+        <Spin
+          spinning={loading}
+          indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
+        >
+          <div className="space-y-4 min-h-[200px]">
+            {!loading && filteredEvents.length > 0 ? (
+              filteredEvents.map((event) => (
+                <EventCard
+                  key={event.donationEventId}
+                  event={event}
+                  onRegisterEvent={handleRegisterEvent}
+                />
+              ))
+            ) : !loading ? (
+              <div className="flex justify-center items-center h-full pt-16">
+                <Empty
+                  description={
+                    <div>
+                      <p className="font-semibold text-base">
+                        Không tìm thấy sự kiện
+                      </p>
+                      <span className="text-gray-500">
+                        Vui lòng thử lại với tiêu chí tìm kiếm khác.
+                      </span>
+                    </div>
+                  }
+                />
+              </div>
+            ) : null}
+          </div>
+        </Spin>
+
+        <RegistrationPopup
+          visible={showPopup}
+          onClose={() => setShowPopup(false)}
+          onFinish={handlePopupFinish}
+          form={form}
+
+          navigate={navigate}
+        />
+      </div>
+    </Layout>
   );
 };
 
