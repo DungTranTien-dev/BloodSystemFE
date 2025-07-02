@@ -1,146 +1,67 @@
-import React, { useState } from 'react';
-import { Card, Button, Tag, Table, Modal, notification, Typography, Space, Row, Col } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Tag, Table, Modal, notification, Typography, Space, Row, Col, Spin } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, EyeOutlined, HeartOutlined } from '@ant-design/icons';
+import { getAllBloodRegistrations } from '../../service/bloodRegistrationApi';
 const { Title, Text } = Typography;
 
-// Mock data giữ nguyên
-const mockDonorRequests = [
-  {
-    id: 1,
-    fullName: "Nguyễn Văn A",
-    phone: "0123456789",
-    email: "nguyenvana@email.com",
-    bloodType: "O+",
-    weight: 65,
-    lastDonation: "2024-01-15",
-    hospital: "Bệnh viện Chợ Rẫy",
-    status: "pending",
-    createdAt: "2024-06-25",
-    medicalHistory: "Không có bệnh lý"
-  },
-  {
-    id: 2,
-    fullName: "Trần Thị B",
-    phone: "0987654321",
-    email: "tranthib@email.com",
-    bloodType: "A+",
-    weight: 55,
-    lastDonation: "2024-03-10",
-    hospital: "Bệnh viện Bạch Mai",
-    status: "accepted",
-    createdAt: "2024-06-24",
-    medicalHistory: "Không có bệnh lý"
-  },
-  {
-    id: 3,
-    fullName: "Lê Văn C",
-    phone: "0369852147",
-    email: "levanc@email.com",
-    bloodType: "B+",
-    weight: 70,
-    lastDonation: "2024-02-20",
-    hospital: "Bệnh viện Việt Đức",
-    status: "rejected",
-    createdAt: "2024-06-23",
-    medicalHistory: "Không có bệnh lý"
-  }
-];
-
 const StaffDonorRequests = () => {
-  const [donorRequests, setDonorRequests] = useState(mockDonorRequests);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const res = await getAllBloodRegistrations();
+    if (res && res.isSuccess) setData(res.result);
+    else notification.error({ message: res.message || 'Lỗi khi tải dữ liệu đăng ký máu' });
+    setLoading(false);
+  };
+
   const getStatusTag = (status) => {
     switch (status) {
-      case 'pending':
+      case 'PENDING':
         return <Tag icon={<ClockCircleOutlined />} color="warning">Chờ duyệt</Tag>;
-      case 'accepted':
+      case 'ACCEPTED':
         return <Tag icon={<CheckCircleOutlined />} color="success">Đã duyệt</Tag>;
-      case 'rejected':
+      case 'REJECTED':
         return <Tag icon={<CloseCircleOutlined />} color="error">Bị từ chối</Tag>;
       default:
         return <Tag>Không xác định</Tag>;
     }
   };
 
-  const showModal = (request) => {
-    setSelectedRequest(request);
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedRequest(null);
-  };
-
-  const handleUpdateStatus = async (requestId, newStatus) => {
-    setDonorRequests(prev =>
-      prev.map(req => req.id === requestId ? { ...req, status: newStatus } : req)
-    );
-    notification.success({
-      message: "Cập nhật thành công",
-      description: `Yêu cầu hiến máu đã được ${newStatus === 'accepted' ? 'chấp nhận' : 'từ chối'}.`,
-    });
-  };
-
-  const filteredRequests = donorRequests.filter(req => {
+  const filteredRequests = data.filter(req => {
     if (activeTab === 'all') return true;
-    return req.status === activeTab;
+    return req.registerType === activeTab.toUpperCase();
   });
 
   const getStatusCounts = () => {
-    const pending = donorRequests.filter(req => req.status === 'pending').length;
-    const accepted = donorRequests.filter(req => req.status === 'accepted').length;
-    const rejected = donorRequests.filter(req => req.status === 'rejected').length;
-    return { pending, accepted, rejected, total: donorRequests.length };
+    const pending = data.filter(req => req.registerType === 'PENDING').length;
+    const accepted = data.filter(req => req.registerType === 'ACCEPTED').length;
+    const rejected = data.filter(req => req.registerType === 'REJECTED').length;
+    return { pending, accepted, rejected, total: data.length };
   };
 
   const counts = getStatusCounts();
 
   const columns = [
-    { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', render: text => <strong>{text}</strong> },
-    { title: 'Nhóm máu', dataIndex: 'bloodType', key: 'bloodType' },
-    { title: 'Bệnh viện', dataIndex: 'hospital', key: 'hospital' },
-    { title: 'Ngày gửi', dataIndex: 'createdAt', key: 'createdAt' },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', render: status => getStatusTag(status) },
-    {
-      title: 'Thao tác',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button icon={<EyeOutlined />} size="small" onClick={() => showModal(record)}>Xem</Button>
-          {record.status === 'pending' && (
-            <>
-              <Button
-                type="primary"
-                icon={<CheckCircleOutlined />}
-                size="small"
-                onClick={() => handleUpdateStatus(record.id, 'accepted')}
-                className="bg-green-600 hover:bg-green-700 !border-green-600"
-              >
-                Duyệt
-              </Button>
-              <Button
-                type="primary"
-                danger
-                icon={<CloseCircleOutlined />}
-                size="small"
-                onClick={() => handleUpdateStatus(record.id, 'rejected')}
-              >
-                Từ chối
-              </Button>
-            </>
-          )}
-        </Space>
-      ),
-    },
+    { title: 'Mã đăng ký', dataIndex: 'bloodRegistrationId', key: 'bloodRegistrationId' },
+    { title: 'Sự kiện', dataIndex: 'eventTitle', key: 'eventTitle' },
+    { title: 'Địa điểm', dataIndex: 'eventLocation', key: 'eventLocation' },
+    { title: 'Thời gian bắt đầu', dataIndex: 'startTime', key: 'startTime', render: v => v ? new Date(v).toLocaleString('vi-VN') : '' },
+    { title: 'Thời gian kết thúc', dataIndex: 'endTime', key: 'endTime', render: v => v ? new Date(v).toLocaleString('vi-VN') : '' },
+    { title: 'Ngày đăng ký', dataIndex: 'createDate', key: 'createDate', render: v => v ? new Date(v).toLocaleString('vi-VN') : '' },
+    { title: 'Trạng thái', dataIndex: 'registerType', key: 'registerType', render: status => getStatusTag(status) },
   ];
 
   return (
     <div className="container mx-auto p-6">
-
       {/* Stats Cards */}
       <Row gutter={[24, 24]} className="mb-8">
         <Col xs={12} md={6}>
@@ -176,7 +97,6 @@ const StaffDonorRequests = () => {
           </Card>
         </Col>
       </Row>
-
       {/* Filter Tabs */}
       <Card className="border-0 shadow-lg mb-6">
         <div className="flex flex-wrap gap-2 mb-4">
@@ -197,37 +117,36 @@ const StaffDonorRequests = () => {
           ))}
         </div>
       </Card>
-
       {/* Table */}
       <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-        <Table 
-          columns={columns} 
-          dataSource={filteredRequests} 
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-          className="overflow-hidden"
-        />
+        <Spin spinning={loading} tip="Đang tải dữ liệu...">
+          <Table 
+            columns={columns} 
+            dataSource={filteredRequests} 
+            rowKey="bloodRegistrationId"
+            pagination={{ pageSize: 10 }}
+            className="overflow-hidden"
+          />
+        </Spin>
       </Card>
-
       {/* Modal */}
       {isModalVisible && selectedRequest && (
         <Modal
-          title={<Title level={4}>Chi tiết yêu cầu hiến máu</Title>}
+          title={<Title level={4}>Chi tiết đăng ký máu</Title>}
           open={isModalVisible}
-          onCancel={handleCancel}
+          onCancel={() => setIsModalVisible(false)}
           footer={[
-            <Button key="close" onClick={handleCancel}>Đóng</Button>
+            <Button key="close" onClick={() => setIsModalVisible(false)}>Đóng</Button>
           ]}
         >
           <Space direction="vertical" className="w-full">
-            <Text><strong>Họ tên:</strong> {selectedRequest.fullName}</Text>
-            <Text><strong>Điện thoại:</strong> {selectedRequest.phone}</Text>
-            <Text><strong>Email:</strong> {selectedRequest.email}</Text>
-            <Text><strong>Nhóm máu:</strong> {selectedRequest.bloodType}</Text>
-            <Text><strong>Cân nặng:</strong> {selectedRequest.weight} kg</Text>
-            <Text><strong>Lần hiến cuối:</strong> {selectedRequest.lastDonation}</Text>
-            <Text><strong>Tiền sử bệnh:</strong> {selectedRequest.medicalHistory}</Text>
-            <Text><strong>Bệnh viện:</strong> {selectedRequest.hospital}</Text>
+            <Text><strong>Mã đăng ký:</strong> {selectedRequest.bloodRegistrationId}</Text>
+            <Text><strong>Sự kiện:</strong> {selectedRequest.eventTitle}</Text>
+            <Text><strong>Địa điểm:</strong> {selectedRequest.eventLocation}</Text>
+            <Text><strong>Thời gian bắt đầu:</strong> {selectedRequest.startTime ? new Date(selectedRequest.startTime).toLocaleString('vi-VN') : ''}</Text>
+            <Text><strong>Thời gian kết thúc:</strong> {selectedRequest.endTime ? new Date(selectedRequest.endTime).toLocaleString('vi-VN') : ''}</Text>
+            <Text><strong>Ngày đăng ký:</strong> {selectedRequest.createDate ? new Date(selectedRequest.createDate).toLocaleString('vi-VN') : ''}</Text>
+            <Text><strong>Trạng thái:</strong> {getStatusTag(selectedRequest.registerType)}</Text>
           </Space>
         </Modal>
       )}
