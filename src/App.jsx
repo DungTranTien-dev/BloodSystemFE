@@ -12,6 +12,7 @@ import StaffDonorRequests from "./pages/dashboard-staff/StaffDonorRequests";
 import DashboardS from "./components/dashboard";
 import CreateHospital from "./pages/dashboard-staff/CreateHospital";
 import BloodManagement from "./pages/dashboard-staff/BloodManagement";
+import BloodSeparation from "./pages/dashboard-staff/BloodSeparation";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -328,7 +329,15 @@ function App() {
         {
           path: "create-user",
           element: <div>Tạo user</div>,
-        }
+        },
+        {
+          path: "blood-separation",
+          element: (
+            <Suspense fallback={<LoadingSpinner />}>
+              <BloodSeparation />
+            </Suspense>
+          ),
+        },
       ],
     },
   ]);

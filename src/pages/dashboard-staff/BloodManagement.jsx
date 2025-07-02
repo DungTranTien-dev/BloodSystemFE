@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, InputNumber, message, Popconfirm } from "antd";
+import { Table, Button, Modal, Form, Input, Select, InputNumber, message, Popconfirm, Spin } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getBloodList, addBlood, updateBlood, deleteBlood } from "../../service/bloodApi";
 
@@ -18,8 +18,8 @@ const BloodManagement = () => {
   const fetchData = async () => {
     setLoading(true);
     const res = await getBloodList();
-    if (res.success) setData(res.data);
-    else message.error(res.error || "Lấy dữ liệu thất bại");
+    if (res && res.isSuccess) setData(res.result);
+    else message.error(res.message || "Lấy dữ liệu thất bại");
     setLoading(false);
   };
 
@@ -33,7 +33,13 @@ const BloodManagement = () => {
 
   const handleEdit = (record) => {
     setEditing(record);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      bloodId: record.bloodId,
+      bloodName: record.bloodName,
+      volumeInML: record.volumeInML,
+      collectedDate: record.collectedDate ? record.collectedDate.split('T')[0] : '',
+      expiryDate: record.expiryDate ? record.expiryDate.split('T')[0] : '',
+    });
     setModalVisible(true);
   };
 
@@ -50,26 +56,29 @@ const BloodManagement = () => {
       const values = await form.validateFields();
       let res;
       if (editing) {
-        res = await updateBlood(editing.id, values);
+        res = await updateBlood(editing.bloodId, values);
       } else {
         res = await addBlood(values);
       }
-      if (res.success) {
+      if (res.isSuccess) {
         message.success(editing ? "Cập nhật thành công" : "Thêm thành công");
         setModalVisible(false);
         fetchData();
       } else {
-        message.error(res.error || "Lưu thất bại");
+        message.error(res.message || "Lưu thất bại");
       }
     } catch {}
   };
 
   const columns = [
-    { title: "Nhóm máu", dataIndex: "bloodGroup", key: "bloodGroup" },
-    { title: "Thành phần", dataIndex: "componentType", key: "componentType" },
+    { title: "Mã máu", dataIndex: "bloodId", key: "bloodId" },
+    { title: "Tên máu", dataIndex: "bloodName", key: "bloodName" },
     { title: "Thể tích (ml)", dataIndex: "volumeInML", key: "volumeInML" },
-    { title: "Ngày nhập", dataIndex: "importDate", key: "importDate" },
-    { title: "Hạn sử dụng", dataIndex: "expiryDate", key: "expiryDate" },
+    { title: "Trạng thái", dataIndex: "status", key: "status" },
+    { title: "Ngày thu thập", dataIndex: "collectedDate", key: "collectedDate", render: v => v ? new Date(v).toLocaleString('vi-VN') : '' },
+    { title: "Hạn sử dụng", dataIndex: "expiryDate", key: "expiryDate", render: v => v ? new Date(v).toLocaleString('vi-VN') : '' },
+    { title: "Còn sử dụng", dataIndex: "isAvailable", key: "isAvailable", render: v => v ? 'Còn' : 'Hết' },
+    { title: "Người hiến", dataIndex: "userName", key: "userName" },
     {
       title: "Hành động",
       key: "action",
@@ -92,7 +101,9 @@ const BloodManagement = () => {
           Thêm máu
         </Button>
       </div>
-      <Table columns={columns} dataSource={data} rowKey="id" loading={loading} bordered pagination={{ pageSize: 8 }} />
+      <Spin spinning={loading} tip="Đang tải dữ liệu...">
+        <Table columns={columns} dataSource={data} rowKey="bloodId" bordered pagination={{ pageSize: 8 }} />
+      </Spin>
       <Modal
         title={editing ? "Cập nhật thông tin máu" : "Thêm máu mới"}
         open={modalVisible}
@@ -102,11 +113,21 @@ const BloodManagement = () => {
         cancelText="Hủy"
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="bloodGroup" label="Nhóm máu" rules={[{ required: true, message: "Chọn nhóm máu" }]}> <Select>{bloodGroups.map(g => <Option key={g} value={g}>{g}</Option>)}</Select></Form.Item>
-          <Form.Item name="componentType" label="Thành phần máu" rules={[{ required: true, message: "Chọn thành phần" }]}> <Select>{componentTypes.map(c => <Option key={c} value={c}>{c}</Option>)}</Select></Form.Item>
-          <Form.Item name="volumeInML" label="Thể tích (ml)" rules={[{ required: true, message: "Nhập thể tích" }]}> <InputNumber min={1} style={{ width: "100%" }} /></Form.Item>
-          <Form.Item name="importDate" label="Ngày nhập" rules={[{ required: true, message: "Chọn ngày nhập" }]}> <Input type="date" /></Form.Item>
-          <Form.Item name="expiryDate" label="Hạn sử dụng" rules={[{ required: true, message: "Chọn hạn sử dụng" }]}> <Input type="date" /></Form.Item>
+          <Form.Item name="bloodId" label="ID máu">
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="bloodName" label="Tên máu" rules={[{ required: true, message: "Nhập tên máu" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="volumeInML" label="Thể tích (ml)" rules={[{ required: true, message: "Nhập thể tích" }]}>
+            <Input type="number" min={1} />
+          </Form.Item>
+          <Form.Item name="collectedDate" label="Ngày thu thập" rules={[{ required: true, message: "Chọn ngày thu thập" }]}>
+            <Input type="date" />
+          </Form.Item>
+          <Form.Item name="expiryDate" label="Hạn sử dụng" rules={[{ required: true, message: "Chọn hạn sử dụng" }]}>
+            <Input type="date" />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

@@ -1,35 +1,35 @@
-import axios from "../config/axios";
+import api from '../config/axios';
 
-export const getBloodList = async () => {
+export async function getBloodList() {
   try {
-    const res = await axios.get("/api/blood");
-    return { success: true, data: res.data };
-  } catch (err) {
-    return { success: false, error: err.response?.data?.message || err.message };
+    const response = await api.get('/Blood');
+    return response.data;
+  } catch (error) {
+    return { isSuccess: false, message: error.message };
   }
-};
+}
 
 export const addBlood = async (payload) => {
   try {
-    const res = await axios.post("/api/blood", payload);
+    const res = await api.post("/api/blood", payload);
     return { success: true, data: res.data };
   } catch (err) {
     return { success: false, error: err.response?.data?.message || err.message };
   }
 };
 
-export const updateBlood = async (id, payload) => {
+export async function updateBlood(id, data) {
   try {
-    const res = await axios.put(`/api/blood/${id}`, payload);
-    return { success: true, data: res.data };
-  } catch (err) {
-    return { success: false, error: err.response?.data?.message || err.message };
+    const response = await api.put(`/Blood/${id}`, data);
+    return response.data;
+  } catch (error) {
+    return { isSuccess: false, message: error.message };
   }
-};
+}
 
 export const deleteBlood = async (id) => {
   try {
-    await axios.delete(`/api/blood/${id}`);
+    await api.delete(`/api/blood/${id}`);
     return { success: true };
   } catch (err) {
     return { success: false, error: err.response?.data?.message || err.message };

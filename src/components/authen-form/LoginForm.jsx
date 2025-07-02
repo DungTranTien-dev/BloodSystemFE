@@ -33,27 +33,26 @@ function LoginForm() {
     try {
       const response = await api.post("auth/login", values);
       console.log(response);
-      toast.success("Login successful!");
 
-      dispatch(login(response.data.result));
+      dispatch(login(response.data.result.user));
       localStorage.setItem("token", response.data.result.accessToken);
-      // const user = response.data.data;
-      // if (user.role === 'ADMIN') {
-      //     navigate("/dashboard");
-      // }
-      // else if (user.role === 'USER') {
-      //     navigate("/");
-      // }
-      const redirectTo = location.state?.redirectTo || "/";
-      if (redirectTo === "/donorblood") {
-        navigate("/donorblood", {
-          state: {
-            selectedHospital: location.state?.selectedHospital,
-            availableDates: location.state?.availableDates,
-          },
-        });
+      const user = response.data.result.user;
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+        toast.success('Login successful!');
+        return;
+      } else if (user.role === 'STAFF') {
+        navigate('/DashboardS');
+        toast.success('Login successful!');
+        return;
+      } else if (user.role === 'CUSTOMER') {
+        navigate('/');
+        toast.success('Login successful!');
+        return;
       } else {
-        navigate(redirectTo);
+        navigate('/');
+        toast.success('Login successful!');
+        return;
       }
     } catch (e) {
       console.log(e);

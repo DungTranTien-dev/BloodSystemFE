@@ -7,9 +7,13 @@ import {
   PlusOutlined,
   BankOutlined,
   ExperimentOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Layout, Menu, theme, Avatar, Dropdown, Space } from "antd";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../redux/features/userSlice";
 const { Header, Content, Footer, Sider } = Layout;
 
 function getItem(label, key, icon) {
@@ -26,6 +30,7 @@ const items = [
   getItem("Yêu cầu cần máu", "blood-request", <ExperimentOutlined />),
   getItem("Tạo bệnh viện", "create-hospital", <BankOutlined />),
   getItem("Thêm máu", "blood", <PlusOutlined />),
+  getItem("Tách máu", "blood-separation", <ExperimentOutlined />),
   //   getItem("Tom", "3"),
   //   getItem("Bill", "4"),
   //   getItem("Alex", "5"),
@@ -41,9 +46,33 @@ const DashboardS = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("overview");
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  // Dropdown menu for avatar
+  const menu = {
+    items: [
+      {
+        key: "profile",
+        icon: <ProfileOutlined />,
+        label: "Hồ sơ",
+        onClick: () => navigate("/profile"),
+      },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "Đăng xuất",
+        onClick: () => {
+          dispatch(logout());
+          navigate("/");
+        },
+      },
+    ],
+  };
 
   // Extract the current page from URL and set selectedKey
   useEffect(() => {
@@ -57,6 +86,7 @@ const DashboardS = () => {
       'blood-request': 'blood-request',
       'create-hospital': 'create-hospital',
       'blood': 'blood',
+      'blood-separation': 'blood-separation',
     };
     
     if (pageToKeyMap[currentPage]) {
@@ -98,6 +128,21 @@ const DashboardS = () => {
         >
           <HeartFilled style={{ color: "#fff", fontSize: 28, marginRight: 8 }} />
           {!collapsed && "Hiến máu"}
+        </div>
+        {/* Avatar + Tên staff */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '16px 0' }}>
+          <Dropdown menu={menu} placement="bottom">
+            <Space direction="vertical" align="center" style={{ cursor: 'pointer' }}>
+              <Avatar size={48} src={user?.avatarUrl || undefined}>
+                {!user?.avatarUrl && user?.userName ? user.userName.charAt(0).toUpperCase() : <UserOutlined />}
+              </Avatar>
+              {!collapsed && (
+                <span style={{ color: '#fff', fontWeight: 600, fontSize: 16 }}>
+                  {user?.userName || 'Staff'}
+                </span>
+              )}
+            </Space>
+          </Dropdown>
         </div>
         <Menu
           theme="dark"

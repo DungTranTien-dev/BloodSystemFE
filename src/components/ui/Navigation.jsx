@@ -17,6 +17,7 @@ const navigation = {
     { label: "Trang chủ", path: "/" },
     { label: "Quản lý lịch hẹn", path: "/staff-request-blood" },
     { label: "Quản lý kho máu", path: "/staff-request-donor" },
+    { label: "Tách máu", path: "/DashboardS/blood-separation" },
   ],
 };
 

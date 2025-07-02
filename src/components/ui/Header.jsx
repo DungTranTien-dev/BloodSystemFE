@@ -94,10 +94,19 @@ function Header() {
               // Giao diện khi ĐÃ ĐĂNG NHẬP
               <Dropdown menu={userMenu} placement="bottomRight" arrow>
                 <div className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Avatar icon={<UserOutlined />} src={user.avatarUrl} />
+                  <Avatar
+                    size={48}
+                    src={user?.avatarUrl || undefined}
+                  >
+                    {!user?.avatarUrl
+                      ? (user?.userName
+                          ? user.userName.charAt(0).toUpperCase()
+                          : <UserOutlined />)
+                      : null}
+                  </Avatar>
                   {/* Giả sử API trả về có trường `fullName` */}
-                  <span className="font-semibold text-slate-700 hidden sm:block">
-                    {user.fullName || "Tài khoản"}
+                  <span className="font-semibold text-slate-700 hidden sm:block ml-3">
+                    {user.userName || "Tài khoản"}
                   </span>
                 </div>
               </Dropdown>
