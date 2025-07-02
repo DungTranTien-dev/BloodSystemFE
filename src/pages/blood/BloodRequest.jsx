@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Form, Input, Select, Button, message, Card } from 'antd';
+import { Form, Input, Select, Button, message, Card, DatePicker } from 'antd';
 import { FaDroplet, FaHeart } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/ui/Layout';
+import dayjs from 'dayjs';
+import { Heart as HeartLucide, Droplet } from 'lucide-react';
+import { requestBlood } from '../../service/bloodRequestApi';
 
 const { Option } = Select;
 
@@ -15,53 +18,39 @@ const BloodRequest = () => {
     'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
   ];
 
-  const unitOptions = [
-    '1 Unit (450ml)',
-    '2 Units (900ml)', 
-    '3 Units (1350ml)',
-    '4 Units (1800ml)',
-    '5+ Units (Contact for details)'
+  const componentTypes = [
+    'Toàn phần', 'Hồng cầu', 'Tiểu cầu', 'Huyết tương'
   ];
 
   const handleSubmit = async (values) => {
     setLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create request object
-      const bloodRequest = {
-        id: Date.now(),
+      const payload = {
         patientName: values.patientName,
-        patientAge: values.patientAge,
-        disease: values.disease || 'Not specified',
+        hospitalName: values.hospitalName,
         bloodGroup: values.bloodGroup,
-        units: values.units,
-        requestDate: new Date().toISOString(),
-        status: 'Pending',
-        priority: values.patientAge < 18 || values.patientAge > 65 ? 'High' : 'Normal'
+        componentType: values.componentType,
+        volumeInML: Number(values.volumeInML),
+        reason: values.reason,
+        requestedDate: values.requestedDate.toISOString(),
+        requestedByUserId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // demo user id
       };
-
-      // Save to localStorage (in real app, this would be API call)
-      const existingRequests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
-      existingRequests.push(bloodRequest);
-      localStorage.setItem('bloodRequests', JSON.stringify(existingRequests));
-
-      message.success('Blood donation request submitted successfully! We will contact you soon.');
-      form.resetFields();
-      
-      // Optional: Navigate to confirmation page
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-      
-    } catch (error) {
-      message.error('Failed to submit request. Please try again.');
+      const res = await requestBlood(payload);
+      if (res.success) {
+        message.success('Yêu cầu cần máu đã được gửi thành công!');
+        form.resetFields();
+        setTimeout(() => navigate('/'), 1500);
+      } else {
+        throw new Error(res.error || 'Gửi yêu cầu cần máu thất bại');
+      }
+    } catch (err) {
+      message.error(err.message || 'Gửi yêu cầu cần máu thất bại');
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <Layout className="bg-gradient-to-br from-red-50 via-pink-50 to-red-100">
       <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -69,13 +58,13 @@ const BloodRequest = () => {
           {/* Header Section */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
-              <FaDroplet className="text-2xl text-white" />
+              <Droplet className="text-2xl text-white" />
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-              Donate Blood Request
+              Yêu Cầu Cần Máu
             </h1>
             <p className="text-gray-600 text-lg">
-              Help save lives by requesting blood donations for patients in need
+              Gửi yêu cầu cần máu cho bệnh nhân cần giúp đỡ
             </p>
           </div>
 
@@ -96,62 +85,35 @@ const BloodRequest = () => {
                 <Form.Item
                   name="patientName"
                   label={
-                    <span className="text-sm font-medium text-purple-600">
-                      Patient Name*
+                    <span className="text-sm font-medium text-red-500">
+                      Tên bệnh nhân*
                     </span>
                   }
                   rules={[
-                    { required: true, message: 'Please enter patient name' },
-                    { min: 2, message: 'Name must be at least 2 characters' }
+                    { required: true, message: 'Vui lòng nhập tên bệnh nhân' },
                   ]}
                 >
                   <Input
-                    placeholder="Enter Patient Name"
+                    placeholder="Nhập tên bệnh nhân"
                     className="h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                     style={{ fontSize: '16px' }}
                   />
                 </Form.Item>
 
-                {/* Patient Age */}
+                {/* Hospital Name */}
                 <Form.Item
-                  name="patientAge"
+                  name="hospitalName"
                   label={
-                    <span className="text-sm font-medium text-purple-600">
-                      Patient Age*
+                    <span className="text-sm font-medium text-red-500">
+                      Tên bệnh viện*
                     </span>
                   }
                   rules={[
-                    { required: true, message: 'Please enter patient age' },
-                    { 
-                      type: 'number', 
-                      min: 0, 
-                      max: 120, 
-                      message: 'Please enter a valid age' 
-                    }
+                    { required: true, message: 'Vui lòng nhập tên bệnh viện' },
                   ]}
                 >
                   <Input
-                    type="number"
-                    placeholder="Enter Patient Age"
-                    className="h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    style={{ fontSize: '16px' }}
-                  />
-                </Form.Item>
-
-                {/* Disease */}
-                <Form.Item
-                  name="disease"
-                  label={
-                    <span className="text-sm font-medium text-purple-600">
-                      Disease* (If Not Then None)
-                    </span>
-                  }
-                  rules={[
-                    { required: true, message: 'Please enter disease information or "None"' }
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter disease for Blood"
+                    placeholder="Nhập tên bệnh viện"
                     className="h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                     style={{ fontSize: '16px' }}
                   />
@@ -161,16 +123,16 @@ const BloodRequest = () => {
                 <Form.Item
                   name="bloodGroup"
                   label={
-                    <span className="text-sm font-medium text-purple-600">
-                      Blood Group*
+                    <span className="text-sm font-medium text-red-500">
+                      Nhóm máu*
                     </span>
                   }
                   rules={[
-                    { required: true, message: 'Please select blood group' }
+                    { required: true, message: 'Vui lòng chọn nhóm máu' },
                   ]}
                 >
                   <Select
-                    placeholder="Blood Group Select"
+                    placeholder="Chọn nhóm máu"
                     className="h-12"
                     style={{ fontSize: '16px' }}
                     dropdownStyle={{ borderRadius: '8px' }}
@@ -186,30 +148,91 @@ const BloodRequest = () => {
                   </Select>
                 </Form.Item>
 
-                {/* Units */}
+                {/* Component Type */}
                 <Form.Item
-                  name="units"
+                  name="componentType"
                   label={
-                    <span className="text-sm font-medium text-purple-600">
-                      Unit (ml)*
+                    <span className="text-sm font-medium text-red-500">
+                      Thành phần máu*
                     </span>
                   }
                   rules={[
-                    { required: true, message: 'Please select required units' }
+                    { required: true, message: 'Vui lòng chọn thành phần máu' },
                   ]}
                 >
                   <Select
-                    placeholder="Enter Unit"
+                    placeholder="Chọn thành phần máu"
                     className="h-12"
                     style={{ fontSize: '16px' }}
                     dropdownStyle={{ borderRadius: '8px' }}
                   >
-                    {unitOptions.map(unit => (
-                      <Option key={unit} value={unit}>
-                        {unit}
+                    {componentTypes.map(type => (
+                      <Option key={type} value={type}>
+                        {type}
                       </Option>
                     ))}
                   </Select>
+                </Form.Item>
+
+                {/* Volume In ML */}
+                <Form.Item
+                  name="volumeInML"
+                  label={
+                    <span className="text-sm font-medium text-red-500">
+                      Thể tích cần (ml)*
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập thể tích' },
+                    { type: 'number', min: 50, message: 'Tối thiểu 50ml' },
+                  ]}
+                >
+                  <Input
+                    type="number"
+                    placeholder="Nhập thể tích (ml)"
+                    className="h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    style={{ fontSize: '16px' }}
+                  />
+                </Form.Item>
+
+                {/* Reason */}
+                <Form.Item
+                  name="reason"
+                  label={
+                    <span className="text-sm font-medium text-red-500">
+                      Lý do cần máu*
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập lý do' },
+                  ]}
+                >
+                  <Input.TextArea
+                    rows={3}
+                    placeholder="Nhập lý do cần máu"
+                    className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    style={{ fontSize: '16px' }}
+                  />
+                </Form.Item>
+
+                {/* Requested Date */}
+                <Form.Item
+                  name="requestedDate"
+                  label={
+                    <span className="text-sm font-medium text-red-500">
+                      Ngày cần máu*
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: 'Vui lòng chọn ngày' },
+                  ]}
+                >
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    format="DD/MM/YYYY"
+                    className="h-12 rounded-lg"
+                    disabledDate={d => d && d < dayjs().startOf('day')}
+                  />
                 </Form.Item>
 
                 {/* Submit Button */}
@@ -220,13 +243,13 @@ const BloodRequest = () => {
                     loading={loading}
                     className="w-full h-14 text-lg font-semibold rounded-lg border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                     style={{
-                      background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)',
+                      background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)',
                       fontSize: '16px'
                     }}
                   >
                     <div className="flex items-center justify-center">
-                      <FaHeart className="mr-2" />
-                      {loading ? 'Submitting Request...' : 'Donate Blood Request'}
+                      <HeartLucide className="mr-2" />
+                      {loading ? 'Đang gửi...' : 'Gửi Yêu Cầu Cần Máu'}
                     </div>
                   </Button>
                 </Form.Item>
@@ -271,8 +294,8 @@ const BloodRequest = () => {
               <p className="text-sm text-gray-600">Regular donation improves health</p>
             </div>
           </div>
-        </div>      </div>
-      
+        </div>
+      </div>
     </Layout>
   );
 };

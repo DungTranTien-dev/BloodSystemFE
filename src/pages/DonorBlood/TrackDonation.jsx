@@ -3,7 +3,6 @@ import { Card, Spin, Typography, Tag, Empty, Space } from 'antd';
 import { ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, CalendarOutlined, BankOutlined, ClockCircleFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Layout from '../../components/ui/Layout';
-import { getDonationRequests } from '../../service/donationApi';
 
 const { Title, Text } = Typography;
 

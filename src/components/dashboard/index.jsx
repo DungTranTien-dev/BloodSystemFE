@@ -24,9 +24,8 @@ const items = [
   getItem("Tổng quan", "overview", <PieChartOutlined />),
   getItem("Yêu cầu hiến máu", "donor-blood", <DesktopOutlined />),
   getItem("Yêu cầu cần máu", "blood-request", <ExperimentOutlined />),
-  getItem("Người dùng", "user", <UserOutlined />),
   getItem("Tạo bệnh viện", "create-hospital", <BankOutlined />),
-  getItem("Tạo user", "create-user", <PlusOutlined />),
+  getItem("Thêm máu", "blood", <PlusOutlined />),
   //   getItem("Tom", "3"),
   //   getItem("Bill", "4"),
   //   getItem("Alex", "5"),
@@ -56,9 +55,8 @@ const DashboardS = () => {
       'overview': 'overview',
       'donor-blood': 'donor-blood', 
       'blood-request': 'blood-request',
-      'user': 'user',
       'create-hospital': 'create-hospital',
-      'create-user': 'create-user'
+      'blood': 'blood',
     };
     
     if (pageToKeyMap[currentPage]) {

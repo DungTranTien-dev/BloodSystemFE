@@ -461,7 +461,6 @@ const CreateHospital = () => {
         onCancel={handleAddModalCancel}
         footer={null}
         width={800}
-        destroyOnClose
       >
         <Form
           form={form}
@@ -601,7 +600,6 @@ const CreateHospital = () => {
         onCancel={handleEditModalCancel}
         footer={null}
         width={800}
-        destroyOnClose
       >
         <Form
           form={editForm}

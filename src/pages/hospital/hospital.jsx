@@ -178,7 +178,12 @@ const Hospitals = () => {
       navigate("/login", {
         state: {
           redirectTo: "/donor-blood",
-          selectedHospital: hospital,
+          selectedHospital: {
+            title: hospital.title,
+            startTime: hospital.startTime,
+            endTime: hospital.endTime,
+            eventId: hospital.donationEventId
+          },
         },
       });
       return;
@@ -186,7 +191,12 @@ const Hospitals = () => {
 
     navigate("/donor-blood", {
       state: {
-        selectedHospital: hospital,
+        selectedHospital: {
+          title: hospital.title,
+          startTime: hospital.startTime,
+          endTime: hospital.endTime,
+          eventId: hospital.donationEventId
+        },
       },
     });
   };

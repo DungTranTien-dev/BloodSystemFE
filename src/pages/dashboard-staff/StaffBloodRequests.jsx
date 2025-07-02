@@ -1,56 +1,42 @@
-import React, { useState } from 'react';
-import { Card, Button, Tag, Table, Modal, notification, Typography, Space, Row, Col } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, EyeOutlined, ExperimentOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Tag, Table, Modal, notification, Typography, Space, Row, Col, Form, Input, Select, DatePicker, InputNumber, Tooltip, Popconfirm } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, EyeOutlined, ExperimentOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { getBloodRequests, addBloodRequest, updateBloodRequest, deleteBloodRequest } from '../../service/bloodRequestApi';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
-const mockBloodRequests = [
-  {
-    id: 1,
-    patientName: "Lê Văn C",
-    bloodType: "AB+",
-    quantity: 2,
-    urgency: "Khẩn cấp",
-    hospital: "Bệnh viện Việt Đức",
-    contactPerson: "Bác sĩ Nguyễn",
-    contactPhone: "0111222333",
-    reason: "Phẫu thuật tim",
-    status: "pending",
-    createdAt: "2024-06-25"
-  },
-  {
-    id: 2,
-    patientName: "Phạm Thị D",
-    bloodType: "O-",
-    quantity: 1,
-    urgency: "Bình thường",
-    hospital: "Bệnh viện 108",
-    contactPerson: "Điều dưỡng Mai",
-    contactPhone: "0444555666",
-    reason: "Thiếu máu",
-    status: "accepted",
-    createdAt: "2024-06-24"
-  },
-  {
-    id: 3,
-    patientName: "Hoàng Văn E",
-    bloodType: "A-",
-    quantity: 3,
-    urgency: "Khẩn cấp",
-    hospital: "Bệnh viện Chợ Rẫy",
-    contactPerson: "Bác sĩ Trần",
-    contactPhone: "0777888999",
-    reason: "Tai nạn giao thông",
-    status: "rejected",
-    createdAt: "2024-06-23"
-  }
-];
+const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const urgencyLevels = ["Bình thường", "Khẩn cấp", "Cực kỳ khẩn cấp"];
 
 const StaffBloodRequests = () => {
-  const [bloodRequests, setBloodRequests] = useState(mockBloodRequests);
+  const [bloodRequests, setBloodRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFormModalVisible, setIsFormModalVisible] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
+  const [form] = Form.useForm();
+
+  const fetchData = async () => {
+    setLoading(true);
+    const res = await getBloodRequests();
+    if (res.success) {
+      setBloodRequests(res.data);
+    } else {
+      notification.error({
+        message: "Lỗi",
+        description: res.error || "Không thể tải dữ liệu"
+      });
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const getStatusTag = (status) => {
     switch (status) {
@@ -75,75 +61,244 @@ const StaffBloodRequests = () => {
     setSelectedRequest(null);
   };
 
-  const handleUpdateStatus = async (requestId, newStatus) => {
-    // TODO: API call to update blood request status
-    setBloodRequests(prev =>
-      prev.map(req => req.id === requestId ? { ...req, status: newStatus } : req)
-    );
+  const handleAdd = () => {
+    setEditing(null);
+    form.resetFields();
+    setIsFormModalVisible(true);
+  };
 
-    notification.success({
-      message: "Cập nhật thành công",
-      description: `Yêu cầu cần máu đã được ${newStatus === 'accepted' ? 'chấp nhận' : 'từ chối'}.`,
+  const handleEdit = (record) => {
+    setEditing(record);
+    form.setFieldsValue({
+      ...record,
+      requestedDate: dayjs(record.requestedDate)
     });
+    setIsFormModalVisible(true);
+  };
 
-    // TODO: Send notification to requester
+  const handleDelete = async (id) => {
+    const res = await deleteBloodRequest(id);
+    if (res.success) {
+      notification.success({
+        message: "Thành công",
+        description: "Đã xóa yêu cầu cần máu"
+      });
+      fetchData();
+    } else {
+      notification.error({
+        message: "Lỗi",
+        description: res.error || "Không thể xóa yêu cầu"
+      });
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      const payload = {
+        ...values,
+        requestedDate: values.requestedDate.toISOString(),
+        requestedByUserId: "3fa85f64-5717-4562-b3fc-2c963f66afa6" // demo user id
+      };
+
+      let res;
+      if (editing) {
+        res = await updateBloodRequest(editing.bloodRequestId, payload);
+      } else {
+        res = await addBloodRequest(payload);
+      }
+
+      if (res.success) {
+        notification.success({
+          message: "Thành công",
+          description: editing ? "Đã cập nhật yêu cầu" : "Đã thêm yêu cầu mới"
+        });
+        setIsFormModalVisible(false);
+        fetchData();
+      } else {
+        notification.error({
+          message: "Lỗi",
+          description: res.error || "Không thể lưu yêu cầu"
+        });
+      }
+    } catch (error) {
+      console.error('Form validation failed:', error);
+    }
+  };
+
+  const handleUpdateStatus = async (requestId, newStatus) => {
+    const request = bloodRequests.find(req => req.bloodRequestId === requestId);
+    if (!request) return;
+
+    const res = await updateBloodRequest(requestId, { ...request, status: newStatus });
+    if (res.success) {
+      notification.success({
+        message: "Cập nhật thành công",
+        description: `Yêu cầu cần máu đã được ${newStatus === 'accepted' ? 'chấp nhận' : 'từ chối'}.`,
+      });
+      fetchData();
+    } else {
+      notification.error({
+        message: "Lỗi",
+        description: res.error || "Không thể cập nhật trạng thái"
+      });
+    }
   };
 
   const filteredRequests = bloodRequests.filter(req => {
     if (activeTab === 'all') return true;
-    return req.status === activeTab;
+    const statusMap = {
+      'pending': 'PENDING',
+      'accepted': 'ACCEPTED', 
+      'rejected': 'REJECTED'
+    };
+    return req.status === statusMap[activeTab];
   });
 
   const getStatusCounts = () => {
-    const pending = bloodRequests.filter(req => req.status === 'pending').length;
-    const accepted = bloodRequests.filter(req => req.status === 'accepted').length;
-    const rejected = bloodRequests.filter(req => req.status === 'rejected').length;
+    const pending = bloodRequests.filter(req => req.status === 'PENDING').length;
+    const accepted = bloodRequests.filter(req => req.status === 'ACCEPTED').length;
+    const rejected = bloodRequests.filter(req => req.status === 'REJECTED').length;
     return { pending, accepted, rejected, total: bloodRequests.length };
   };
 
   const counts = getStatusCounts();
 
   const columns = [
-    { title: 'Bệnh nhân', dataIndex: 'patientName', key: 'patientName', render: text => <strong>{text}</strong> },
-    { title: 'Nhóm máu', dataIndex: 'bloodType', key: 'bloodType' },
-    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', render: text => `${text} đơn vị` },
     { 
-      title: 'Mức độ', 
-      dataIndex: 'urgency', 
-      key: 'urgency', 
-      render: urgency => (
-        <Tag color={urgency === 'Khẩn cấp' ? 'red' : 'blue'}>{urgency}</Tag>
-      )
+      title: 'Bệnh nhân', 
+      dataIndex: 'patientName', 
+      key: 'patientName', 
+      width: 140,
+      render: text => <strong className="text-gray-800">{text}</strong> 
     },
-    { title: 'Bệnh viện', dataIndex: 'hospital', key: 'hospital' },
-    { title: 'Ngày gửi', dataIndex: 'createdAt', key: 'createdAt' },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', render: status => getStatusTag(status) },
+    { 
+      title: 'Bệnh viện', 
+      dataIndex: 'hospitalName', 
+      key: 'hospitalName',
+      width: 180,
+      ellipsis: true,
+      render: text => <span className="text-gray-700">{text}</span>
+    },
+    { 
+      title: 'Nhóm máu', 
+      dataIndex: 'bloodGroup', 
+      key: 'bloodGroup',
+      width: 100,
+      render: text => <span className="font-semibold text-red-600">{text}</span>
+    },
+    { 
+      title: 'Thành phần', 
+      dataIndex: 'componentType', 
+      key: 'componentType', 
+      width: 120,
+      render: type => {
+        const typeMap = {
+          'WHOLE_BLOOD': 'Toàn phần',
+          'RED_BLOOD_CELLS': 'Hồng cầu',
+          'PLATELETS': 'Tiểu cầu',
+          'PLASMA': 'Huyết tương'
+        };
+        return <span className="text-blue-600">{typeMap[type] || type}</span>;
+      }
+    },
+    { 
+      title: 'Thể tích (ml)', 
+      dataIndex: 'volumeInML', 
+      key: 'volumeInML',
+      width: 120,
+      render: text => <span className="font-medium text-gray-700">{text} ml</span>
+    },
+    { 
+      title: 'Lý do', 
+      dataIndex: 'reason', 
+      key: 'reason', 
+      width: 200,
+      ellipsis: true,
+      render: text => <span title={text} className="text-gray-600">{text}</span>
+    },
+    { 
+      title: 'Ngày cần', 
+      dataIndex: 'requestedDate', 
+      key: 'requestedDate', 
+      width: 120,
+      render: date => <span className="text-gray-700">{dayjs(date).format('DD/MM/YYYY')}</span>
+    },
+    { 
+      title: 'Trạng thái', 
+      dataIndex: 'status', 
+      key: 'status', 
+      width: 120,
+      render: status => {
+        const statusMap = {
+          'PENDING': 'pending',
+          'ACCEPTED': 'accepted', 
+          'REJECTED': 'rejected'
+        };
+        return getStatusTag(statusMap[status] || status);
+      }
+    },
     {
       title: 'Thao tác',
       key: 'action',
+      width: 200,
       render: (_, record) => (
-        <Space size="middle">
-          <Button icon={<EyeOutlined />} size="small" onClick={() => showModal(record)}>Xem</Button>
-          {record.status === 'pending' && (
-            <>
+        <Space size="small">
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              size="small"
+              type="text"
+              onClick={() => showModal(record)}
+              style={{ color: '#3b82f6' }}
+            />
+          </Tooltip>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              icon={<EditOutlined />}
+              size="small"
+              type="text"
+              onClick={() => handleEdit(record)}
+              style={{ color: '#f59e0b' }}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Popconfirm
+              title="Xác nhận xóa"
+              description="Bạn có chắc chắn muốn xóa yêu cầu này?"
+              onConfirm={() => handleDelete(record.bloodRequestId)}
+              okText="Xóa"
+              cancelText="Hủy"
+              okType="danger"
+            >
               <Button
-                type="primary"
-                icon={<CheckCircleOutlined />}
+                icon={<DeleteOutlined />}
                 size="small"
-                onClick={() => handleUpdateStatus(record.id, 'accepted')}
-                className="bg-green-600 hover:bg-green-700 !border-green-600"
-              >
-                Duyệt
-              </Button>
-              <Button
-                type="primary"
+                type="text"
                 danger
-                icon={<CloseCircleOutlined />}
-                size="small"
-                onClick={() => handleUpdateStatus(record.id, 'rejected')}
-              >
-                Từ chối
-              </Button>
+              />
+            </Popconfirm>
+          </Tooltip>
+          {record.status === 'PENDING' && (
+            <>
+              <Tooltip title="Duyệt yêu cầu">
+                <Button
+                  icon={<CheckCircleOutlined />}
+                  size="small"
+                  type="text"
+                  onClick={() => handleUpdateStatus(record.bloodRequestId, 'ACCEPTED')}
+                  style={{ color: '#10b981' }}
+                />
+              </Tooltip>
+              <Tooltip title="Từ chối yêu cầu">
+                <Button
+                  icon={<CloseCircleOutlined />}
+                  size="small"
+                  type="text"
+                  danger
+                  onClick={() => handleUpdateStatus(record.bloodRequestId, 'REJECTED')}
+                />
+              </Tooltip>
             </>
           )}
         </Space>
@@ -153,6 +308,19 @@ const StaffBloodRequests = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Header with Add Button */}
+      <div className="flex justify-between items-center mb-6">
+        <Title level={2} className="!text-red-600">Quản lý yêu cầu cần máu</Title>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={handleAdd}
+          style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0 }}
+        >
+          Thêm yêu cầu
+        </Button>
+      </div>
+
       {/* Stats Cards */}
       <Row gutter={[24, 24]} className="mb-8">
         <Col xs={12} md={6}>
@@ -215,13 +383,21 @@ const StaffBloodRequests = () => {
         <Table 
           columns={columns} 
           dataSource={filteredRequests} 
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
+          rowKey="bloodRequestId"
+          loading={loading}
+          pagination={{ 
+            pageSize: 8,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} yêu cầu`
+          }}
           className="overflow-hidden"
+          size="middle"
+          bordered
         />
       </Card>
 
-      {/* Modal */}
+      {/* Detail Modal */}
       {isModalVisible && selectedRequest && (
         <Modal
           title={<Title level={4}>Chi tiết yêu cầu cần máu</Title>}
@@ -233,16 +409,57 @@ const StaffBloodRequests = () => {
         >
           <Space direction="vertical" className="w-full">
             <Text><strong>Bệnh nhân:</strong> {selectedRequest.patientName}</Text>
-            <Text><strong>Nhóm máu:</strong> {selectedRequest.bloodType}</Text>
-            <Text><strong>Số lượng:</strong> {selectedRequest.quantity} đơn vị</Text>
-            <Text><strong>Mức độ khẩn cấp:</strong> {selectedRequest.urgency}</Text>
+            <Text><strong>Bệnh viện:</strong> {selectedRequest.hospitalName}</Text>
+            <Text><strong>Nhóm máu:</strong> {selectedRequest.bloodGroup}</Text>
+            <Text><strong>Thành phần:</strong> {selectedRequest.componentType}</Text>
+            <Text><strong>Thể tích:</strong> {selectedRequest.volumeInML} ml</Text>
             <Text><strong>Lý do:</strong> {selectedRequest.reason}</Text>
-            <Text><strong>Bệnh viện:</strong> {selectedRequest.hospital}</Text>
-            <Text><strong>Người liên hệ:</strong> {selectedRequest.contactPerson}</Text>
-            <Text><strong>Điện thoại:</strong> {selectedRequest.contactPhone}</Text>
+            <Text><strong>Ngày cần:</strong> {dayjs(selectedRequest.requestedDate).format('DD/MM/YYYY')}</Text>
           </Space>
         </Modal>
       )}
+
+      {/* Form Modal */}
+      <Modal
+        title={editing ? "Cập nhật yêu cầu cần máu" : "Thêm yêu cầu cần máu mới"}
+        open={isFormModalVisible}
+        onOk={handleFormSubmit}
+        onCancel={() => setIsFormModalVisible(false)}
+        okText={editing ? "Cập nhật" : "Thêm"}
+        cancelText="Hủy"
+        width={600}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="patientName" label="Tên bệnh nhân" rules={[{ required: true, message: "Vui lòng nhập tên bệnh nhân" }]}>
+            <Input placeholder="Nhập tên bệnh nhân" />
+          </Form.Item>
+          <Form.Item name="hospitalName" label="Tên bệnh viện" rules={[{ required: true, message: "Vui lòng nhập tên bệnh viện" }]}>
+            <Input placeholder="Nhập tên bệnh viện" />
+          </Form.Item>
+          <Form.Item name="bloodGroup" label="Nhóm máu" rules={[{ required: true, message: "Vui lòng chọn nhóm máu" }]}>
+            <Select placeholder="Chọn nhóm máu">
+              {bloodGroups.map(group => <Option key={group} value={group}>{group}</Option>)}
+            </Select>
+          </Form.Item>
+          <Form.Item name="componentType" label="Thành phần máu" rules={[{ required: true, message: "Vui lòng chọn thành phần máu" }]}>
+            <Select placeholder="Chọn thành phần máu">
+              <Option value="WHOLE_BLOOD">Toàn phần</Option>
+              <Option value="RED_BLOOD_CELLS">Hồng cầu</Option>
+              <Option value="PLATELETS">Tiểu cầu</Option>
+              <Option value="PLASMA">Huyết tương</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="volumeInML" label="Thể tích cần (ml)" rules={[{ required: true, message: "Vui lòng nhập thể tích" }]}>
+            <InputNumber min={1} style={{ width: "100%" }} placeholder="Nhập thể tích" />
+          </Form.Item>
+          <Form.Item name="reason" label="Lý do cần máu" rules={[{ required: true, message: "Vui lòng nhập lý do" }]}>
+            <Input.TextArea rows={3} placeholder="Nhập lý do cần máu" />
+          </Form.Item>
+          <Form.Item name="requestedDate" label="Ngày cần máu" rules={[{ required: true, message: "Vui lòng chọn ngày" }]}>
+            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -11,6 +11,7 @@ import StaffBloodRequests from "./pages/dashboard-staff/StaffBloodRequests";
 import StaffDonorRequests from "./pages/dashboard-staff/StaffDonorRequests";
 import DashboardS from "./components/dashboard";
 import CreateHospital from "./pages/dashboard-staff/CreateHospital";
+import BloodManagement from "./pages/dashboard-staff/BloodManagement";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -30,6 +31,7 @@ const AddDonor = React.lazy(() => import("./pages/admin/AddDonor"));
 const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
 const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
 const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
+const BlogDetail = React.lazy(() => import("./pages/blog/BlogDetail"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
 // Loading component for suspense fallback
@@ -85,6 +87,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <BlogPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/blog/:id",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BlogDetail />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -307,8 +318,8 @@ function App() {
           element: <StaffBloodRequests />,
         },
         {
-          path: "user",
-          element: <div>Quản lý người dùng</div>,
+          path: "blood",
+          element: <BloodManagement/>,
         },
         {
           path: "create-hospital",

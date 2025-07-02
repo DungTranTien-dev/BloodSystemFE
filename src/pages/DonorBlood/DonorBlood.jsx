@@ -16,7 +16,7 @@ import { Clock, Heart as HeartLucide, MapPin, UserCheck, Droplet, Activity, Smil
 import dayjs from 'dayjs';
 import Layout from '../../components/ui/Layout';
 import { CalendarOutlined } from '@ant-design/icons';
-import { submitDonationRequest } from '../../service/donationApi';
+import { submitDonorBlood, registerBloodDonation } from '../../service/bloodRequestApi';
 
 const { Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -45,34 +45,40 @@ const DonorBlood = () => {
   }, [selectedHospital, form]);
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  const componentTypes = [
+    { value: 'WHOLE_BLOOD', label: 'Toàn phần (WHOLE_BLOOD)' },
+    { value: 'RED_BLOOD_CELL', label: 'Hồng cầu (RED_BLOOD_CELL)' },
+    { value: 'PLASMA', label: 'Huyết tương (PLASMA)' },
+    { value: 'PLATELET', label: 'Tiểu cầu (PLATELET)' },
+  ];
 
   const onFinish = async (values) => {
     setLoading(true);
     message.loading({ content: 'Đang gửi đăng ký...', key: 'submit' });
 
     try {
-      // Dữ liệu đầy đủ để gửi đi
       const donationData = {
-        ...values,
+        patientName: values.patientName,
+        hospitalName: values.hospitalName,
+        bloodGroup: values.bloodGroup,
+        componentType: values.componentType,
+        volumeInML: values.volumeInML,
+        reason: values.reason,
         donationDate: values.donationDate.toISOString(),
-        medicalHistory: values.medicalHistory || 'Không có',
-        donationCount: values.donationCount || 0,
       };
+      const response = await submitDonorBlood(donationData);
 
-      // Gọi API để lưu dữ liệu
-      const response = await submitDonationRequest(donationData);
-
-      if (response.success) {
-        message.success({ content: 'Yêu cầu của bạn đã được gửi thành công!', key: 'submit', duration: 2 });
-        
-        // Điều hướng đến trang thông báo
-        setTimeout(() => {
-          navigate('/donation-confirmation');
-        }, 1000);
-      } else {
-        throw new Error(response.error || 'Đăng ký thất bại.');
+      const eventId = selectedHospital?.eventId;
+      if (!eventId) {
+        throw new Error('Không tìm thấy eventId. Vui lòng thử lại.');
       }
-
+      const regRes = await registerBloodDonation(eventId, donationData);
+      if (regRes.success) {
+        message.success({ content: 'Đăng ký hiến máu thành công!', key: 'submit', duration: 2 });
+        navigate('/donation-confirmation');
+      } else {
+        throw new Error(regRes.error || 'Đăng ký hiến máu thất bại.');
+      }
     } catch (error) {
       message.error({ content: error.message || 'Đăng ký thất bại. Vui lòng thử lại.', key: 'submit', duration: 3 });
     } finally {
@@ -116,86 +122,91 @@ const DonorBlood = () => {
                 onFinish={onFinish}
                 className="space-y-6"
                 size="large"
+                initialValues={{
+                  hospitalName: selectedHospital?.title,
+                  donationDate: selectedHospital ? dayjs(selectedHospital.startTime) : undefined,
+                }}
               >
-                {/* Tuổi & Cân nặng */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Form.Item name="age" label={<span className="text-sm font-medium text-red-500">Tuổi của bạn*</span>} rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }, { type: 'number', min: 18, max: 60, message: 'Tuổi hiến máu phải từ 18 đến 60!' }]}>
-                    <InputNumber type="number" placeholder="18-60" className="w-full h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" style={{ fontSize: '16px', width: '100%' }}/>
-                  </Form.Item>
-                  <Form.Item name="weight" label={<span className="text-sm font-medium text-red-500">Cân nặng (kg)*</span>} rules={[{ required: true, message: 'Vui lòng nhập cân nặng!' }, { type: 'number', min: 45, message: 'Cân nặng tối thiểu là 45kg!' }]}>
-                    <InputNumber type="number" placeholder="Tối thiểu 45kg" className="w-full h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" style={{ fontSize: '16px', width: '100%' }} />
-                  </Form.Item>
-                </div>
-                
+                {/* Tên bệnh nhân */}
+                <Form.Item
+                  name="patientName"
+                  label={<span className="text-sm font-medium text-red-500">Tên bệnh nhân*</span>}
+                  rules={[{ required: true, message: 'Vui lòng nhập tên bệnh nhân!' }]}
+                >
+                  <Input placeholder="Nhập tên bệnh nhân" />
+                </Form.Item>
+                {/* Tên bệnh viện */}
+                <Form.Item
+                  name="hospitalName"
+                  label={<span className="text-sm font-medium text-red-500">Tên bệnh viện*</span>}
+                  rules={[{ required: true, message: 'Vui lòng nhập tên bệnh viện!' }]}
+                >
+                  <Input placeholder="Tên bệnh viện" disabled />
+                </Form.Item>
+                {/* Ngày hiến máu */}
+                <Form.Item
+                  name="donationDate"
+                  label={<span className="text-sm font-medium text-red-500">Ngày hiến máu*</span>}
+                  rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}
+                >
+                  <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" disabled />
+                </Form.Item>
+                {/* Giờ hoạt động */}
+                <Form.Item
+                  label={<span className="text-sm font-medium text-red-500">Giờ hoạt động</span>}
+                >
+                  <Input
+                    value={operatingHours}
+                    disabled
+                    className="h-12"
+                    prefix={<Clock size={14} className="mr-2 text-gray-400" />}
+                  />
+                </Form.Item>
                 {/* Nhóm máu */}
-                <Form.Item name="bloodGroup" label={<span className="text-sm font-medium text-red-500">Nhóm máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn nhóm máu!' }]}>
-                  <Select placeholder="Chọn nhóm máu của bạn" className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
+                <Form.Item
+                  name="bloodGroup"
+                  label={<span className="text-sm font-medium text-red-500">Nhóm máu*</span>}
+                  rules={[{ required: true, message: 'Vui lòng chọn nhóm máu!' }]}
+                >
+                  <Select placeholder="Chọn nhóm máu của bạn" className="h-12">
                     {bloodGroups.map(group => (
-                      <Option key={group} value={group}>
-                        <div className="flex items-center"><Droplet className="text-red-500 mr-2" size={16}/>{group}</div>
-                      </Option>
+                      <Option key={group} value={group}>{group}</Option>
                     ))}
                   </Select>
                 </Form.Item>
-
-                {/* Ngày hiến máu */}
-                <Form.Item name="donationDate" label={<span className="text-sm font-medium text-red-500">Ngày dự kiến hiến máu*</span>} rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
-                  <DatePicker style={{ width: '100%' }} placeholder="Chọn ngày bạn muốn hiến máu" format="DD/MM/YYYY" disabled className="h-12 rounded-lg" suffixIcon={<CalendarOutlined />} />
-                </Form.Item>
-                
-                {/* Địa chỉ & Giờ hiến máu */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Form.Item name="hospitalAddress" label={<span className="text-sm font-medium text-red-500">Địa chỉ bệnh viện*</span>} rules={[{ required: true, message: 'Vui lòng chọn bệnh viện!' }]}>
-                    <Input placeholder="Địa chỉ bệnh viện" disabled className="h-12" />
-                  </Form.Item>
-                  <Form.Item
-                    label={
-                      <span className="text-sm font-medium text-red-500">
-                        Giờ hoạt động
-                      </span>
-                    }
-                  >
-                    <Input
-                      value={operatingHours}
-                      disabled
-                      className="h-12"
-                      prefix={<Clock size={14} className="mr-2 text-gray-400" />}
-                    />
-                  </Form.Item>
-                </div>
-
-                {/* Tiền sử hiến máu */}
-                <Form.Item name="previousDonations" label={<span className="text-sm font-medium text-red-500">Bạn đã từng hiến máu chưa?*</span>} rules={[{ required: true, message: 'Vui lòng chọn!' }]}>
-                  <Select placeholder="Chọn..." className="h-12" dropdownStyle={{ borderRadius: '8px' }}>
-                    <Option value="no">Chưa bao giờ</Option>
-                    <Option value="yes">Đã hiến máu</Option>
+                {/* Loại thành phần máu */}
+                <Form.Item
+                  name="componentType"
+                  label={<span className="text-sm font-medium text-red-500">Loại thành phần máu*</span>}
+                  rules={[{ required: true, message: 'Vui lòng chọn loại thành phần máu!' }]}
+                >
+                  <Select placeholder="Chọn loại thành phần máu" className="h-12">
+                    {componentTypes.map(type => (
+                      <Option key={type.value} value={type.value}>{type.label}</Option>
+                    ))}
                   </Select>
                 </Form.Item>
-
-                <Form.Item noStyle shouldUpdate={(prev, curr) => prev.previousDonations !== curr.previousDonations}>
-                  {({ getFieldValue }) => getFieldValue('previousDonations') === 'yes' ? (
-                    <Form.Item name="donationCount" label={<span className="text-sm font-medium text-red-500">Bạn đã hiến máu bao nhiêu lần?*</span>} rules={[{ required: true, message: 'Vui lòng nhập số lần!' }]}>
-                      <InputNumber placeholder="Nhập số lần" className="w-full h-12 rounded-lg" style={{ fontSize: '16px', width: '100%' }} min={1} />
-                    </Form.Item>
-                  ) : null}
+                {/* Thể tích (ml) */}
+                <Form.Item
+                  name="volumeInML"
+                  label={<span className="text-sm font-medium text-red-500">Thể tích cần (ml)*</span>}
+                  rules={[{ required: true, message: 'Vui lòng nhập thể tích!' }]}
+                >
+                  <Input
+                    type="number"
+                    placeholder="Nhập thể tích (ml)"
+                    className="h-12 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    style={{ fontSize: '16px' }}
+                  />
                 </Form.Item>
-
-                {/* Tiền sử bệnh lý */}
-                <Form.Item name="medicalHistory" label={<span className="text-sm font-medium text-red-500">Tiền sử bệnh lý (nếu có)</span>}>
-                  <Input.TextArea rows={3} placeholder="Liệt kê các bệnh mãn tính hoặc tình trạng sức khỏe đặc biệt..." className="rounded-lg" />
+                {/* Lý do */}
+                <Form.Item
+                  name="reason"
+                  label={<span className="text-sm font-medium text-red-500">Lý do*</span>}
+                  rules={[{ required: true, message: 'Vui lòng nhập lý do!' }]}
+                >
+                  <Input.TextArea rows={3} placeholder="Nhập lý do cần truyền máu" />
                 </Form.Item>
-                
-                {/* Cam kết */}
-                <Form.Item name="agreedToTerms" valuePropName="checked" rules={[{ validator: (_, v) => v ? Promise.resolve() : Promise.reject(new Error('Bạn phải đồng ý với các điều khoản!')) }]}>
-                  <Checkbox><span className="font-semibold text-red-500">Tôi đồng ý với các điều khoản và điều kiện.</span></Checkbox>
-                </Form.Item>
-                <Paragraph type="secondary" className="-mt-4 ml-6 text-xs">
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Tôi hiểu rằng việc hiến máu là hoàn toàn tự nguyện.</li>
-                    <li>Tôi cam kết đã khai báo thông tin y tế trung thực.</li>
-                  </ul>
-                </Paragraph>
-
                 {/* Submit Button */}
                 <Form.Item className="mb-0 pt-4">
                   <Button type="primary" htmlType="submit" loading={loading} className="w-full h-14 text-lg font-semibold rounded-lg border-0 shadow-lg hover:shadow-xl transition-all duration-300" style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', fontSize: '16px' }}>
