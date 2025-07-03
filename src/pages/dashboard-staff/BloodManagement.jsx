@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, InputNumber, message, Popconfirm, Spin } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Form, Input, Select, message, Popconfirm, Spin } from "antd";
+import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, ExperimentOutlined } from "@ant-design/icons";
 import { getBloodList, addBlood, updateBlood, deleteBlood } from "../../service/bloodApi";
 
 const { Option } = Select;
@@ -84,9 +84,9 @@ const BloodManagement = () => {
       key: "action",
       render: (_, record) => (
         <>
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} style={{ marginRight: 8 }} />
-          <Popconfirm title="Xác nhận xóa?" onConfirm={() => handleDelete(record.id)} okText="Xóa" cancelText="Hủy">
-            <Button icon={<DeleteOutlined />} danger />
+          <Button icon={<EditOutlined />} type="text" onClick={() => handleEdit(record)} style={{ color: '#f59e0b', marginRight: 8 }} />
+          <Popconfirm title="Xác nhận xóa?" onConfirm={() => handleDelete(record.bloodId)} okText="Xóa" cancelText="Hủy">
+            <Button icon={<DeleteOutlined />} type="text" danger />
           </Popconfirm>
         </>
       ),
@@ -94,13 +94,21 @@ const BloodManagement = () => {
   ];
 
   return (
-    <div style={{ background: "#fff", borderRadius: 12, padding: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <h2 style={{ color: "#db2777", fontWeight: 700, fontSize: 24 }}>Quản lý máu</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} style={{ background: "linear-gradient(135deg, #EF4444 0%, #EC4899 100%)", border: 0 }}>
-          Thêm máu
-        </Button>
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent flex items-center gap-2">
+        <ExperimentOutlined className="text-2xl" />
+        Danh sách máu
+      </h1>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        className="mb-4"
+        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0 }}
+        onClick={handleAdd}
+      >
+        Thêm máu
+      </Button>
+      <Button onClick={fetchData} className="mb-4 ml-2" icon={<ReloadOutlined />}>Làm mới</Button>
       <Spin spinning={loading} tip="Đang tải dữ liệu...">
         <Table columns={columns} dataSource={data} rowKey="bloodId" bordered pagination={{ pageSize: 8 }} />
       </Spin>
@@ -111,23 +119,16 @@ const BloodManagement = () => {
         onCancel={() => setModalVisible(false)}
         okText={editing ? "Cập nhật" : "Thêm"}
         cancelText="Hủy"
+        destroyOnClose
       >
         <Form form={form} layout="vertical">
           <Form.Item name="bloodId" label="ID máu">
             <Input disabled />
           </Form.Item>
-          <Form.Item name="bloodName" label="Tên máu" rules={[{ required: true, message: "Nhập tên máu" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="volumeInML" label="Thể tích (ml)" rules={[{ required: true, message: "Nhập thể tích" }]}>
-            <Input type="number" min={1} />
-          </Form.Item>
-          <Form.Item name="collectedDate" label="Ngày thu thập" rules={[{ required: true, message: "Chọn ngày thu thập" }]}>
-            <Input type="date" />
-          </Form.Item>
-          <Form.Item name="expiryDate" label="Hạn sử dụng" rules={[{ required: true, message: "Chọn hạn sử dụng" }]}>
-            <Input type="date" />
-          </Form.Item>
+          <Form.Item name="bloodName" label="Tên máu" rules={[{ required: true, message: "Nhập tên máu" }]}> <Input /> </Form.Item>
+          <Form.Item name="volumeInML" label="Thể tích (ml)" rules={[{ required: true, message: "Nhập thể tích" }]}> <Input type="number" min={1} /> </Form.Item>
+          <Form.Item name="collectedDate" label="Ngày thu thập" rules={[{ required: true, message: "Chọn ngày thu thập" }]}> <Input type="date" /> </Form.Item>
+          <Form.Item name="expiryDate" label="Hạn sử dụng" rules={[{ required: true, message: "Chọn hạn sử dụng" }]}> <Input type="date" /> </Form.Item>
         </Form>
       </Modal>
     </div>

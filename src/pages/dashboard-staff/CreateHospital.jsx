@@ -17,7 +17,8 @@ import {
   Popconfirm,
   Tooltip,
   Badge,
-  Statistic
+  Statistic,
+  Spin
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -54,6 +55,7 @@ const CreateHospital = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingHospital, setEditingHospital] = useState(null);
   const [loadingEdit, setLoadingEdit] = useState(false);
+  const [viewModal, setViewModal] = useState(false);
 
   useEffect(() => {
     fetchHospitals();
@@ -321,11 +323,14 @@ const CreateHospital = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Xem chi tiết">
-          <Button
-            icon={<EyeOutlined />}
-            size="small"
+            <Button
+              icon={<EyeOutlined />}
+              size="small"
               type="text"
-            onClick={() => showModal(record)}
+              onClick={() => {
+                setSelectedHospital(record);
+                setViewModal(true);
+              }}
               style={{ color: '#3b82f6' }}
             />
           </Tooltip>
@@ -361,51 +366,22 @@ const CreateHospital = () => {
   ];
 
   return (
-    <div className="container mx-auto p-6">
-      {/* Header with Statistics */}
-      <div className="mb-8">
-        <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-4">
-          <BankOutlined className="text-2xl text-white" />
-        </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
-          Quản lý bệnh viện
-        </h1>
-          <p className="text-gray-600 text-lg">Quản lý và theo dõi tất cả bệnh viện trong hệ thống</p>
-        </div>   
-      </div>
-
-      {/* Main Content - Hospital List */}
-      <Card 
-        title={
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BankOutlined className="text-red-500" />
-              <span className="font-semibold text-lg">Danh sách bệnh viện</span>
-            </div>
-            <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={fetchHospitals}
-                loading={loadingHospitals}
-                size="middle"
-              >
-                Làm mới
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={showAddModal}
-                size="middle"
-                className="bg-gradient-to-r from-red-500 to-pink-600 border-0 hover:from-red-600 hover:to-pink-700"
-              >
-                Thêm bệnh viện
-              </Button>
-            </Space>
-          </div>
-        }
-        className="border-0 shadow-xl bg-white/80 backdrop-blur-sm"
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent flex items-center gap-2">
+        <BankOutlined className="text-2xl" />
+        Danh sách bệnh viện
+      </h1>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        className="mb-4"
+        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0 }}
+        onClick={showAddModal}
       >
+        Thêm bệnh viện
+      </Button>
+      <Button onClick={fetchHospitals} className="mb-4 ml-2" icon={<ReloadOutlined />}>Làm mới</Button>
+      <Spin spinning={loadingHospitals} tip="Đang tải dữ liệu...">
         <Table 
           columns={columns} 
           dataSource={hospitals} 
@@ -423,49 +399,19 @@ const CreateHospital = () => {
             emptyText: 'Chưa có bệnh viện nào được tạo'
           }}
         />
-      </Card>
-
-      {/* Modal chi tiết bệnh viện */}
-      {isModalVisible && selectedHospital && (
-        <Modal
-          title={<Title level={4}>Chi tiết bệnh viện</Title>}
-          open={isModalVisible}
-          onCancel={handleCancel}
-          footer={[
-            <Button key="close" onClick={handleCancel}>Đóng</Button>
-          ]}
-        >
-          <Space direction="vertical" className="w-full">
-            <Text><strong>Tên bệnh viện:</strong> {selectedHospital.title}</Text>
-            <Text><strong>Địa chỉ:</strong> {selectedHospital.location}</Text>
-            <Text><strong>Thời gian bắt đầu:</strong> {formatDateTime(selectedHospital.startTime)}</Text>
-            <Text><strong>Thời gian kết thúc:</strong> {formatDateTime(selectedHospital.endTime)}</Text>
-            <Text><strong>Mô tả:</strong> {selectedHospital.description}</Text>
-            <Badge 
-              status={getStatusColor(selectedHospital.startTime, selectedHospital.endTime)} 
-              text={getStatusText(selectedHospital.startTime, selectedHospital.endTime)}
-            />
-          </Space>
-        </Modal>
-      )}
-
-      {/* Modal thêm bệnh viện */}
+      </Spin>
       <Modal
-        title={
-          <div className="flex items-center gap-2">
-            <PlusOutlined className="text-red-500" />
-            <span className="font-semibold text-lg">Thêm bệnh viện mới</span>
-          </div>
-        }
-        open={isAddModalVisible}
-        onCancel={handleAddModalCancel}
+        title={editingHospital ? 'Chỉnh sửa bệnh viện' : 'Thêm bệnh viện mới'}
+        open={isAddModalVisible || isEditModalVisible}
+        onOk={editingHospital ? onEditFinish : onFinish}
+        onCancel={editingHospital ? handleEditModalCancel : handleAddModalCancel}
         footer={null}
         width={800}
       >
         <Form
-          form={form}
+          form={editingHospital ? editForm : form}
           layout="vertical"
-          onFinish={onFinish}
+          onFinish={editingHospital ? onEditFinish : onFinish}
           initialValues={{
             date: dayjs(),
             startTime: dayjs().hour(8).minute(0),
@@ -570,7 +516,7 @@ const CreateHospital = () => {
 
           <Form.Item className="mb-0">
             <div className="flex justify-end gap-2">
-              <Button onClick={handleAddModalCancel}>
+              <Button onClick={editingHospital ? handleEditModalCancel : handleAddModalCancel}>
                 Hủy
               </Button>
               <Button
@@ -581,145 +527,32 @@ const CreateHospital = () => {
                 icon={<SaveOutlined />}
                 className="bg-gradient-to-r from-red-500 to-pink-600 border-0 hover:from-red-600 hover:to-pink-700"
               >
-                Tạo bệnh viện
+                {editingHospital ? 'Cập nhật' : 'Tạo bệnh viện'}
               </Button>
             </div>
           </Form.Item>
         </Form>
       </Modal>
-
-      {/* Modal chỉnh sửa bệnh viện */}
       <Modal
-        title={
-          <div className="flex items-center gap-2">
-            <EditOutlined className="text-orange-500" />
-            <span className="font-semibold text-lg">Chỉnh sửa bệnh viện</span>
-          </div>
-        }
-        open={isEditModalVisible}
-        onCancel={handleEditModalCancel}
+        title="Chi tiết bệnh viện"
+        open={viewModal}
+        onCancel={() => setViewModal(false)}
         footer={null}
-        width={800}
+        destroyOnClose
       >
-        <Form
-          form={editForm}
-          layout="vertical"
-          onFinish={onEditFinish}
-        >
-          <Row gutter={[16, 0]}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label={<Text strong>Tên bệnh viện</Text>}
-                name="title"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập tên bệnh viện!' },
-                  { min: 3, message: 'Tên bệnh viện phải có ít nhất 3 ký tự!' }
-                ]}
-              >
-                <Input 
-                  size="large" 
-                  placeholder="Nhập tên bệnh viện"
-                  prefix={<BankOutlined className="text-gray-400" />}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label={<Text strong>Địa chỉ</Text>}
-                name="location"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập địa chỉ!' },
-                  { min: 10, message: 'Địa chỉ phải có ít nhất 10 ký tự!' }
-                ]}
-              >
-                <Input 
-                  size="large" 
-                  placeholder="Nhập địa chỉ bệnh viện"
-                  prefix={<EnvironmentOutlined className="text-gray-400" />}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 0]}>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label={<Text strong>Ngày hoạt động</Text>}
-                name="date"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn ngày!' }
-                ]}
-              >
-                <DatePicker 
-                  size="large" 
-                  style={{ width: '100%' }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn ngày"
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label={<Text strong>Giờ bắt đầu</Text>}
-                name="startTime"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn giờ bắt đầu!' }
-                ]}
-              >
-                <TimePicker 
-                  size="large" 
-                  style={{ width: '100%' }}
-                  format="HH:mm"
-                  placeholder="Chọn giờ bắt đầu"
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label={<Text strong>Giờ kết thúc</Text>}
-                name="endTime"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn giờ kết thúc!' }
-                ]}
-              >
-                <TimePicker 
-                  size="large" 
-                  style={{ width: '100%' }}
-                  format="HH:mm"
-                  placeholder="Chọn giờ kết thúc"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item
-            label={<Text strong>Mô tả</Text>}
-            name="description"
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Nhập mô tả chi tiết về sự kiện hiến máu"
+        {selectedHospital && (
+          <div>
+            <p><strong>Tên bệnh viện:</strong> {selectedHospital.title}</p>
+            <p><strong>Địa chỉ:</strong> {selectedHospital.location}</p>
+            <p><strong>Thời gian bắt đầu:</strong> {formatDateTime(selectedHospital.startTime)}</p>
+            <p><strong>Thời gian kết thúc:</strong> {formatDateTime(selectedHospital.endTime)}</p>
+            <p><strong>Mô tả:</strong> {selectedHospital.description}</p>
+            <Badge 
+              status={getStatusColor(selectedHospital.startTime, selectedHospital.endTime)} 
+              text={getStatusText(selectedHospital.startTime, selectedHospital.endTime)}
             />
-          </Form.Item>
-
-          <Form.Item className="mb-0">
-            <div className="flex justify-end gap-2">
-              <Button onClick={handleEditModalCancel}>
-                Hủy
-              </Button>
-              <Button
-                type="primary"
-                size="large"
-                htmlType="submit"
-                loading={loadingEdit}
-                icon={<SaveOutlined />}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 border-0 hover:from-orange-600 hover:to-orange-700"
-              >
-                Cập nhật
-              </Button>
-            </div>
-          </Form.Item>
-        </Form>
+          </div>
+        )}
       </Modal>
     </div>
   );
