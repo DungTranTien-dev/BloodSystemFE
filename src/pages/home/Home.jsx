@@ -14,6 +14,9 @@ import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { Button, Card, DatePicker, Popover } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
+import ChatBox from '../../components/ai/ChatBox';
+import { MessageCircle } from 'lucide-react';
+
 const FeatureCard = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-3 hover:bg-red-50 text-center">
     <div className="inline-block p-5 bg-gradient-to-br from-red-100 to-pink-100 rounded-full mb-6">
@@ -43,6 +46,7 @@ const Homepage = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const { RangePicker } = DatePicker;
+  const [showChat, setShowChat] = useState(false);
 
   const handleSearch = () => {
     if (!startDate || !endDate) {
@@ -229,6 +233,26 @@ const Homepage = () => {
           </div>
         </div>{" "}
       </section>
+
+      {/* Floating AI Chat Button & Box */}
+      <div>
+        {/* Floating Button */}
+        <button
+          onClick={() => setShowChat((v) => !v)}
+          className="fixed z-50 bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-pink-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Open AI Chat"
+        >
+          <MessageCircle className="w-8 h-8 text-white" />
+        </button>
+        {/* ChatBox Floating */}
+        {showChat && (
+          <div className="fixed z-50 bottom-24 right-6 animate-fade-in">
+            <div className="shadow-2xl rounded-2xl">
+              <ChatBox />
+            </div>
+          </div>
+        )}
+      </div>
     </Layout>
   );
 };

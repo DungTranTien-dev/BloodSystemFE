@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Badge, message } from 'antd';
 import { getUserBloodRegistrations } from '../../service/bloodRegistrationApi';
-import { Clock, CheckCircle, XCircle, Calendar, MapPin, User } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Calendar, MapPin, User, MessageCircle } from 'lucide-react';
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
+import ChatBox from '../../components/ai/ChatBox';
 
 const getStatusBadge = (status) => {
   switch (status) {
@@ -29,6 +30,7 @@ const getStatusBadge = (status) => {
 const TrackDonation = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -134,6 +136,23 @@ const TrackDonation = () => {
         )}
 
      
+      </div>
+      {/* Floating AI Chat Button & Box */}
+      <div>
+        <button
+          onClick={() => setShowChat((v) => !v)}
+          className="fixed z-50 bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-pink-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Open AI Chat"
+        >
+          <MessageCircle className="w-8 h-8 text-white" />
+        </button>
+        {showChat && (
+          <div className="fixed z-50 bottom-24 right-6 animate-fade-in">
+            <div className="shadow-2xl rounded-2xl">
+              <ChatBox />
+            </div>
+          </div>
+        )}
       </div>
     </div>
     <Footer/>
