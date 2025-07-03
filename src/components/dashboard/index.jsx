@@ -18,6 +18,7 @@ import {
   Activity
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const menuItems = [
   {
@@ -66,11 +67,12 @@ const DashboardS = () => {
   const navigate = useNavigate();
 
   // Dữ liệu người dùng mẫu - thay thế bằng dữ liệu thực tế của bạn
-  const user = {
-    userName: "Nguyễn Văn A",
-    avatarUrl: null,
-    role: "Nhân viên Y tế"
-  };
+  // const user = {
+  //   userName: "Nguyễn Văn A",
+  //   avatarUrl: null,
+  //   role: "Nhân viên Y tế"
+  // };
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     const pathSegments = location.pathname.split('/');
@@ -249,10 +251,6 @@ const DashboardS = () => {
               <h1 className="text-2xl font-bold text-gray-900">Hệ thống quản lý hiến máu</h1>
               <p className="text-gray-600 mt-1">Kết nối sự sống, lan tỏa yêu thương</p>
             </div>
-            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-              <Heart className="h-4 w-4 mr-1" />
-              Trực tuyến
-            </span>
           </div>
         </header>
 
@@ -276,32 +274,7 @@ const DashboardS = () => {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {statsData.map((stat, index) => (
-                  <div key={index} className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div className={`${stat.color} p-6 text-white`}>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-white/80 text-sm font-medium">{stat.title}</p>
-                          <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                        </div>
-                        <div className="p-3 bg-white/20 rounded-xl">
-                          <stat.icon className="h-6 w-6" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-white">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{stat.description}</span>
-                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                          {stat.change}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+        
               {/* Info Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="bg-white rounded-lg p-6 hover:shadow-lg transition-all duration-300">

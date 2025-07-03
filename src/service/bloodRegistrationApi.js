@@ -5,7 +5,7 @@ import api from '../config/axios';
 
 export async function getAllBloodRegistrations() {
   try {
-    const response = await api.get('/BloodRegistration/all');
+    const response = await api.get('/BloodRegistrations');
     return response.data;
   } catch (error) {
     return { isSuccess: false, message: error.message };
