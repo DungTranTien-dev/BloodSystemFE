@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Form,
@@ -21,8 +21,9 @@ import {
   HeartOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
+import { getBloodList } from "../../service/bloodApi";
+import api from "../../config/axios";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -30,16 +31,51 @@ const { Option } = Select;
 const RegisterForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [bloodList, setBloodList] = useState([]);
+  const [loadingBlood, setLoadingBlood] = useState(false);
+
+  useEffect(() => {
+    const fetchBlood = async () => {
+      setLoadingBlood(true);
+      const res = await getBloodList();
+      if (res && res.isSuccess && Array.isArray(res.result)) {
+        setBloodList(res.result);
+      } else if (Array.isArray(res.data)) {
+        setBloodList(res.data);
+      } else {
+        setBloodList([]);
+      }
+      setLoadingBlood(false);
+    };
+    fetchBlood();
+  }, []);
 
   const onFinish = async (values) => {
-    console.log("Success:", values);
+    // Map gender to API value
+    let genderValue = values.gender;
+    if (genderValue === "male") genderValue = "1";
+    else if (genderValue === "female") genderValue = "2";
+    else genderValue = "3";
+
+    const payload = {
+      userName: values.email.split("@")[0],
+      email: values.email,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+      fullName: values.fullName,
+      dateOfBirth: values.birthDate ? values.birthDate.format("YYYY-MM-DD") : undefined,
+      gender: genderValue,
+      citizenId: values.idNumber,
+      phoneNumber: values.phoneNumber,
+      currentAddress: values.address,
+      bloodId: values.bloodId,
+    };
     try {
-      await axios.post("http://localhost:5101/api/auth/register", values);
-      toast.success("Successfully create new account!");
-      Navigate("/login");
+      await api.post("Auth/register", payload);
+      toast.success("Đăng ký tài khoản thành công!");
+      navigate("/login");
     } catch (e) {
-      console.log(e);
-      toast.error(e.response.data);
+      toast.error(e.response?.data || "Đăng ký thất bại!");
     }
   };
 
@@ -244,7 +280,33 @@ const RegisterForm = () => {
             </Col>
           </Row>
         </div>
-        
+        <div className="mb-6">
+          <Title level={4} className="mb-4 border-b border-gray-200 pb-2">
+            Nhóm máu
+          </Title>
+          <Row>
+            <Col span={24}>
+              <Form.Item
+                name="bloodId"
+                label="Chọn nhóm máu"
+                rules={[{ required: true, message: "Vui lòng chọn nhóm máu!" }]}
+              >
+                <Select
+                  placeholder="Chọn nhóm máu"
+                  loading={loadingBlood}
+                  showSearch
+                  optionFilterProp="children"
+                >
+                  {bloodList.map((b) => (
+                    <Option key={b.bloodId} value={b.bloodId}>
+                      {b.bloodName}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
         <div className="text-center mt-8">
             <Space size="large" direction="vertical" className="w-full">
               <Button
