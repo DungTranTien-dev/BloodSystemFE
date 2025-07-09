@@ -9,6 +9,15 @@ import {
   Spin,
   Empty,
   Layout,
+  Modal,
+  Form,
+  Select,
+  Radio,
+  InputNumber,
+  Checkbox,
+  Row,
+  Col,
+  Typography,
 } from "antd";
 import {
   EnvironmentOutlined,
@@ -18,15 +27,295 @@ import {
   SearchOutlined,
   TeamOutlined,
   LoadingOutlined,
+  UserOutlined,
+  MailOutlined,
+  HomeOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import { format, parseISO } from "date-fns";
 import dayjs from "dayjs"; // Cần dayjs để làm việc với AntD DatePicker
 import { getHospitalsNew } from "../../service/hospitalApi";
+import { createUserMedical } from "../../service/medicalApi";
 import { useSelector } from "react-redux";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
+import { toast } from "sonner";
 
 const { RangePicker } = DatePicker;
+const { Option } = Select;
+const { TextArea } = Input;
+const { Title } = Typography;
+
+// --- Component Modal Đăng ký hiến máu ---
+const DonationModal = ({ visible, onCancel, selectedHospital, onSubmit }) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    try {
+      // Format date
+      const formattedValues = {
+        ...values,
+        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]") : null,
+        gender: values.gender === "male" ? 0 : values.gender === "female" ? 1 : 2,
+        hasDonatedBefore: values.hasDonatedBefore || false,
+        donationCount: values.donationCount || 0,
+        chronicDiseaseIds: values.chronicDiseaseIds || [],
+        latitue: values.latitue || 0,
+        longtitue: values.longtitue || 0,
+      };
+
+      // Gọi API hoặc xử lý submit
+      console.log("Form data:", formattedValues);
+      
+      // Chuyển đến trang confirm
+      onSubmit(formattedValues);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const bloodTypes = [
+    "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+  ];
+
+  const chronicDiseases = [
+    { id: "3fa85f64-5717-4562-b3fc-2c963f66afa6", name: "Tiểu đường" },
+    { id: "4fa85f64-5717-4562-b3fc-2c963f66afa7", name: "Cao huyết áp" },
+    { id: "5fa85f64-5717-4562-b3fc-2c963f66afa8", name: "Bệnh tim" },
+  ];
+
+  return (
+    <Modal
+      title={
+        <div className="text-center">
+          <HeartOutlined className="text-red-500 text-2xl mr-2" />
+          <span className="text-xl font-bold">Đăng ký hiến máu</span>
+        </div>
+      }
+      open={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={800}
+      className="donation-modal"
+    >
+      <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+        <h4 className="font-semibold text-blue-800 mb-2">Thông tin sự kiện:</h4>
+        <p className="text-blue-700">{selectedHospital?.title}</p>
+        <p className="text-blue-600 text-sm">
+          {selectedHospital?.startTime && format(parseISO(selectedHospital.startTime), "dd/MM/yyyy HH:mm")}
+        </p>
+      </div>
+
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        scrollToFirstError
+      >
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="fullName"
+              label="Họ và tên"
+              rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Họ và tên" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="dateOfBirth"
+              label="Ngày sinh"
+              rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
+            >
+              <DatePicker
+                className="w-full"
+                format="DD/MM/YYYY"
+                placeholder="Chọn ngày sinh"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="gender"
+              label="Giới tính"
+              rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}
+            >
+              <Radio.Group>
+                <Radio value="male">Nam</Radio>
+                <Radio value="female">Nữ</Radio>
+                <Radio value="other">Khác</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="citizenId"
+              label="Số CMND/CCCD"
+              rules={[
+                { required: true, message: "Vui lòng nhập số CMND/CCCD!" },
+                { pattern: /^[0-9]{9,12}$/, message: "Số CMND/CCCD không hợp lệ!" }
+              ]}
+            >
+              <Input placeholder="CMND hoặc CCCD" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="bloodName"
+              label="Nhóm máu"
+              rules={[{ required: true, message: "Vui lòng chọn nhóm máu!" }]}
+            >
+              <Select placeholder="Chọn nhóm máu">
+                {bloodTypes.map(type => (
+                  <Option key={type} value={type}>{type}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="phoneNumber"
+              label="Số điện thoại"
+              rules={[
+                { required: true, message: "Vui lòng nhập số điện thoại!" },
+                { pattern: /^[0-9]{10,11}$/, message: "Số điện thoại không hợp lệ!" }
+              ]}
+            >
+              <Input prefix={<PhoneOutlined />} placeholder="Số điện thoại" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[
+                { required: true, message: "Vui lòng nhập email!" },
+                { type: "email", message: "Email không hợp lệ!" }
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="Email" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="currentAddress"
+              label="Địa chỉ hiện tại"
+              rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
+            >
+              <Input prefix={<HomeOutlined />} placeholder="Địa chỉ" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="hasDonatedBefore"
+              valuePropName="checked"
+            >
+              <Checkbox>Đã hiến máu trước đây</Checkbox>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="donationCount"
+              label="Số lần hiến máu"
+            >
+              <InputNumber
+                min={0}
+                className="w-full"
+                placeholder="Số lần hiến máu"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item
+          name="diseaseDescription"
+          label="Mô tả bệnh tật (nếu có)"
+        >
+          <TextArea
+            rows={3}
+            placeholder="Mô tả các bệnh tật hoặc tình trạng sức khỏe..."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="chronicDiseaseIds"
+          label="Bệnh mãn tính"
+        >
+          <Select
+            mode="multiple"
+            placeholder="Chọn bệnh mãn tính (nếu có)"
+            allowClear
+          >
+            {chronicDiseases.map(disease => (
+              <Option key={disease.id} value={disease.id}>
+                {disease.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="latitue"
+              label="Vĩ độ"
+            >
+              <InputNumber
+                className="w-full"
+                placeholder="Vĩ độ"
+                step={0.000001}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="longtitue"
+              label="Kinh độ"
+            >
+              <InputNumber
+                className="w-full"
+                placeholder="Kinh độ"
+                step={0.000001}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <div className="flex justify-end gap-2 mt-6">
+          <Button onClick={onCancel} size="large">
+            Hủy
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            loading={loading}
+            className="!bg-gradient-to-r !from-red-500 !to-pink-600 !border-none"
+          >
+            Đăng ký hiến máu
+          </Button>
+        </div>
+      </Form>
+    </Modal>
+  );
+};
 
 // --- Component Card cho mỗi bệnh viện ---
 const HospitalCard = ({ hospital, onBookAppointment }) => {
@@ -138,6 +427,8 @@ const Hospitals = () => {
     return null;
   });
   const [tempDateRange, setTempDateRange] = useState(dateRange);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedHospital, setSelectedHospital] = useState(null);
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -177,7 +468,7 @@ const Hospitals = () => {
     if (!user) {
       navigate("/login", {
         state: {
-          redirectTo: "/donor-blood",
+          redirectTo: "/hospital",
           selectedHospital: {
             title: hospital.title,
             startTime: hospital.startTime,
@@ -189,16 +480,33 @@ const Hospitals = () => {
       return;
     }
 
-    navigate("/donor-blood", {
-      state: {
-        selectedHospital: {
-          title: hospital.title,
-          startTime: hospital.startTime,
-          endTime: hospital.endTime,
-          eventId: hospital.donationEventId
-        },
-      },
-    });
+    setSelectedHospital(hospital);
+    setModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    setSelectedHospital(null);
+  };
+
+  const handleFormSubmit = async (formData) => {
+    // Gọi API đăng ký y tế/hiến máu
+    try {
+      const res = await createUserMedical(formData);
+      if (res.success) {
+        setModalVisible(false);
+        navigate("/donate-confirm", {
+          state: {
+            formData,
+            hospital: selectedHospital
+          }
+        });
+      } else {
+        toast.error(res.error || "Đăng ký thất bại!");
+      }
+    } catch (err) {
+      toast.error("Đăng ký thất bại!");
+    }
   };
 
   const filteredHospitals = hospitals.filter((hospital) => {
@@ -333,6 +641,15 @@ const Hospitals = () => {
           </Spin>
         </div>
       </Layout>
+
+      {/* Modal đăng ký hiến máu */}
+      <DonationModal
+        visible={modalVisible}
+        onCancel={handleModalCancel}
+        selectedHospital={selectedHospital}
+        onSubmit={handleFormSubmit}
+      />
+
       <Footer />
     </>
   );
