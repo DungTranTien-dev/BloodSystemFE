@@ -16,7 +16,6 @@ import { Clock, Heart as HeartLucide, MapPin, UserCheck, Droplet, Activity, Smil
 import dayjs from 'dayjs';
 import Layout from '../../components/ui/Layout';
 import { CalendarOutlined } from '@ant-design/icons';
-import { submitDonorBlood, registerBloodDonation } from '../../service/bloodRequestApi';
 
 const { Text, Paragraph } = Typography;
 const { Option } = Select;

@@ -29,8 +29,17 @@ export async function updateBlood(id, data) {
 
 export const deleteBlood = async (id) => {
   try {
-    await api.delete(`/api/blood/${id}`);
+    await api.delete(`blood/${id}`);
     return { success: true };
+  } catch (err) {
+    return { success: false, error: err.response?.data?.message || err.message };
+  }
+};
+
+export const changeBloodStatus = async (id, status) => {
+  try {
+    const res = await api.post('Blood/change-status', null, { params: { id, status } });
+    return { success: true, data: res.data };
   } catch (err) {
     return { success: false, error: err.response?.data?.message || err.message };
   }

@@ -6,26 +6,30 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import ChatBox from '../../components/ai/ChatBox';
 
-const getStatusBadge = (status) => {
-  switch (status) {
-    case 'PENDING':
-      return (
-        <Badge color="yellow" text={<span className="text-yellow-800">Chờ duyệt</span>} />
-      );
-    case 'ACCEPTED':
-      return (
-        <Badge color="green" text={<span className="text-green-800">Đã duyệt</span>} />
-      );
-    case 'REJECTED':
-      return (
-        <Badge color="red" text={<span className="text-red-800">Bị từ chối</span>} />
-      );
-    default:
-      return (
-        <Badge color="gray" text={<span>Không xác định</span>} />
-      );
-  }
+const typeMap = {
+  PENDING: 'Chờ duyệt',
+  COMPLETED: 'Hoàn thành',
+  REJECTED: 'Từ chối',
+  CANCEL: 'Đã hủy',
+  0: 'Chờ duyệt',
+  1: 'Hoàn thành',
+  2: 'Từ chối',
 };
+const typeColorClass = {
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  COMPLETED: 'bg-blue-100 text-blue-800',
+  REJECTED: 'bg-red-100 text-red-800',
+  CANCEL: 'bg-gray-200 text-gray-500',
+  0: 'bg-yellow-100 text-yellow-800',
+  1: 'bg-blue-100 text-blue-800',
+  2: 'bg-red-100 text-red-800',
+};
+
+const getStatusBadge = (status) => (
+  <span className={`px-2 py-1 rounded-full text-xs ${typeColorClass[status] || 'bg-gray-100 text-gray-800'}`} style={{ fontWeight: 500, minWidth: 90, display: 'inline-block', textAlign: 'center' }}>
+    {typeMap[status] || status}
+  </span>
+);
 
 const TrackDonation = () => {
   const [data, setData] = useState([]);

@@ -261,6 +261,21 @@ const CreateHospital = () => {
     return 'Đang diễn ra';
   };
 
+  const statusColorClass = {
+    upcoming: 'bg-yellow-100 text-yellow-800',
+    ongoing: 'bg-green-100 text-green-800',
+    ended: 'bg-blue-100 text-blue-800',
+  };
+
+  const getStatusKey = (startTime, endTime) => {
+    const now = dayjs();
+    const start = dayjs(startTime);
+    const end = dayjs(endTime);
+    if (now.isBefore(start)) return 'upcoming';
+    if (now.isAfter(end)) return 'ended';
+    return 'ongoing';
+  };
+
   const columns = [
     {
       title: 'Tên bệnh viện',
@@ -306,14 +321,12 @@ const CreateHospital = () => {
       title: 'Trạng thái',
       key: 'status',
       render: (_, record) => {
-        const color = getStatusColor(record.startTime, record.endTime);
+        const statusKey = getStatusKey(record.startTime, record.endTime);
         const text = getStatusText(record.startTime, record.endTime);
         return (
-          <Badge 
-            status={color} 
-            text={text}
-            style={{ fontWeight: 500 }}
-          />
+          <span className={`px-2 py-1 rounded-full text-xs ${statusColorClass[statusKey] || 'bg-gray-100 text-gray-800'}`} style={{ fontWeight: 500, minWidth: 90, display: 'inline-block', textAlign: 'center' }}>
+            {text}
+          </span>
         );
       },
     },
@@ -321,61 +334,36 @@ const CreateHospital = () => {
       title: 'Thao tác',
       key: 'action',
       render: (_, record) => (
-        <Space size="small">
+        <div style={{ display: 'flex', gap: 8 }}>
           <Tooltip title="Xem chi tiết">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              type="text"
-              onClick={() => {
-                setSelectedHospital(record);
-                setViewModal(true);
-              }}
-              style={{ color: '#3b82f6' }}
-            />
+            <Button icon={<EyeOutlined style={{ color: '#3b82f6', fontSize: 18 }} />} style={actionButtonStyle} onClick={() => { setSelectedHospital(record); setViewModal(true); }} />
           </Tooltip>
           <Tooltip title="Chỉnh sửa">
-            <Button
-              icon={<EditOutlined />}
-              size="small"
-              type="text"
-              onClick={() => showEditModal(record)}
-              style={{ color: '#f59e0b' }}
-            />
+            <Button icon={<EditOutlined style={{ color: '#f59e0b', fontSize: 18 }} />} style={actionButtonStyle} onClick={() => showEditModal(record)} />
           </Tooltip>
           <Tooltip title="Xóa">
-            <Popconfirm
-              title="Xác nhận xóa"
-              description="Bạn có chắc chắn muốn xóa bệnh viện này?"
-              onConfirm={() => handleDelete(record.donationEventId)}
-              okText="Xóa"
-              cancelText="Hủy"
-              okType="danger"
-            >
-              <Button
-                icon={<DeleteOutlined />}
-                size="small"
-                type="text"
-                danger
-              />
+            <Popconfirm title="Xác nhận xóa" description="Bạn có chắc chắn muốn xóa bệnh viện này?" onConfirm={() => handleDelete(record.donationEventId)} okText="Xóa" cancelText="Hủy" okType="danger">
+              <Button icon={<DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />} style={actionButtonStyle} danger />
             </Popconfirm>
           </Tooltip>
-        </Space>
+        </div>
       ),
     },
   ];
 
+  const actionButtonStyle = { border: 'none', background: 'none', padding: 0, margin: 0 };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent flex items-center gap-2">
-        <BankOutlined className="text-2xl" />
+
         Danh sách bệnh viện
       </h1>
       <Button
         type="primary"
         icon={<PlusOutlined />}
         className="mb-4"
-        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0 }}
+        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0, borderRadius: 6, fontWeight: 500 }}
         onClick={showAddModal}
       >
         Thêm bệnh viện
@@ -526,6 +514,7 @@ const CreateHospital = () => {
                 loading={loading}
                 icon={<SaveOutlined />}
                 className="bg-gradient-to-r from-red-500 to-pink-600 border-0 hover:from-red-600 hover:to-pink-700"
+                style={{ borderRadius: 6, fontWeight: 500 }}
               >
                 {editingHospital ? 'Cập nhật' : 'Tạo bệnh viện'}
               </Button>
@@ -547,10 +536,9 @@ const CreateHospital = () => {
             <p><strong>Thời gian bắt đầu:</strong> {formatDateTime(selectedHospital.startTime)}</p>
             <p><strong>Thời gian kết thúc:</strong> {formatDateTime(selectedHospital.endTime)}</p>
             <p><strong>Mô tả:</strong> {selectedHospital.description}</p>
-            <Badge 
-              status={getStatusColor(selectedHospital.startTime, selectedHospital.endTime)} 
-              text={getStatusText(selectedHospital.startTime, selectedHospital.endTime)}
-            />
+            <span className={`px-2 py-1 rounded-full text-xs ${statusColorClass[getStatusKey(selectedHospital.startTime, selectedHospital.endTime)] || 'bg-gray-100 text-gray-800'}`} style={{ fontWeight: 500, minWidth: 90, display: 'inline-block', textAlign: 'center' }}>
+              {getStatusText(selectedHospital.startTime, selectedHospital.endTime)}
+            </span>
           </div>
         )}
       </Modal>

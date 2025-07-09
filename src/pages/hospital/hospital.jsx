@@ -36,6 +36,7 @@ import { format, parseISO } from "date-fns";
 import dayjs from "dayjs"; // Cần dayjs để làm việc với AntD DatePicker
 import { getHospitalsNew } from "../../service/hospitalApi";
 import { createUserMedical } from "../../service/medicalApi";
+import { registerBloodDonation } from '../../service/bloodRegistrationApi';
 import { useSelector } from "react-redux";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
@@ -64,6 +65,7 @@ const DonationModal = ({ visible, onCancel, selectedHospital, onSubmit }) => {
         chronicDiseaseIds: values.chronicDiseaseIds || [],
         latitue: values.latitue || 0,
         longtitue: values.longtitue || 0,
+        diseaseDescription: values.diseaseDescription && values.diseaseDescription.trim() !== '' ? values.diseaseDescription : 'Không có',
       };
 
       // Gọi API hoặc xử lý submit
@@ -494,9 +496,28 @@ const Hospitals = () => {
     try {
       const res = await createUserMedical(formData);
       if (res.success) {
+        // Gọi tiếp API registerBloodDonation
+        const eventId = selectedHospital?.donationEventId;
+        if (eventId) {
+          const regRes = await registerBloodDonation(eventId, formData);
+          if (regRes.success) {
+            setModalVisible(false);
+            navigate("/donate-confirm", {
+              state: {
+                formData,
+                hospital: selectedHospital
+              }
+            });
+            return;
+          } else {
+            toast.error(regRes.error || "Đăng ký hiến máu thất bại!");
+            return;
+          }
+        }
+        // Nếu không có eventId vẫn cho chuyển trang confirm (fallback)
         setModalVisible(false);
         navigate("/donate-confirm", {
-      state: {
+          state: {
             formData,
             hospital: selectedHospital
           }

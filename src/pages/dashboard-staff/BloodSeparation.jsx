@@ -17,6 +17,12 @@ const componentTypeOptions = [
   { value: 3, label: 'Bạch cầu' },
 ];
 
+const statusColorClass = {
+  true: 'bg-green-100 text-green-800',
+  false: 'bg-gray-100 text-gray-800',
+};
+const actionButtonStyle = { border: 'none', background: 'none', padding: 0, margin: 0 };
+
 const BloodSeparation = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -141,44 +147,26 @@ const BloodSeparation = () => {
       title: 'Trạng thái',
       dataIndex: 'isAvailable',
       key: 'isAvailable',
-      render: (value) => value ? 'Còn sử dụng' : 'Đã sử dụng',
-    },
-    {
-      title: 'Chỉnh sửa',
-      key: 'edit',
-      render: (_, record) => (
-        <Button
-          icon={<EditOutlined style={{ color: '#faad14', fontSize: 20 }} />}
-          type="text"
-          onClick={() => showEditModal(record)}
-        />
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${statusColorClass[value]} `} style={{ fontWeight: 500, minWidth: 90, display: 'inline-block', textAlign: 'center' }}>
+          {value ? 'Còn sử dụng' : 'Đã sử dụng'}
+        </span>
       ),
     },
     {
-      title: 'Xóa',
-      key: 'delete',
+      title: 'Thao tác',
+      key: 'action',
       render: (_, record) => (
-        <Popconfirm
-          title="Bạn có chắc chắn muốn xóa?"
-          onConfirm={async () => {
-            const res = await deleteBloodSeparation(record.separatedBloodComponentId);
-            if (res && res.isSuccess) {
-              message.success('Xóa thành công!');
-              fetchData();
-            } else {
-              message.error(res.message || 'Xóa thất bại');
-            }
-          }}
-          okText="Xóa"
-          cancelText="Hủy"
-        >
-          <Tooltip title="Xóa">
-            <Button
-              icon={<DeleteOutlined style={{ color: '#ff4d4f', fontSize: 20 }} />}
-              type="text"
-            />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Tooltip title="Chỉnh sửa">
+            <Button icon={<EditOutlined style={{ color: '#f59e0b', fontSize: 18 }} />} style={actionButtonStyle} onClick={() => showEditModal(record)} />
           </Tooltip>
-        </Popconfirm>
+          <Tooltip title="Xóa">
+            <Popconfirm title="Bạn có chắc chắn muốn xóa?" onConfirm={async () => { const res = await deleteBloodSeparation(record.separatedBloodComponentId); if (res && res.isSuccess) { message.success('Xóa thành công!'); fetchData(); } else { message.error(res.message || 'Xóa thất bại'); } }} okText="Xóa" cancelText="Hủy">
+              <Button icon={<DeleteOutlined style={{ color: '#ff4d4f', fontSize: 18 }} />} style={actionButtonStyle} danger />
+            </Popconfirm>
+          </Tooltip>
+        </div>
       ),
     },
   ];
@@ -192,7 +180,7 @@ const BloodSeparation = () => {
         type="primary"
         icon={<PlusOutlined />}
         className="mb-4"
-        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0 }}
+        style={{ background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0, borderRadius: 6, fontWeight: 500 }}
         onClick={() => setCreateModalVisible(true)}
       >
         Thêm tách máu
@@ -206,9 +194,10 @@ const BloodSeparation = () => {
         open={editModalVisible}
         onOk={handleEditOk}
         onCancel={() => setEditModalVisible(false)}
-        okText="Lưu"
+        okText={<span style={{ color: '#fff' }}>Lưu</span>}
         cancelText="Hủy"
         confirmLoading={updating}
+        okButtonProps={{ style: { background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0, borderRadius: 6 } }}
       >
         <Form form={form} layout="vertical">
           <Form.Item name="code" label="Mã tách máu">
@@ -239,9 +228,10 @@ const BloodSeparation = () => {
         open={createModalVisible}
         onOk={handleCreateOk}
         onCancel={() => setCreateModalVisible(false)}
-        okText="Tạo"
+        okText={<span style={{ color: '#fff' }}>Tạo</span>}
         cancelText="Hủy"
         confirmLoading={creating}
+        okButtonProps={{ style: { background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0, borderRadius: 6 } }}
       >
         <Form form={createForm} layout="vertical">
           <Form.Item name="bloodId" label="Blood ID" rules={[{ required: true, message: 'Nhập bloodId' }]}> 

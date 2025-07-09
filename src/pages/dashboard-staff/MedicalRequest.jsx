@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, message, Spin, Modal, Form, Input, DatePicker, Switch, Select, InputNumber } from 'antd';
+import { Table, Button, message, Spin, Modal, Form, Input, DatePicker, Switch, Select, InputNumber, Tooltip } from 'antd';
 import { ReloadOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
 import { getAllUserMedical, changeUserMedicalStatus, updateUserMedical } from '../../service/medicalApi';
 import dayjs from 'dayjs';
@@ -34,6 +34,18 @@ const typeOptions = [
   { label: 'Hoàn tất', value: 3 },
 ];
 
+const typeColorClass = {
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  AVAILABLE: 'bg-green-100 text-green-800',
+  BLOCK: 'bg-red-100 text-red-800',
+  COMPLETE: 'bg-blue-100 text-blue-800',
+  0: 'bg-yellow-100 text-yellow-800',
+  1: 'bg-green-100 text-green-800',
+  2: 'bg-red-100 text-red-800',
+  3: 'bg-blue-100 text-blue-800',
+};
+const actionButtonStyle = { border: 'none', background: 'none', padding: 0, margin: 0 };
+
 const MedicalRequest = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -51,6 +63,7 @@ const MedicalRequest = () => {
   const fetchData = async () => {
     setLoading(true);
     const res = await getAllUserMedical();
+    console.log('DATA:', res.data); // Thêm dòng này
     if (res && res.success) {
       setData(res.data);
     } else {
@@ -119,6 +132,7 @@ const MedicalRequest = () => {
   const handleStatusChange = async (userMedicalId, newType) => {
     try {
       const res = await changeUserMedicalStatus(userMedicalId, newType);
+      console.log('CHANGE STATUS RESPONSE:', res);
       if (res && res.success) {
         message.success(res.message || 'Cập nhật trạng thái thành công!');
         fetchData();
@@ -159,16 +173,10 @@ const MedicalRequest = () => {
       key: 'type',
       render: (v, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            v === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-            v === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
-            v === 'BLOCK' ? 'bg-red-100 text-red-800' :
-            v === 'COMPLETE' ? 'bg-blue-100 text-blue-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
+          <span className={`px-2 py-1 rounded-full text-xs ${typeColorClass[v] || 'bg-gray-100 text-gray-800'}`} style={{ fontWeight: 500, minWidth: 90, display: 'inline-block', textAlign: 'center' }}>
             {typeMap[v] || v || ''}
           </span>
-          {v === 'PENDING' && (
+          {v === 'PENDING' || v === 0 ? (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button
                 size="small"
@@ -187,7 +195,7 @@ const MedicalRequest = () => {
                 Từ chối
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
       ),
     },
@@ -196,20 +204,12 @@ const MedicalRequest = () => {
       key: 'action',
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button
-            icon={<EyeOutlined />}
-            size="small"
-            type="text"
-            onClick={() => showViewModal(record)}
-            style={{ color: '#3b82f6' }}
-          />
-          <Button
-            icon={<EditOutlined />}
-            size="small"
-            type="text"
-            onClick={() => showEditModal(record)}
-            style={{ color: '#f59e0b' }}
-          />
+          <Tooltip title="Xem chi tiết">
+            <Button icon={<EyeOutlined style={{ color: '#3b82f6', fontSize: 18 }} />} style={actionButtonStyle} onClick={() => showViewModal(record)} />
+          </Tooltip>
+          <Tooltip title="Chỉnh sửa">
+            <Button icon={<EditOutlined style={{ color: '#f59e0b', fontSize: 18 }} />} style={actionButtonStyle} onClick={() => showEditModal(record)} />
+          </Tooltip>
         </div>
       ),
     },
@@ -349,10 +349,11 @@ const MedicalRequest = () => {
           setEditingRecord(null);
           editForm.resetFields();
         }}
-        okText="Lưu"
+        okText={<span style={{ color: '#fff' }}>Lưu</span>}
         cancelText="Hủy"
         confirmLoading={updating}
         width={800}
+        okButtonProps={{ style: { background: 'linear-gradient(135deg, #EF4444 0%, #EC4899 100%)', border: 0, borderRadius: 6 } }}
       >
         <Form form={editForm} layout="vertical">
           <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true, message: 'Nhập họ và tên' }]}>
