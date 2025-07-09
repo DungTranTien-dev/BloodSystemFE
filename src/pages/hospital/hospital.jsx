@@ -496,7 +496,7 @@ const Hospitals = () => {
       if (res.success) {
         setModalVisible(false);
         navigate("/donate-confirm", {
-          state: {
+      state: {
             formData,
             hospital: selectedHospital
           }

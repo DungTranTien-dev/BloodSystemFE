@@ -35,7 +35,28 @@ export const getAllUserMedical = async () => {
   }
 };
 
-// Đổi trạng thái yêu cầu y tế
+// Cập nhật thông tin yêu cầu y tế
+export const updateUserMedical = async (medicalData) => {
+  try {
+    console.log('Sending update request with data:', medicalData);
+    const response = await api.post("UserMedical/update", medicalData);
+    console.log('Update response:', response);
+    return {
+      success: true,
+      data: response.data,
+      message: response.data?.message || "Cập nhật thành công!"
+    };
+  } catch (error) {
+    console.error('Update API error:', error);
+    console.error('Error response:', error.response?.data);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.response?.data?.error || error.message || "Có lỗi xảy ra khi cập nhật yêu cầu y tế"
+    };
+  }
+};
+
+// Thay đổi trạng thái yêu cầu y tế
 export const changeUserMedicalStatus = async (userMedicalId, type) => {
   try {
     const response = await api.post(`UserMedical/change-status?userMedicalId=${userMedicalId}&type=${type}`);

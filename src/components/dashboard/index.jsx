@@ -91,6 +91,7 @@ const DashboardS = () => {
       'create-hospital': 'create-hospital',
       'blood': 'blood',
       'blood-separation': 'blood-separation',
+      'medical-request': 'medical-request',
     };
     
     if (pageToKeyMap[currentPage]) {
