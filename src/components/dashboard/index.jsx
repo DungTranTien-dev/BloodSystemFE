@@ -40,6 +40,12 @@ const menuItems = [
     path: "/DashboardS/blood-request"
   },
   {
+    key: "medical-request",
+    label: "Yêu cầu y tế",
+    icon: Monitor,
+    path: "/DashboardS/medical-request"
+  },
+  {
     key: "create-hospital",
     label: "Tạo bệnh viện",
     icon: Building2,

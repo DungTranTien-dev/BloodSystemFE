@@ -13,6 +13,7 @@ import DashboardS from "./components/dashboard";
 import CreateHospital from "./pages/dashboard-staff/CreateHospital";
 import BloodManagement from "./pages/dashboard-staff/BloodManagement";
 import BloodSeparation from "./pages/dashboard-staff/BloodSeparation";
+import MedicalRequest from "./pages/dashboard-staff/MedicalRequest";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -337,6 +338,10 @@ function App() {
               <BloodSeparation />
             </Suspense>
           ),
+        },
+        {
+          path: "medical-request",
+          element: <MedicalRequest />,
         },
       ],
     },
