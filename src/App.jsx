@@ -4,8 +4,6 @@ import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
-import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
-import TrackDonation from "./pages/DonorBlood/TrackDonation";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -27,6 +25,31 @@ const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
 const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
+//DOCTOR
+const DoctorPage = React.lazy(() => import("./pages/doctor/DoctorPage"));
+const ManageBlood = React.lazy(() => import("./pages/doctor/ManageBlood"));
+const ManageMedical = React.lazy(() => import("./pages/doctor/ManageUserMedical"));
+const ManageSeparated = React.lazy(() => import("./pages/doctor/ManageSeparatedBlood"));
+
+//Donate
+const DonateConfirm = React.lazy(() => import("./pages/DonorBlood/DonateConfirm"));
+const TrackDonation = React.lazy(() => import("./pages/DonorBlood/TrackDonation"));
+
+
+
+
+
+//STAFF
+const StaffPage = React.lazy(() => import("./pages/staff/StaffPage"));
+const ManageEvent = React.lazy(() => import("./pages/staff/ManageEvent"));
+const ManageNews = React.lazy(() => import("./pages/staff/ManageNews"));
+const ManageBloodRequest = React.lazy(() => import("./pages/staff/ManageBloodRequest"));
+const ManageBloodRegistion = React.lazy(() => import("./pages/staff/ManageBloodRegistion"));
+
+
+//PAYMENT
+const CallBackVNPay = React.lazy(() => import("./pages/payment/CallBackVNPay"));
+
 // Loading component for suspense fallback
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -44,6 +67,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <Homepage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "payment/callBackVNPay",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <CallBackVNPay />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -84,15 +116,6 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    {
-      path: "/hospital",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <Hospitals />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
      {
       path: "/donation-confirmation",
       element: (
@@ -102,11 +125,20 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
+    {
       path: "/track-donation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <TrackDonation />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/hospitals",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Hospitals />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -156,7 +188,6 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    
     {
       path: "/admin",
       element: (
@@ -228,6 +259,90 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorDetails />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    //DOCTOR
+    {
+      path: "/doctor",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <DoctorPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-blood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-medical",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageMedical />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/doctor/manage-separated",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageSeparated />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    //STAFF
+    {
+      path: "/staff",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    
+    {
+      path: "/staff/manage-registion",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBloodRegistion />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff/manage-event",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageEvent />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff/manage-news",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageNews />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+        {
+      path: "/staff/manage-blood-requests",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBloodRequest />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
