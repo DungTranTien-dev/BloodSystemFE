@@ -6,6 +6,8 @@ import {
 } from "react-icons/fa";
 import Layout from "../../components/ui/Layout";
 import DonorSearchPopup from "../../components/DonorSearchPopup ";
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZHVuZ2RldjExMyIsImEiOiJjbWNicWJnd2owYzF2MmtvbHRjbTI3c3Z6In0.GxTBXw4sDwC2RAzMpNPMRA"; // Replace with your real token
 
@@ -24,14 +26,14 @@ const BloodTypePage = () => {
   const [route, setRoute] = useState(null);
 
   const bloodTypes = [
-    { type: "A+", description: "Second most common blood type", percentage: "35.7%", canDonateTo: ["A+", "AB+"], canReceiveFrom: ["A+", "A-", "O+", "O-"] },
-    { type: "A-", description: "Universal plasma donor", percentage: "6.3%", canDonateTo: ["A+", "A-", "AB+", "AB-"], canReceiveFrom: ["A-", "O-"] },
-    { type: "B+", description: "Third most common blood type", percentage: "8.5%", canDonateTo: ["B+", "AB+"], canReceiveFrom: ["B+", "B-", "O+", "O-"] },
-    { type: "B-", description: "Rare blood type", percentage: "1.5%", canDonateTo: ["B+", "B-", "AB+", "AB-"], canReceiveFrom: ["B-", "O-"] },
-    { type: "AB+", description: "Universal recipient", percentage: "3.4%", canDonateTo: ["AB+"], canReceiveFrom: ["All Types"] },
-    { type: "AB-", description: "Rarest blood type", percentage: "0.6%", canDonateTo: ["AB+", "AB-"], canReceiveFrom: ["A-", "B-", "O-", "AB-"] },
-    { type: "O+", description: "Most common blood type", percentage: "37.4%", canDonateTo: ["O+", "A+", "B+", "AB+"], canReceiveFrom: ["O+", "O-"] },
-    { type: "O-", description: "Universal donor", percentage: "6.6%", canDonateTo: ["All Types"], canReceiveFrom: ["O-"] }
+    { type: "A+", description: "Nhóm máu phổ biến thứ hai", percentage: "35.7%", canDonateTo: ["A+", "AB+"], canReceiveFrom: ["A+", "A-", "O+", "O-"] },
+    { type: "A-", description: "Người hiến huyết tương phổ quát", percentage: "6.3%", canDonateTo: ["A+", "A-", "AB+", "AB-"], canReceiveFrom: ["A-", "O-"] },
+    { type: "B+", description: "Nhóm máu phổ biến thứ ba", percentage: "8.5%", canDonateTo: ["B+", "AB+"], canReceiveFrom: ["B+", "B-", "O+", "O-"] },
+    { type: "B-", description: "Nhóm máu hiếm", percentage: "1.5%", canDonateTo: ["B+", "B-", "AB+", "AB-"], canReceiveFrom: ["B-", "O-"] },
+    { type: "AB+", description: "Người nhận máu phổ quát", percentage: "3.4%", canDonateTo: ["AB+"], canReceiveFrom: ["Tất cả các nhóm"] },
+    { type: "AB-", description: "Nhóm máu hiếm nhất", percentage: "0.6%", canDonateTo: ["AB+", "AB-"], canReceiveFrom: ["A-", "B-", "O-", "AB-"] },
+    { type: "O+", description: "Nhóm máu phổ biến nhất", percentage: "37.4%", canDonateTo: ["O+", "A+", "B+", "AB+"], canReceiveFrom: ["O+", "O-"] },
+    { type: "O-", description: "Người hiến máu phổ quát", percentage: "6.6%", canDonateTo: ["Tất cả các nhóm"], canReceiveFrom: ["O-"] }
   ];
 
   const componentCompatibility = {
@@ -68,10 +70,10 @@ const BloodTypePage = () => {
   };
 
   const facts = [
-    "Someone needs blood every two seconds",
-    "One donation can save up to three lives",
-    "Less than 38% of the population is eligible to donate blood",
-    "Blood cannot be manufactured – it can only come from donors"
+    "Cứ mỗi 2 giây lại có một người cần truyền máu",
+    "Một lần hiến máu có thể cứu tới 3 người",
+    "Chỉ dưới 38% dân số đủ điều kiện hiến máu",
+    "Máu không thể sản xuất nhân tạo – chỉ có thể đến từ người hiến"
   ];
 
   const sampleDonors = [
@@ -180,20 +182,26 @@ const BloodTypePage = () => {
   };
 
   return (
-    <Layout className="bg-gradient-to-r from-red-500 to-pink-600">
-      <div className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">Understanding Blood Types</h1>
-            <p className="text-xl text-white opacity-90">Learn about different blood types and their compatibility</p>
+    <>
+      <Header />
+      <div className="min-h-screen bg-white relative overflow-hidden">
+        {/* Tiêu đề với nền chuyển sắc giống Q&A */}
+        <div className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-15.5 text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2">Nhóm máu & Tương thích</h1>
+          <p className="mt-2 text-lg text-pink-100">Tìm hiểu về các nhóm máu và khả năng truyền nhận</p>
+        </div>
+        {/* Nội dung chính của trang */}
+        <div className="relative z-10 py-8 px-2 sm:px-4 lg:px-8 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            {/* Đã chuyển phần title ra ngoài, không cần lặp lại ở đây */}
           </div>
 
-          <div className="mb-8 flex flex-col md:flex-row gap-4">
+          <div className="mb-6 flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search blood types..."
+                placeholder="Tìm kiếm nhóm máu..."
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -204,17 +212,17 @@ const BloodTypePage = () => {
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
             >
-              <option value="all">All Types</option>
-              <option value="+">Positive Types</option>
-              <option value="-">Negative Types</option>
+              <option value="all">Tất cả</option>
+              <option value="+">Nhóm máu dương (+)</option>
+              <option value="-">Nhóm máu âm (-)</option>
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {filteredBloodTypes.map((blood) => (
               <div
                 key={blood.type}
-                className="bg-white rounded-lg p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
+                className="bg-white rounded-lg p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer border"
                 onClick={() => setSelectedType(blood)}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -225,37 +233,16 @@ const BloodTypePage = () => {
                 <div className="bg-gray-100 rounded-full h-2 mb-2">
                   <div className="bg-red-600 rounded-full h-2" style={{ width: blood.percentage }}></div>
                 </div>
-                <p className="text-sm text-gray-500">{blood.percentage} of population</p>
+                <p className="text-sm text-gray-500">{blood.percentage} dân số</p>
               </div>
             ))}
           </div>
 
           {selectedType && renderCompatibility()}
 
-          <div className="bg-white rounded-lg p-6 mb-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Quick Facts About Blood Donation</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {facts.map((fact, index) => (
-                <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <FaInfoCircle className="text-red-600 text-xl flex-shrink-0 mt-1" />
-                  <p className="text-gray-700">{fact}</p>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="text-center mt-8">
-            <button
-              className="bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center mx-auto"
-              onClick={() => setIsDonorPopupOpen(true)}
-            >
-              <FaUser className="mr-2" />
-              Find Local Donors
-            </button>
-          </div>
+  
         </div>
-      </div>
-
         <DonorSearchPopup
           isOpen={isDonorPopupOpen}
           onClose={() => setIsDonorPopupOpen(false)}
@@ -273,7 +260,9 @@ const BloodTypePage = () => {
           setRoute={setRoute}
           MAPBOX_TOKEN={MAPBOX_TOKEN}
         />
-    </Layout>
+      </div>
+      <Footer />
+    </>
   );
 };
 

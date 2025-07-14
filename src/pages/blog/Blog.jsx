@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight, FaCalendarAlt, FaUser } from 'react-icons/fa';
 import Header from "../../components/ui/Header";
+import ChatBox from '../../components/ai/ChatBox';
+import { MessageCircle } from 'lucide-react';
+import Footer from '../../components/ui/Footer';
 
 // Dữ liệu mẫu cho các bài blog
 const blogPosts = [
@@ -68,6 +71,7 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
 const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(6); // Số bài viết trên mỗi trang
+  const [showChat, setShowChat] = useState(false);
 
   // Logic để lấy các bài viết cho trang hiện tại
   const indexOfLastPost = currentPage * postsPerPage;
@@ -81,7 +85,7 @@ const BlogPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-20">
+      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-14.5 text-center">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight">Blog & Tin Tức</h1>
           <p className="mt-4 text-lg text-pink-200">Cập nhật những kiến thức, câu chuyện và sự kiện mới nhất từ cộng đồng.</p>
@@ -108,6 +112,25 @@ const BlogPage = () => {
           )}
         </div>
       </section>
+
+      {/* Floating AI Chat Button & Box */}
+      <div>
+        <button
+          onClick={() => setShowChat((v) => !v)}
+          className="fixed z-50 bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-pink-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Open AI Chat"
+        >
+          <MessageCircle className="w-8 h-8 text-white" />
+        </button>
+        {showChat && (
+          <div className="fixed z-50 bottom-24 right-6 animate-fade-in">
+            <div className="shadow-2xl rounded-2xl">
+              <ChatBox />
+            </div>
+          </div>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 };

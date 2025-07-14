@@ -4,6 +4,7 @@ import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
+import QAPage from "./pages/Q&A/Q&A";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -103,6 +104,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <BlogPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/Q&A",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <QAPage/>
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,

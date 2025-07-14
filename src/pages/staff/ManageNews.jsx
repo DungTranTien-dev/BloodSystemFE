@@ -3,16 +3,16 @@ import Sidebar from "../../components/SideBar";
 import PopupForm from "../../components/PopupForm"; // Đường dẫn tuỳ dự án
 import Header from "../../components/Header";
 const staffMenus = [
-  { label: "Staff Page", href: "/staff" },
-  { label: "Manage Event", href: "/staff/manage-event" },
-  { label: "Manage News", href: "/staff/manage-news" },
-  { label: "Manage Blood Requests", href: "/staff/manage-blood-requests" },
-  { label: "Manage Medical", href: "/doctor/manage-medical" },
-  { label: "Manage Blood", href: "/doctor/manage-blood" },
-  { label: "Manage Blood đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Manage Blood Registion", href: "/staff/manage-registion" }, // sửa path đúng
-
+  { label: "Trang nhân viên", href: "/staff" },
+  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
+  { label: "Quản lý tin tức", href: "/staff/manage-news" },
+  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
+  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
+  { label: "Quản lý máu", href: "/doctor/manage-blood" },
+  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
+  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
 ];
+
 
 // Dữ liệu mẫu
 const newsSample = [
