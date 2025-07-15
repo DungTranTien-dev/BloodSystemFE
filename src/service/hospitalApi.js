@@ -1,231 +1,234 @@
-const hospitals = [
-  {
-    id: 1,
-    name: "Bệnh viện Bạch Mai",
-    type: "public",
-    address: "78 Giải Phóng, Đông Da, Hà Nội",
-    phone: "024 3869 3731",
-    workingHours: "07:00 - 17:00",
-    operatingDays: "Thứ 2 - Thứ 6",
-    operatingSchedule: [
-      { date: "2025-06-26", hours: "07:00 - 17:00" },
-      { date: "2025-06-27", hours: "07:00 - 17:00" },
-      { date: "2025-06-28", hours: "07:00 - 17:00" },
-      { date: "2025-06-29", hours: "07:00 - 17:00" },
-      { date: "2025-06-30", hours: "07:00 - 17:00" },
-      { date: "2025-07-01", hours: "07:00 - 17:00" },
-      { date: "2025-07-02", hours: "07:00 - 17:00" },
-      { date: "2025-07-03", hours: "07:00 - 17:00" },
-      { date: "2025-07-04", hours: "07:00 - 17:00" },
-      { date: "2025-07-05", hours: "07:00 - 17:00" }
-    ],
-    donationDays: [
-      { date: "2025-06-26", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-27", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-28", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-06-29", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-30", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-01", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-02", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-03", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-04", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-05", timeSlots: ["08:00-10:00", "10:00-12:00"] }
-    ],
-    description: "Bệnh viện hạng đặc biệt với đầy đủ trang thiết bị hiện đại",
-    image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=2940&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    name: "Bệnh viện Việt Đức",
-    type: "public",
-    address: "40 Tràng Thi, Hoàn Kiếm, Hà Nội",
-    phone: "024 3825 3531",
-    workingHours: "07:30 - 17:30",
-    operatingDays: "Thứ 2 - Thứ 7",
-    operatingSchedule: [
-      { date: "2025-06-26", hours: "07:30 - 17:30" },
-      { date: "2025-06-27", hours: "07:30 - 17:30" },
-      { date: "2025-06-28", hours: "07:30 - 17:30" },
-      { date: "2025-06-29", hours: "07:30 - 17:30" },
-      { date: "2025-06-30", hours: "07:30 - 17:30" },
-      { date: "2025-07-01", hours: "07:30 - 17:30" },
-      { date: "2025-07-02", hours: "07:30 - 17:30" },
-      { date: "2025-07-03", hours: "07:30 - 17:30" },
-      { date: "2025-07-04", hours: "07:30 - 17:30" },
-      { date: "2025-07-05", hours: "07:30 - 17:30" }
-    ],
-    donationDays: [
-      { date: "2025-06-26", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-27", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-06-28", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-29", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-30", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-01", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-02", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-03", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-04", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-05", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] }
-    ],
-    description: "Bệnh viện chuyên khoa ngoại hàng đầu Việt Nam",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2940&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    name: "Bệnh viện Vinmec Times City",
-    type: "private",
-    address: "458 Minh Khai, Hai Bà Trưng, Hà Nội",
-    phone: "024 3974 3556",
-    workingHours: "08:00 - 20:00",
-    operatingDays: "Thứ 2 - Chủ nhật",
-    operatingSchedule: [
-      { date: "2025-06-26", hours: "08:00 - 20:00" },
-      { date: "2025-06-27", hours: "08:00 - 20:00" },
-      { date: "2025-06-28", hours: "08:00 - 20:00" },
-      { date: "2025-06-29", hours: "08:00 - 20:00" },
-      { date: "2025-06-30", hours: "08:00 - 20:00" },
-      { date: "2025-07-01", hours: "08:00 - 20:00" },
-      { date: "2025-07-02", hours: "08:00 - 20:00" },
-      { date: "2025-07-03", hours: "08:00 - 20:00" },
-      { date: "2025-07-04", hours: "08:00 - 20:00" },
-      { date: "2025-07-05", hours: "08:00 - 20:00" }
-    ],
-    donationDays: [
-      { date: "2025-06-26", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-06-27", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-06-28", timeSlots: ["09:00-11:00", "13:00-15:00"] },
-      { date: "2025-06-29", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-06-30", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-07-01", timeSlots: ["09:00-11:00", "13:00-15:00"] },
-      { date: "2025-07-02", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-07-03", timeSlots: ["09:00-11:00", "13:00-15:00"] },
-      { date: "2025-07-04", timeSlots: ["09:00-11:00", "13:00-15:00", "15:00-17:00"] },
-      { date: "2025-07-05", timeSlots: ["09:00-11:00", "13:00-15:00"] }
-    ],
-    description: "Bệnh viện tư nhân với dịch vụ chất lượng cao",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?q=80&w=2940&auto=format&fit=crop"
-  },
-  {
-    id: 4,
-    name: "Bệnh viện 108",
-    type: "military",
-    address: "1 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội",
-    phone: "024 3622 5741",
-    workingHours: "07:00 - 16:30",
-    operatingDays: "Thứ 2 - Thứ 6",
-    operatingSchedule: [
-      { date: "2025-06-26", hours: "07:00 - 16:30" },
-      { date: "2025-06-27", hours: "07:00 - 16:30" },
-      { date: "2025-06-30", hours: "07:00 - 16:30" },
-      { date: "2025-07-01", hours: "07:00 - 16:30" },
-      { date: "2025-07-02", hours: "07:00 - 16:30" },
-      { date: "2025-07-03", hours: "07:00 - 16:30" },
-      { date: "2025-07-04", hours: "07:00 - 16:30" }
-    ],
-    donationDays: [
-      { date: "2025-06-26", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-27", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-06-30", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-01", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-02", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-03", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-04", timeSlots: ["08:00-10:00", "10:00-12:00"] }
-    ],
-    description: "Bệnh viện quân y trung ương",
-    image: "https://images.unsplash.com/photo-1512678080530-7760d81faba6?q=80&w=2940&auto=format&fit=crop"
-  },
-  {
-    id: 5,
-    name: "Bệnh viện K",
-    type: "public",
-    address: "43 Quân Sứ, Hoàn Kiếm, Hà Nội",
-    phone: "024 3822 5531",
-    workingHours: "07:00 - 17:00",
-    operatingDays: "Thứ 2 - Thứ 6",
-    operatingSchedule: [
-      { date: "2025-06-27", hours: "07:00 - 17:00" },
-      { date: "2025-06-28", hours: "07:00 - 17:00" },
-      { date: "2025-06-30", hours: "07:00 - 17:00" },
-      { date: "2025-07-01", hours: "07:00 - 17:00" },
-      { date: "2025-07-02", hours: "07:00 - 17:00" },
-      { date: "2025-07-04", hours: "07:00 - 17:00" },
-      { date: "2025-07-05", hours: "07:00 - 17:00" }
-    ],
-    donationDays: [
-      { date: "2025-06-27", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-06-28", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-06-30", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-01", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-02", timeSlots: ["08:00-10:00", "10:00-12:00"] },
-      { date: "2025-07-04", timeSlots: ["08:00-10:00", "10:00-12:00", "14:00-16:00"] },
-      { date: "2025-07-05", timeSlots: ["08:00-10:00", "10:00-12:00"] }
-    ],
-    description: "Bệnh viện ung bướu hàng đầu",
-    image: "https://images.unsplash.com/photo-1551190822-a9333d879b1f?q=80&w=2940&auto=format&fit=crop"
-  }
-];
+import api from "../config/axios";
 
 // API Functions
 export const getHospitals = async (filters = {}) => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  let filteredHospitals = [...hospitals];
-  
-  // Filter by type
-  if (filters.type && filters.type !== 'all') {
-    filteredHospitals = filteredHospitals.filter(hospital => hospital.type === filters.type);
-  }
-  
-  // Filter by date range
-  if (filters.startDate && filters.endDate) {
-    filteredHospitals = filteredHospitals.filter(hospital => {
-      return hospital.operatingSchedule.some(schedule => {
-        const scheduleDate = new Date(schedule.date);
-        const startDate = new Date(filters.startDate);
-        const endDate = new Date(filters.endDate);
-        return scheduleDate >= startDate && scheduleDate <= endDate;
-      });
-    });
-  }
+  // TODO: Replace with actual API call
+  // const response = await axios.get('/api/hospitals', { params: filters });
+  // return response.data;
   
   return {
     success: true,
-    data: filteredHospitals,
-    total: filteredHospitals.length
+    data: [],
+    total: 0
   };
 };
 
-export const getHospitalById = async (hospitalId) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const hospital = hospitals.find(h => h.id === parseInt(hospitalId));
-  
-  if (hospital) {
+// New API function for the new hospital structure
+export const getHospitalsNew = async () => {
+  try {
+    const response = await api.get('Event/all');
+    
+    if (response.data && response.data.isSuccess && Array.isArray(response.data.result)) {
+      return {
+        success: true,
+        data: response.data.result,
+        total: response.data.result.length
+      };
+    } else {
     return {
       success: true,
-      data: hospital
+        data: [],
+        total: 0
     };
-  } else {
+    }
+  } catch (error) {
     return {
       success: false,
-      message: 'Hospital not found'
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy danh sách bệnh viện',
+      data: []
     };
+  }
+};
+
+// Create new hospital
+export const createHospital = async (hospitalData) => {
+  try {
+    const response = await api.post('Event/create', hospitalData);
+    
+    // Handle the actual API response structure
+    if (response.data && response.data.isSuccess) {
+    return {
+      success: true,
+        data: response.data.result || response.data,
+        message: response.data.message || 'Bệnh viện đã được tạo thành công'
+    };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || 'Có lỗi xảy ra khi tạo bệnh viện'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi tạo bệnh viện'
+    };
+  }
+};
+
+export const getHospitalById = async (donationEventId) => {
+  try {
+    const response = await api.get(`Event/${donationEventId}`);
+  
+    if (response.data && response.data.isSuccess && response.data.result) {
+  return {
+    success: true,
+        data: response.data.result
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || 'Không tìm thấy bệnh viện'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy thông tin bệnh viện'
+  };
   }
 };
 
 export const getHospitalsByDate = async (date) => {
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  const availableHospitals = hospitals.filter(hospital => {
-    return hospital.operatingSchedule.some(schedule => schedule.date === date);
-  }).map(hospital => ({
-    ...hospital,
-    todaySchedule: hospital.operatingSchedule.find(schedule => schedule.date === date),
-    availableSlots: hospital.donationDays.find(day => day.date === date)?.timeSlots || []
-  }));
+  // TODO: Replace with actual API call
+  // const response = await axios.get('/api/hospitals', { params: { date } });
+  // return response.data;
   
   return {
     success: true,
-    data: availableHospitals
+    data: [],
+    total: 0
   };
+};
+
+// Get list of created hospitals/events
+export const getCreatedHospitals = async () => {
+  try {
+    const response = await api.get('Event/all');
+    
+    // Handle the actual API response structure
+    if (response.data && response.data.isSuccess && Array.isArray(response.data.result)) {
+      return {
+        success: true,
+        data: response.data.result,
+        total: response.data.result.length
+      };
+    } else {
+      // If API response is not in expected format, return empty array
+      return {
+        success: true,
+        data: [],
+        total: 0
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy danh sách bệnh viện',
+      data: [] // Return empty array on error
+    };
+  }
+};
+
+// Update hospital
+export const updateHospital = async (donationEventId, hospitalData) => {
+  try {
+    // Gửi toàn bộ hospitalData (bao gồm donationEventId) vào body
+    const response = await api.put('Event/update', hospitalData);
+
+    if (response.data && response.data.isSuccess) {
+    return {
+      success: true,
+        data: response.data.result || response.data,
+        message: response.data.message || 'Bệnh viện đã được cập nhật thành công'
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || 'Có lỗi xảy ra khi cập nhật bệnh viện'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi cập nhật bệnh viện'
+    };
+  }
+};
+
+// Delete hospital
+export const deleteHospital = async (donationEventId) => {
+  try {
+    const response = await api.delete(`Event/${donationEventId}`);
+    
+    if (response.data && response.data.isSuccess) {
+      return {
+        success: true,
+        message: response.data.message || 'Bệnh viện đã được xóa thành công'
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || 'Có lỗi xảy ra khi xóa bệnh viện'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi xóa bệnh viện'
+    };
+  }
+};
+
+// Check if user has medical record
+export const checkUserMedical = async () => {
+  try {
+    const response = await api.get('UserMedical/check');
+    return {
+      success: response.data?.isSuccess,
+      data: response.data,
+      message: response.data?.message
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi kiểm tra hồ sơ y tế',
+      data: null
+    };
+  }
+};
+
+// Get events by date range
+export const getEventsByRange = async (start, end) => {
+  try {
+    const response = await api.get('Event/range', {
+      params: { start, end }
+    });
+    if (response.data && response.data.isSuccess && Array.isArray(response.data.result)) {
+      return {
+        success: true,
+        data: response.data.result,
+        total: response.data.result.length
+      };
+    } else {
+      return {
+        success: false,
+        data: [],
+        total: 0,
+        error: response.data?.message || 'Không tìm thấy sự kiện'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi lấy danh sách sự kiện',
+      data: [],
+      total: 0
+    };
+  }
 };
