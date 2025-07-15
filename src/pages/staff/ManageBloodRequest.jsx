@@ -157,7 +157,15 @@ function ManageBloodRequest() {
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-red-200">
                 <tr>
-                  {["Mã", "Bệnh nhân", "Nhóm máu", "Thể tích", "Ngày", "Trạng thái", "Hành động"].map((h, i) => (
+                  {[
+                    // "Mã", // Bỏ cột mã
+                    "Bệnh nhân",
+                    "Nhóm máu",
+                    "Thể tích",
+                    "Ngày",
+                    "Trạng thái",
+                    "Hành động",
+                  ].map((h, i) => (
                     <th key={i} className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-700">{h}</th>
                   ))}
                 </tr>
@@ -165,12 +173,12 @@ function ManageBloodRequest() {
               <tbody>
                 {filteredList.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-6 text-slate-400">Không tìm thấy đơn phù hợp.</td>
+                    <td colSpan={6} className="text-center py-6 text-slate-400">Không tìm thấy đơn phù hợp.</td>
                   </tr>
                 ) : (
                   paginatedList.map((item) => (
                     <tr key={item.id} className="hover:bg-red-50">
-                      <td className="px-6 py-4 font-mono">{item.id}</td>
+                      {/* <td className="px-6 py-4 font-mono">{item.id}</td> */}
                       <td className="px-6 py-4">{item.patient}</td>
                       <td className="px-6 py-4">{item.bloodGroup}</td>
                       <td className="px-6 py-4">{item.volume}</td>
@@ -187,9 +195,9 @@ function ManageBloodRequest() {
                           {item.statusText}
                         </span>
                       </td>
-                      <td className="px-6 py-4 space-y-1">
-                        <button className="text-pink-600 hover:underline mr-2" onClick={() => handleDetail(item)}>Chi tiết</button>
-                        <button className="text-blue-600 hover:underline mr-2" onClick={() => handleEdit(item)}>Sửa</button>
+                      <td className="px-6 py-4 space-y-1 flex gap-2 flex-wrap min-w-[180px]">
+                        <button className="text-pink-600 hover:underline" onClick={() => handleDetail(item)}>Xem chi tiết</button>
+                        <button className="text-blue-600 hover:text-blue-800 hover:underline" onClick={() => handleEdit(item)}>Sửa</button>
                         {item.status === "PENDING" && (
                           <div className="mt-1 flex gap-2">
                             <button
@@ -206,9 +214,6 @@ function ManageBloodRequest() {
                             </button>
                           </div>
                         )}
-                      </td>
-                      <td className="px-6 py-4 space-x-2">
-                        <button className="text-pink-600 hover:underline" onClick={() => handleDetail(item)}>Chi tiết</button>
                       </td>
                     </tr>
                   ))
@@ -241,21 +246,26 @@ function ManageBloodRequest() {
             submitText={currentRequest ? "Cập nhật" : "Tạo mới"}
           />
 
-          {isDetailOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg">
-                <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đơn nhận máu</h2>
-                <div className="mb-2"><b>Mã đơn:</b> {currentRequest.id}</div>
-                <div className="mb-2"><b>Bệnh nhân:</b> {currentRequest.patient}</div>
-                <div className="mb-2"><b>Nhóm máu:</b> {currentRequest.bloodGroup}</div>
-                <div className="mb-2"><b>Thể tích:</b> {currentRequest.volume} ml</div>
-                <div className="mb-2"><b>Ngày yêu cầu:</b> {currentRequest.date}</div>
-                <div className="mb-2"><b>Trạng thái:</b> {currentRequest.status}</div>
-                <div className="mb-2"><b>Ghi chú:</b> {currentRequest.note}</div>
-                <div className="flex justify-end">
-                  <button className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white" onClick={() => setIsDetailOpen(false)}>
-                    Đóng
-                  </button>
+          {isDetailOpen && currentRequest && (
+            <div className="fixed inset-0 z-50">
+              <div className="absolute inset-0 backdrop-blur-sm" />
+              <div className="relative flex items-center justify-center min-h-screen w-full">
+                <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg transition-all duration-300 transform scale-100 opacity-100">
+                  <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đơn nhận máu</h2>
+                  <div className="mb-2"><b>Bệnh nhân:</b> {currentRequest.patient}</div>
+                  <div className="mb-2"><b>Nhóm máu:</b> {currentRequest.bloodGroup}</div>
+                  <div className="mb-2"><b>Thể tích:</b> {currentRequest.volume} ml</div>
+                  <div className="mb-2"><b>Ngày yêu cầu:</b> {currentRequest.date}</div>
+                  <div className="mb-2"><b>Trạng thái:</b> {currentRequest.status}</div>
+                  <div className="mb-2"><b>Ghi chú:</b> {currentRequest.note}</div>
+                  <div className="flex justify-end mt-6">
+                    <button
+                      className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
+                      onClick={() => setIsDetailOpen(false)}
+                    >
+                      Đóng
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

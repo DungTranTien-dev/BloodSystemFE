@@ -20,6 +20,9 @@ function ManageBlood() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Thêm state và popup xem chi tiết
+  const [detailBlood, setDetailBlood] = useState(null);
+
   const openSeparatePopup = (bloodId) => {
     setSeparatingBloodId(bloodId);
     setIsSeparatePopupOpen(true);
@@ -238,11 +241,11 @@ function ManageBlood() {
               <thead className="bg-gradient-to-r from-red-200 to-pink-100">
                 <tr>
                   {[
-                    "Mã đơn vị",
+                    // "Mã đơn vị", // Bỏ mã đơn vị
                     "Người hiến",
                     "Nhóm máu",
                     "Thể tích (ml)",
-                    "Ngày hiến",
+                    // "Ngày hiến", // Bỏ cột này
                     "Ngày hết hạn",
                     "Trạng thái",
                     "Hành động",
@@ -259,7 +262,7 @@ function ManageBlood() {
               <tbody>
                 {paginatedList.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-slate-400">
+                    <td colSpan={6} className="text-center py-8 text-slate-400">
                       Không tìm thấy đơn vị máu phù hợp.
                     </td>
                   </tr>
@@ -269,26 +272,13 @@ function ManageBlood() {
                       key={item.bloodId}
                       className="hover:bg-red-50 transition"
                     >
-                      <td className="px-6 py-4 font-mono text-slate-700">
-                        {item.code}
-                      </td>
-                      {/* <td className="px-6 py-4">{item.patientName}</td> */}
+                      {/* <td className="px-6 py-4 font-mono text-slate-700">{item.code}</td> */}
+                      <td className="px-6 py-4">{item.userName || '-'}</td>
                       <td className="px-6 py-4">{item.bloodName}</td>
                       <td className="px-6 py-4">
                         {item.volumeInML && item.volumeInML !== 1 ? item.volumeInML : "Chưa hiến máu"}
                       </td>
-
-                      <td className="px-6 py-4">
-                        {item.collectedDate
-                          ? new Date(item.collectedDate).toLocaleString("vi-VN", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
-                          : "-"}
-                      </td>
+                      {/* <td className="px-6 py-4">Ngày hiến</td> */}
                       <td className="px-6 py-4">
                         {item.expiryDate
                           ? new Date(item.expiryDate).toLocaleString("vi-VN", {
@@ -300,17 +290,16 @@ function ManageBlood() {
                           })
                           : "-"}
                       </td>
-
-
+                      {/* Cột Trạng thái */}
                       <td className="px-6 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === "PROCESSED"
-                              ? "bg-green-100 text-green-700"
-                              : item.status === "PROCESSING"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : item.status === "ERROR"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-pink-100 text-pink-700"
+                          className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 ${item.status === "PROCESSED"
+                            ? "bg-green-100 text-green-700"
+                            : item.status === "PROCESSING"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : item.status === "ERROR"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-pink-100 text-pink-700"
                             }`}
                         >
                           {{
@@ -321,32 +310,28 @@ function ManageBlood() {
                           }[item.status] || "Không xác định"}
                         </span>
                       </td>
-
-                      <td className="px-6 py-4 flex gap-2">
+                      {/* Cột Hành động */}
+                      <td className="px-6 py-4 flex gap-2 flex-wrap min-w-[180px]">
                         <button
-                          className="text-pink-600 hover:text-pink-800"
+                          className="text-pink-600 hover:underline"
+                          onClick={() => setDetailBlood(item)}
+                        >
+                          Xem chi tiết
+                        </button>
+                        <button
+                          className="text-pink-600 hover:text-pink-800 hover:underline"
                           onClick={() => handleEdit(item)}
                         >
                           Sửa
                         </button>
-                        {item.status === "UNPROCESSED" ? (
+
+                        {item.status === "UNPROCESSED" && (
                           <button
                             className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-1 rounded-lg font-semibold shadow hover:from-pink-500 hover:to-red-500 transition"
                             onClick={() => openSeparatePopup(item.bloodId)}
                           >
                             Tách máu
                           </button>
-
-                        ) : item.status === "PROCESSING" ? (
-                          <span className="text-yellow-500 italic">
-                            Đang xử lý...
-                          </span>
-                        ) : item.status === "PROCESSED" ? (
-                          <span className="text-slate-400 italic">Đã tách</span>
-                        ) : (
-                          <span className="text-red-500 italic">
-                            Lỗi khi tách
-                          </span>
                         )}
                       </td>
                     </tr>
@@ -405,6 +390,37 @@ function ManageBlood() {
             bloodId={separatingBloodId}
             popupEffect
           />
+
+          {/* Popup xem chi tiết */}
+          {detailBlood && (
+            <div className="fixed inset-0 z-50">
+              <div className="absolute inset-0 backdrop-blur-sm" />
+              <div className="relative flex items-center justify-center min-h-screen w-full">
+                <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg transition-all duration-300 transform scale-100 opacity-100">
+                  <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đơn vị máu</h2>
+                  <div className="mb-2"><span className="font-semibold">Người hiến:</span> {detailBlood.userName || '-'}</div>
+                  <div className="mb-2"><span className="font-semibold">Nhóm máu:</span> {detailBlood.bloodName}</div>
+                  <div className="mb-2"><span className="font-semibold">Thể tích:</span> {detailBlood.volumeInML}</div>
+                  <div className="mb-2"><span className="font-semibold">Ngày hiến:</span> {detailBlood.collectedDate ? new Date(detailBlood.collectedDate).toLocaleString("vi-VN") : '-'}</div>
+                  <div className="mb-2"><span className="font-semibold">Ngày hết hạn:</span> {detailBlood.expiryDate ? new Date(detailBlood.expiryDate).toLocaleString("vi-VN") : '-'}</div>
+                  <div className="mb-2"><span className="font-semibold">Trạng thái:</span> {{
+                    UNPROCESSED: "Chưa tách",
+                    PROCESSING: "Đang xử lý",
+                    PROCESSED: "Đã tách",
+                    ERROR: "Lỗi",
+                  }[detailBlood.status] || "Không xác định"}</div>
+                  <div className="flex justify-end mt-6">
+                    <button
+                      className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
+                      onClick={() => setDetailBlood(null)}
+                    >
+                      Đóng
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
         </main>
       </div>

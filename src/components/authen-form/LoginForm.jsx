@@ -1,7 +1,7 @@
 import React, { } from 'react';
 import { Button, Input, Form, Checkbox } from "antd";
 import { FaUser, FaLock } from "react-icons/fa";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from '../../redux/features/userSlice';
 import { toast } from 'react-toastify';
@@ -18,6 +18,7 @@ const Logo = () => (
 
 function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
@@ -29,6 +30,12 @@ function LoginForm() {
       dispatch(login(response.data.result));
       localStorage.setItem("token", response.data.result.accessToken);
       const user = response.data.result.user;
+      const redirectTo = location.state?.redirectTo;
+      if (redirectTo) {
+        navigate(redirectTo);
+        toast.success('Đăng nhập thành công!');
+        return;
+      }
       if (user.role === 'ADMIN') {
         navigate('/admin');
         toast.success('Đăng nhập thành công!');

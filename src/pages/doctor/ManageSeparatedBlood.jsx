@@ -251,7 +251,7 @@ function ManageSeparatedBlood() {
                           Xem chi tiết
                         </button>
                         <button
-                          className="text-pink-600 hover:text-pink-800"
+                          className="text-pink-600 hover:text-pink-800 hover:underline"
                           onClick={() => handleEdit(item)}
                         >
                           Sửa

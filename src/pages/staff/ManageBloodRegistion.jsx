@@ -21,6 +21,7 @@ function ManageBloodRegistion() {
   const [registrations, setRegistrations] = useState([]);
   const [search, setSearch] = useState("");
   const [activeStatus, setActiveStatus] = useState("all");
+  const [detailReg, setDetailReg] = useState(null);
 
   useEffect(() => {
     fetchRegistrations();
@@ -114,7 +115,14 @@ function ManageBloodRegistion() {
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-red-200">
                 <tr>
-                  {["Mã", "Người đăng ký", "Sự kiện", "Ngày", "Trạng thái", "Hành động"].map((h) => (
+                  {[
+                    // "Mã", // Bỏ cột mã
+                    "Người đăng ký",
+                    "Sự kiện",
+                    "Ngày",
+                    "Trạng thái",
+                    "Hành động",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-700"
@@ -127,14 +135,14 @@ function ManageBloodRegistion() {
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center text-slate-400 py-8">
+                    <td colSpan={5} className="text-center text-slate-400 py-8">
                       Không tìm thấy đăng ký phù hợp.
                     </td>
                   </tr>
                 ) : (
                   filtered.map((item) => (
                     <tr key={item.id} className="hover:bg-red-50 transition">
-                      <td className="px-6 py-4 font-mono">{item.id}</td>
+                      {/* <td className="px-6 py-4 font-mono">{item.id}</td> */}
                       <td className="px-6 py-4">{item.fullName}</td>
                       <td className="px-6 py-4">{item.eventName}</td>
                       <td className="px-6 py-4">{item.date}</td>
@@ -152,7 +160,13 @@ function ManageBloodRegistion() {
                           {item.statusText}
                         </span>
                       </td>
-                      <td className="px-6 py-4 space-x-2">
+                      <td className="px-6 py-4 space-x-2 flex gap-2 flex-wrap min-w-[180px]">
+                        <button
+                          className="text-pink-600 hover:underline"
+                          onClick={() => setDetailReg(item)}
+                        >
+                          Xem chi tiết
+                        </button>
                         {item.status === "PENDING" && (
                           <>
                             <button
@@ -178,6 +192,29 @@ function ManageBloodRegistion() {
           </div>
         </main>
       </div>
+      {/* Popup xem chi tiết */}
+      {detailReg && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 backdrop-blur-sm" />
+          <div className="relative flex items-center justify-center min-h-screen w-full">
+            <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg transition-all duration-300 transform scale-100 opacity-100">
+              <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đăng ký hiến máu</h2>
+              <div className="mb-2"><span className="font-semibold">Người đăng ký:</span> {detailReg.fullName}</div>
+              <div className="mb-2"><span className="font-semibold">Sự kiện:</span> {detailReg.eventName}</div>
+              <div className="mb-2"><span className="font-semibold">Ngày đăng ký:</span> {detailReg.date}</div>
+              <div className="mb-2"><span className="font-semibold">Trạng thái:</span> {detailReg.statusText}</div>
+              <div className="flex justify-end mt-6">
+                <button
+                  className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
+                  onClick={() => setDetailReg(null)}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

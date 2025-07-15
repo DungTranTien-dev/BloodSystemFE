@@ -35,8 +35,9 @@ import {
 import { format, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import api from "../../config/axios";
-import { getEventsByRange } from "../../service/hospitalApi";
+import { checkUserMedical, getEventsByRange } from "../../service/hospitalApi";
 import { registerBloodDonation } from "../../service/bloodRegistrationApi";
+import { createUserMedical } from "../../service/medicalApi";
 import { useSelector } from "react-redux";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
@@ -568,11 +569,11 @@ const Hospitals = () => {
     }
   };
 
-  const handleBookAppointment = (hospital) => {
+  const handleBookAppointment = async (hospital) => {
     if (!user) {
       navigate("/login", {
         state: {
-          redirectTo: "/hospital",
+          redirectTo: window.location.pathname + window.location.search,
           selectedHospital: {
             title: hospital.title,
             startTime: hospital.startTime,
@@ -584,8 +585,24 @@ const Hospitals = () => {
       return;
     }
 
-    setSelectedHospital(hospital);
-    setModalVisible(true);
+    // Check hồ sơ y tế trước khi mở form/modal
+    const res = await checkUserMedical();
+    console.log('Kết quả checkUserMedical khi đặt lịch:', res);
+    if (res.success) {
+      // Đã có hồ sơ, đăng ký luôn
+      // Lấy thông tin user từ redux hoặc hỏi lại user nếu cần
+      // Ở đây chỉ cần truyền object rỗng hoặc thông tin cần thiết nếu backend không yêu cầu
+      const registerRes = await registerBloodDonation(hospital.donationEventId, {});
+      if (registerRes.success) {
+        navigate("/donation-confirmation?status=success");
+      } else {
+        window.toast?.error(registerRes.error || "Đăng ký thất bại!");
+      }
+    } else {
+      // Không có hồ sơ, mở form để điền
+      setSelectedHospital(hospital);
+      setModalVisible(true);
+    }
   };
 
   const handleModalCancel = () => {
@@ -594,40 +611,24 @@ const Hospitals = () => {
   };
 
   const handleFormSubmit = async (formData) => {
-    // Gọi API đăng ký y tế/hiến máu
     try {
-      const res = await checkUserMedical();
-
-      if (res.success) {
+      // Không cần checkUserMedical ở đây nữa
+      const createRes = await createUserMedical(formData);
+      if (createRes.success) {
+        // Sau khi tạo hồ sơ y tế thành công, đăng ký hiến máu
         const registerRes = await registerBloodDonation(selectedHospital.donationEventId, formData);
         if (registerRes.success) {
           setModalVisible(false);
           navigate("/donation-confirmation?status=success");
-          return;
         } else {
           window.toast?.error(registerRes.error || "Đăng ký thất bại!");
-          return;
         }
       } else {
-        console.log("Không có hồ sơ - cần tạo mới");
-        setSelectedHospital(hospital); // Keep selectedHospital for form data
-        setModalVisible(true); // Show registration form
+        window.toast?.error(createRes.error || "Tạo hồ sơ y tế thất bại!");
       }
     } catch (err) {
-      if (
-        err.response?.status === 400 &&
-        err.response?.data?.message?.toLowerCase() === "khong co ho so"
-      ) {
-        console.log("Bắt lỗi 400 - không có hồ sơ");
-        setSelectedHospital(hospital); // Keep selectedHospital for form data
-        setModalVisible(true); // Show registration form
-      } else {
-        console.error("Lỗi khác:", err);
-        window.toast?.error(
-          err.response?.data?.message || "Lỗi hệ thống khi kiểm tra hồ sơ y tế!"
-        );
-        navigate("/donation-confirmation?status=error");
-      }
+      console.error("Lỗi khi tạo hồ sơ y tế hoặc đăng ký hiến máu:", err);
+      window.toast?.error("Lỗi hệ thống khi tạo hồ sơ y tế hoặc đăng ký hiến máu!");
     }
   };
 
