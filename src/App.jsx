@@ -17,6 +17,7 @@ const RegisterPage = React.lazy(() => import("./pages/register/register"));
 const AboutUs = React.lazy(() => import("./pages/home/AboutUs"));
 const BloodTypePage = React.lazy(() => import("./pages/blood/blood"));
 const Dashboard = React.lazy(() => import("./pages/admin/Dashboard"));
+const BloodDonationAdminDashboard = React.lazy(() => import("./components/admin/BloodDonationAdminDashboard"));
 const SimpleDashboard = React.lazy(() =>
   import("./components/SimpleDashboard")
 );
@@ -162,7 +163,7 @@ function App() {
       element: (
         <ProtectedRoute>
           <Suspense fallback={<LoadingSpinner />}>
-            <Dashboard />
+            <BloodDonationAdminDashboard />
           </Suspense>
         </ProtectedRoute>
       ),
@@ -173,7 +174,7 @@ function App() {
       element: (
         <ProtectedRoute>
           <Suspense fallback={<LoadingSpinner />}>
-            <SimpleDashboard />
+            <BloodDonationAdminDashboard />
           </Suspense>
         </ProtectedRoute>
       ),

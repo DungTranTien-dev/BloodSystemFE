@@ -105,12 +105,6 @@ const Homepage = () => {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />{" "}
         <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4 drop-shadow-lg">
-<<<<<<< HEAD
-            Be a <span className="text-red-500">Hero</span>. Give <span className="text-pink-400">Blood</span>.
-          </h1>          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-8">
-            Your blood can save lives. Join the movement today.
-          </p>
-=======
             Be a <span className="text-red-500">Hero</span>. Give{" "}
             <span className="text-pink-400">Blood</span>.
           </h1>
@@ -131,7 +125,6 @@ const Homepage = () => {
               Become a Donor
             </button>
           </div>
->>>>>>> main
         </div>
       </section>
 

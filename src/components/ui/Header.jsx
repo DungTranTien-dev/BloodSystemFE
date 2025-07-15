@@ -77,9 +77,7 @@ function Header() {
                 </NavLink>
               )}
               <NavLink onClick={() => navigate("/blog")}>Blog</NavLink>
-<<<<<<< HEAD
               <NavLink onClick={() => navigate("/about-us")}>About Us</NavLink>
-=======
               <NavLink onClick={() => navigate("/Q&A")}>Q&A</NavLink>
               <NavLink onClick={() => navigate("/bloodtype")}>
                 Blood Group
@@ -87,7 +85,6 @@ function Header() {
               <NavLink onClick={() => navigate("/blood-request")}>
                 Request Blood
               </NavLink>
->>>>>>> main
             </ul>
           </nav>
 
