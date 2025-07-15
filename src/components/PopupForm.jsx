@@ -12,6 +12,7 @@ function PopupForm({
   const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -25,7 +26,12 @@ function PopupForm({
       setFormData(emptyForm);
     }
     setErrors({});
-  }, [initialData, fieldsConfig]);
+    if (isOpen) {
+      setTimeout(() => setShow(true), 10);
+    } else {
+      setShow(false);
+    }
+  }, [initialData, fieldsConfig, isOpen]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -54,8 +60,10 @@ function PopupForm({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className="relative flex justify-center items-center min-h-screen w-full p-4">
+        <div className={`bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-300 transform ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
         <div className="border-b border-slate-200 p-4 flex justify-between items-center">
           <h2 className="text-xl font-bold text-slate-800">
             {title || (initialData?.id ? "Cập nhật" : "Tạo mới")}
@@ -160,6 +168,7 @@ function PopupForm({
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

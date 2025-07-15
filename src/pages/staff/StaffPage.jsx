@@ -1,17 +1,4 @@
 import React from "react";
-import Sidebar from "../../components/SideBar"; // Đường dẫn tuỳ theo cấu trúc dự án
-import Header from "../../components/Header";
-
-const staffMenus = [
-  { label: "Trang nhân viên", href: "/staff" },
-  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
-  { label: "Quản lý tin tức", href: "/staff/manage-news" },
-  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
-  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
-  { label: "Quản lý máu", href: "/doctor/manage-blood" },
-  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
-];
 
 function StaffPage() {
   // Dữ liệu tổng quan mẫu
@@ -61,15 +48,8 @@ function StaffPage() {
 
   return (
     <>
-    <Header pageTitle="Chào mừng Nhân viên" />
     <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        
-      <Sidebar
-        title="Staff Panel"
-        version="v1.0.0"
-        menus={staffMenus}
-        activeLabel="Staff Page"
-      />
+      
       <main className="flex-1 p-8">
         {/* Chào mừng */}
         <div className="mb-8">

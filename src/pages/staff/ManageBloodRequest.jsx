@@ -7,17 +7,6 @@ import { Row, Col, Card, Typography } from "antd";
 
 const { Title, Text } = Typography;
 
-const staffMenus = [
-  { label: "Trang nhân viên", href: "/staff" },
-  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
-  { label: "Quản lý tin tức", href: "/staff/manage-news" },
-  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
-  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
-  { label: "Quản lý máu", href: "/doctor/manage-blood" },
-  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
-];
-
 
 const mapStatusText = (status) => {
   switch (status) {
@@ -37,6 +26,19 @@ function ManageBloodRequest() {
   const [currentRequest, setCurrentRequest] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [activeStatus, setActiveStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Đảm bảo filteredList được khai báo trước khi dùng
+  const filteredList = requestList.filter(
+    (item) =>
+      (activeStatus === "all" || item.status === activeStatus) &&
+      (item.patient.toLowerCase().includes(search.toLowerCase()) ||
+        item.bloodGroup.toLowerCase().includes(search.toLowerCase()))
+  );
+  const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const handlePageChange = (page) => setCurrentPage(page);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -61,13 +63,6 @@ function ManageBloodRequest() {
     };
     fetchRequests();
   }, []);
-
-  const filteredList = requestList.filter(
-    (item) =>
-      (activeStatus === "all" || item.status === activeStatus) &&
-      (item.patient.toLowerCase().includes(search.toLowerCase()) ||
-        item.bloodGroup.toLowerCase().includes(search.toLowerCase()))
-  );
 
   const getStatusCounts = () => {
     const counts = {
@@ -130,10 +125,8 @@ function ManageBloodRequest() {
   };
 
   return (
-    <>
-      <Header pageTitle="Quản lý đơn nhận máu" />
+    <>  
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar title="Staff Panel" version="v1.0.0" menus={staffMenus} activeLabel="Manage Blood Requests" />
         <main className="flex-1 p-8">
           <Row gutter={[24, 24]} className="mb-8">
             {["total", "PENDING", "APPROVED", "WAITING_PAYMENT", "REJECTED", "FULFILLED"].map((key) => (
@@ -149,7 +142,7 @@ function ManageBloodRequest() {
               </Col>
             ))}
           </Row>
-
+          <Title level={2} className="!text-red-600">Quản lý yêu cầu cần máu</Title>
           <div className="mb-4">
             <input
               type="text"
@@ -175,7 +168,7 @@ function ManageBloodRequest() {
                     <td colSpan={7} className="text-center py-6 text-slate-400">Không tìm thấy đơn phù hợp.</td>
                   </tr>
                 ) : (
-                  filteredList.map((item) => (
+                  paginatedList.map((item) => (
                     <tr key={item.id} className="hover:bg-red-50">
                       <td className="px-6 py-4 font-mono">{item.id}</td>
                       <td className="px-6 py-4">{item.patient}</td>
@@ -222,6 +215,20 @@ function ManageBloodRequest() {
                 )}
               </tbody>
             </table>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4 gap-2">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 rounded border text-sm font-medium ${currentPage === i + 1 ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-700 border-gray-300'} hover:bg-red-100 transition`}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <PopupForm

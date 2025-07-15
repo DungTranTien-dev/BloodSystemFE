@@ -4,17 +4,6 @@ import Sidebar from "../../components/SideBar";
 // import PopupForm from "../../components/PopupForm";
 import Header from "../../components/Header";
 
-// Menu cho sidebar
-const doctorMenus = [
-  { label: "Trang nhân viên", href: "/staff" },
-  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
-  { label: "Quản lý tin tức", href: "/staff/manage-news" },
-  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
-  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
-  { label: "Quản lý máu", href: "/doctor/manage-blood" },
-  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
-];
 
 
 // Màu trạng thái
@@ -61,10 +50,16 @@ const getStatusColor = (status) => {
 // Popup Form
 const PopupForm = ({ isOpen, onClose, onSubmit, initialData, fieldsConfig, title, submitText }) => {
   const [formData, setFormData] = useState(initialData || {});
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     setFormData(initialData || {});
-  }, [initialData]);
+    if (isOpen) {
+      setTimeout(() => setShow(true), 10);
+    } else {
+      setShow(false);
+    }
+  }, [initialData, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,42 +74,53 @@ const PopupForm = ({ isOpen, onClose, onSubmit, initialData, fieldsConfig, title
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-xl shadow-xl max-w-2xl w-full">
-        <h2 className="text-xl font-bold mb-4 text-red-600">{title}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {fieldsConfig.map((field) => (
-            <div key={field.name} className="flex flex-col">
-              <label className="text-sm font-semibold text-gray-600 mb-1">{field.label}</label>
-              {field.type === "textarea" ? (
-                <textarea
-                  name={field.name}
-                  value={formData[field.name] || ""}
-                  onChange={handleChange}
-                  required={field.required}
-                  className="border border-slate-300 p-2 rounded"
-                />
-              ) : (
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={formData[field.name] || ""}
-                  onChange={handleChange}
-                  required={field.required}
-                  className="border border-slate-300 p-2 rounded"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex justify-end gap-4">
-          <button onClick={onClose} className="px-4 py-2 rounded bg-slate-300 hover:bg-slate-400">Hủy</button>
-          <button onClick={handleSubmit} className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">{submitText}</button>
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className={`relative flex items-center justify-center min-h-screen w-full`}>
+        <div className={`bg-white p-8 rounded-xl shadow-xl max-w-2xl w-full transition-all duration-300 transform ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
+          <h2 className="text-xl font-bold mb-4 text-red-600">{title}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {fieldsConfig.map((field) => (
+              <div key={field.name} className="flex flex-col">
+                <label className="text-sm font-semibold text-gray-600 mb-1">{field.label}</label>
+                {field.type === "textarea" ? (
+                  <textarea
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                    required={field.required}
+                    className="border border-slate-300 p-2 rounded"
+                  />
+                ) : (
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                    required={field.required}
+                    className="border border-slate-300 p-2 rounded"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex justify-end gap-4">
+            <button onClick={onClose} className="px-4 py-2 rounded bg-slate-300 hover:bg-slate-400">Hủy</button>
+            <button onClick={handleSubmit} className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">{submitText}</button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Helper hiển thị thông tin, đặt ở đầu file để mọi component đều dùng được
+const Info = ({ label, value }) => (
+  <div className="mb-1">
+    <strong className="text-gray-600">{label}:</strong>{" "}
+    <span className="text-gray-800">{value || "Không rõ"}</span>
+  </div>
+);
 
 // Hàm định dạng trạng thái
 const formatType = (type) => {
@@ -133,6 +139,18 @@ function ManageUserMedical() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentMedical, setCurrentMedical] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Đảm bảo filteredList được khai báo trước khi dùng
+  const filteredList = medicalList.filter(
+    (item) =>
+      item.patient.toLowerCase().includes(search.toLowerCase()) ||
+      item.diagnosis.toLowerCase().includes(search.toLowerCase())
+  );
+  const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const handlePageChange = (page) => setCurrentPage(page);
 
   useEffect(() => {
     const fetchMedicalList = async () => {
@@ -171,12 +189,6 @@ function ManageUserMedical() {
     };
     fetchMedicalList();
   }, []);
-
-  const filteredList = medicalList.filter(
-    (item) =>
-      item.patient.toLowerCase().includes(search.toLowerCase()) ||
-      item.diagnosis.toLowerCase().includes(search.toLowerCase())
-  );
 
   const medicalFields = [
     { name: "patient", label: "Tên bệnh nhân", type: "text", required: true },
@@ -237,18 +249,9 @@ function ManageUserMedical() {
     }
   };
 
-  const Info = ({ label, value }) => (
-    <div className="mb-1">
-      <strong className="text-gray-600">{label}:</strong>{" "}
-      <span className="text-gray-800">{value || "Không rõ"}</span>
-    </div>
-  );
-
   return (
     <>
-      <Header pageTitle="Quản lý hồ sơ" />
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar title="Doctor Panel" version="v1.0.0" menus={doctorMenus} activeLabel="Manage Medical" />
         <main className="flex-1 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <div>
@@ -293,7 +296,7 @@ function ManageUserMedical() {
                     <td colSpan={5} className="text-center py-8 text-slate-400">Không tìm thấy hồ sơ phù hợp.</td>
                   </tr>
                 ) : (
-                  filteredList.map((item) => (
+                  paginatedList.map((item) => (
                     <tr key={item.id} className="hover:bg-red-50 transition">
                       <td className="px-6 py-4">{item.patient}</td>
                       <td className="px-6 py-4">{item.age}</td>
@@ -318,6 +321,20 @@ function ManageUserMedical() {
                 )}
               </tbody>
             </table>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4 gap-2">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 rounded border text-sm font-medium ${currentPage === i + 1 ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-700 border-gray-300'} hover:bg-red-100 transition`}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Form popup */}
@@ -333,35 +350,7 @@ function ManageUserMedical() {
 
           {/* Detail popup */}
           {isDetailOpen && currentMedical && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl">
-                <h2 className="text-2xl font-bold mb-6 text-red-600 border-b pb-2">📋 Chi tiết hồ sơ hiến máu</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
-                  <Info label="👤 Họ tên" value={currentMedical.patient} />
-                  <Info label="🎂 Tuổi" value={currentMedical.age} />
-                  <Info label="📧 Email" value={currentMedical.email} />
-                  <Info label="📞 SĐT" value={currentMedical.phone} />
-                  <Info label="📍 Địa chỉ" value={currentMedical.address} />
-                  <Info label="🌍 Tỉnh/TP" value={currentMedical.province} />
-                  <Info label="🩸 Nhóm máu" value={currentMedical.blood} />
-                  <Info label="⚧️ Giới tính" value={currentMedical.gender} />
-                  <Info label="🆔 CMND/CCCD" value={currentMedical.citizenId} />
-                  <Info label="📝 Chẩn đoán" value={currentMedical.diagnosis} />
-                  <Info label="📅 Ngày tạo" value={currentMedical.date} />
-                  <Info label="💉 Lần hiến máu" value={currentMedical.donationCount} />
-                  <Info label="📂 Loại hồ sơ" value={formatType(currentMedical.type)} />
-                  <div className="col-span-1 md:col-span-2 flex items-center">
-                    <strong className="mr-2">🚦 Trạng thái:</strong>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentMedical.statusColor}`}>
-                      {currentMedical.status}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-6 flex justify-end">
-                  <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium hover:opacity-90" onClick={() => setIsDetailOpen(false)}>Đóng</button>
-                </div>
-              </div>
-            </div>
+            <DetailModal isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} currentMedical={currentMedical} />
           )}
         </main>
       </div>
@@ -370,3 +359,50 @@ function ManageUserMedical() {
 }
 
 export default ManageUserMedical;
+
+// Popup chi tiết có hiệu ứng
+const DetailModal = ({ isOpen, onClose, currentMedical }) => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => setShow(true), 10);
+    } else {
+      setShow(false);
+    }
+  }, [isOpen]);
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className={`relative flex items-center justify-center min-h-screen w-full`}>
+        <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl transition-all duration-300 transform ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
+          <h2 className="text-2xl font-bold mb-6 text-red-600 border-b pb-2">📋 Chi tiết hồ sơ hiến máu</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
+            <Info label="👤 Họ tên" value={currentMedical.patient} />
+            <Info label="🎂 Tuổi" value={currentMedical.age} />
+            <Info label="📧 Email" value={currentMedical.email} />
+            <Info label="📞 SĐT" value={currentMedical.phone} />
+            <Info label="📍 Địa chỉ" value={currentMedical.address} />
+            <Info label="🌍 Tỉnh/TP" value={currentMedical.province} />
+            <Info label="🩸 Nhóm máu" value={currentMedical.blood} />
+            <Info label="⚧️ Giới tính" value={currentMedical.gender} />
+            <Info label="🆔 CMND/CCCD" value={currentMedical.citizenId} />
+            <Info label="📝 Chẩn đoán" value={currentMedical.diagnosis} />
+            <Info label="📅 Ngày tạo" value={currentMedical.date} />
+            <Info label="💉 Lần hiến máu" value={currentMedical.donationCount} />
+            <Info label="📂 Loại hồ sơ" value={formatType(currentMedical.type)} />
+            <div className="col-span-1 md:col-span-2 flex items-center">
+              <strong className="mr-2">🚦 Trạng thái:</strong>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentMedical.statusColor}`}>
+                {currentMedical.status}
+              </span>
+            </div>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium hover:opacity-90" onClick={onClose}>Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

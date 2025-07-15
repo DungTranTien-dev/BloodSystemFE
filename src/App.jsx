@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
 import QAPage from "./pages/Q&A/Q&A";
+import DashboardS from "./pages/dashboard-staff";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -113,7 +114,7 @@ function App() {
       path: "/Q&A",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
-          <QAPage/>
+          <QAPage />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
@@ -136,7 +137,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
+    {
       path: "/donation-confirmation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -330,7 +331,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    
+
     {
       path: "/staff/manage-registion",
       element: (
@@ -358,7 +359,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-        {
+    {
       path: "/staff/manage-blood-requests",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -389,6 +390,45 @@ function App() {
     {
       path: "*",
       element: <SimpleErrorFallback />,
+    },
+    {
+      path: "/DashboardS",
+      element: <DashboardS />,
+      children: [
+        {
+          path: "staff",
+          element: <StaffPage />,
+        },
+        {
+          path: "manage-registion",
+          element: <ManageBloodRegistion />,
+        },
+        {
+          path: "blood-request",
+          element: <ManageBloodRequest />,
+        },
+        {
+          path: "manage-blood",
+          element: <ManageBlood />,
+        },
+        {
+          path: "manage-event",
+          element: <ManageEvent />,
+        },
+        {
+          path: "create-user",
+          element: <div>Tạo user</div>,
+        },
+        {
+          path: "manage-separated",
+          element:
+            <ManageSeparated />
+        },
+        {
+          path: "medical-request",
+          element: <ManageMedical />,
+        },
+      ],
     },
   ]);
 

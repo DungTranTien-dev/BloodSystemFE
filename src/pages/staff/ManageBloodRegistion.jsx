@@ -6,16 +6,6 @@ import { Row, Col, Card, Typography, message } from "antd";
 
 const { Title, Text } = Typography;
 
-const staffMenus = [
-  { label: "Trang nhân viên", href: "/staff" },
-  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
-  { label: "Quản lý tin tức", href: "/staff/manage-news" },
-  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
-  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
-  { label: "Quản lý máu", href: "/doctor/manage-blood" },
-  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
-];
 
 
 const mapStatusText = (status) => {
@@ -88,14 +78,7 @@ function ManageBloodRegistion() {
 
   return (
     <>
-      <Header pageTitle="Quản lý đăng ký hiến máu" />
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar
-          title="Staff Panel"
-          version="v1.0.0"
-          menus={staffMenus}
-          activeLabel="Manage Blood Registion"
-        />
         <main className="flex-1 p-8">
           {/* Thống kê theo trạng thái */}
           <Row gutter={[16, 16]} className="mb-6">
@@ -117,7 +100,7 @@ function ManageBloodRegistion() {
               </Col>
             ))}
           </Row>
-
+          <Title level={2} className="!text-red-600">Quản lý yêu cầu hiến máu</Title>  
           {/* Thanh tìm kiếm */}
           <input
             className="px-4 py-2 border border-slate-300 rounded mb-4 w-full max-w-md"

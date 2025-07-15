@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const bloodComponentOptions = [
   { value: "RED_BLOOD_CELL", label: "Hồng cầu (RBC)" },
@@ -12,6 +12,15 @@ export default function CreateSeparatedBloodComponentPopup({
   const [components, setComponents] = useState([
     { componentType: "", volumeInML: "" },
   ]);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => setShow(true), 10);
+    } else {
+      setShow(false);
+    }
+  }, [isOpen]);
 
   const handleChange = (index, field, value) => {
     const newComponents = [...components];
@@ -42,8 +51,10 @@ export default function CreateSeparatedBloodComponentPopup({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[400px] max-h-[80vh] overflow-auto">
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className="relative flex justify-center items-center min-h-screen w-full">
+        <div className={`bg-white rounded-lg p-6 w-[400px] max-h-[80vh] overflow-auto transition-all duration-300 transform ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
         <h2 className="text-xl font-bold mb-4">Tách thành phần máu</h2>
 
         {components.map((comp, idx) => (
@@ -99,6 +110,7 @@ export default function CreateSeparatedBloodComponentPopup({
           >
             Tách
           </button>
+        </div>
         </div>
       </div>
     </div>

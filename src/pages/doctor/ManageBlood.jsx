@@ -5,16 +5,6 @@ import Header from "../../components/Header";
 import api from "../../config/axios"; // Axios config
 import CreateSeparatedBloodComponentPopup from "../../components/CreateSeparatedBloodComponentPopup";
 
-const doctorMenus = [
-  { label: "Trang nhân viên", href: "/staff" },
-  { label: "Quản lý sự kiện", href: "/staff/manage-event" },
-  { label: "Quản lý tin tức", href: "/staff/manage-news" },
-  { label: "Quản lý yêu cầu máu", href: "/staff/manage-blood-requests" },
-  { label: "Quản lý hồ sơ y tế", href: "/doctor/manage-medical" },
-  { label: "Quản lý máu", href: "/doctor/manage-blood" },
-  { label: "Quản lý máu đã phân tách", href: "/doctor/manage-separated" },
-  { label: "Quản lý đăng ký hiến máu", href: "/staff/manage-registion" },
-];
 
 
 function ManageBlood() {
@@ -24,13 +14,16 @@ function ManageBlood() {
   const [currentBloodUnit, setCurrentBloodUnit] = useState(null);
 
   // Trong component ManageBlood:
-const [isSeparatePopupOpen, setIsSeparatePopupOpen] = useState(false);
-const [separatingBloodId, setSeparatingBloodId] = useState(null);
+  const [isSeparatePopupOpen, setIsSeparatePopupOpen] = useState(false);
+  const [separatingBloodId, setSeparatingBloodId] = useState(null);
+  // Thêm state cho phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-const openSeparatePopup = (bloodId) => {
-  setSeparatingBloodId(bloodId);
-  setIsSeparatePopupOpen(true);
-};
+  const openSeparatePopup = (bloodId) => {
+    setSeparatingBloodId(bloodId);
+    setIsSeparatePopupOpen(true);
+  };
 
   useEffect(() => {
     const fetchBloodUnits = async () => {
@@ -47,6 +40,10 @@ const openSeparatePopup = (bloodId) => {
   const filteredList = bloodUnits.filter((item) =>
     item.bloodName.toLowerCase().includes(search.toLowerCase())
   );
+  // Phân trang
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const paginatedList = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const handlePageChange = (page) => setCurrentPage(page);
 
   // const handleSeparate = async (id) => {
   //   try {
@@ -63,158 +60,151 @@ const openSeparatePopup = (bloodId) => {
   //   }
   // };
   const BloodComponentType = {
-  WHOLE_BLOOD: 0,
-  RED_BLOOD_CELL: 1,
-  PLASMA: 2,
-  PLATELET: 3,
-  IN_PROGRESS: 4,
-};
+    WHOLE_BLOOD: 0,
+    RED_BLOOD_CELL: 1,
+    PLASMA: 2,
+    PLATELET: 3,
+    IN_PROGRESS: 4,
+  };
 
-const BloodSeparationStatus = {
-  UNPROCESSED: 0,
-  PROCESSING: 1,
-  PROCESSED: 2,
-  ERROR: 3,
-};
+  const BloodSeparationStatus = {
+    UNPROCESSED: 0,
+    PROCESSING: 1,
+    PROCESSED: 2,
+    ERROR: 3,
+  };
 
   const submitSeparatedComponents = async ({ bloodId, components }) => {
-  try {
-    // Gọi API với dữ liệu components tách
-    for (const comp of components) {
-      await api.post("SeparatedBloodComponent/create", {
-  bloodId,
-  componentType: BloodComponentType[comp.componentType],
-  volumeInML: comp.volumeInML,
-  expiryDate: comp.expiryDate ? comp.expiryDate : null, // nếu có expiryDate trong comp thì gửi
-  // không cần gửi createdDate vì backend tự gán rồi
-});
+    try {
+      // Gọi API với dữ liệu components tách
+      for (const comp of components) {
+        await api.post("SeparatedBloodComponent/create", {
+          bloodId,
+          componentType: BloodComponentType[comp.componentType],
+          volumeInML: comp.volumeInML,
+          expiryDate: comp.expiryDate ? comp.expiryDate : null, // nếu có expiryDate trong comp thì gửi
+          // không cần gửi createdDate vì backend tự gán rồi
+        });
 
+      }
+
+      await api.post(`Blood/change-status?id=${bloodId}&status=${BloodSeparationStatus.PROCESSED}`);
+
+
+      // Cập nhật local state
+      setBloodUnits(prev =>
+        prev.map(item =>
+          item.bloodId === bloodId ? { ...item, status: "PROCESSED" } : item
+        )
+      );
+
+      alert("Tách thành công!");
+      setIsSeparatePopupOpen(false);
+      setSeparatingBloodId(null);
+    } catch (error) {
+      alert("Lỗi khi tách thành phần máu");
+      console.error(error);
     }
-
-  await api.post(`Blood/change-status?id=${bloodId}&status=${BloodSeparationStatus.PROCESSED}`);
-
-
-    // Cập nhật local state
-    setBloodUnits(prev =>
-      prev.map(item =>
-        item.bloodId === bloodId ? { ...item, status: "PROCESSED" } : item
-      )
-    );
-
-    alert("Tách thành công!");
-    setIsSeparatePopupOpen(false);
-    setSeparatingBloodId(null);
-  } catch (error) {
-    alert("Lỗi khi tách thành phần máu");
-    console.error(error);
-  }
-};
+  };
 
   const handleCreate = () => {
     setCurrentBloodUnit(null);
     setIsPopupOpen(true);
   };
 
-const handleEdit = (item) => {
-  const editableData = {
-    donor: item.userName,
-    bloodName: item.bloodName,
-    volume: item.volume,
-    collectedDate: item.collectedDate ? item.collectedDate.split("T")[0] : "",
-    expiryDate: item.expiryDate ? item.expiryDate.split("T")[0] : "",
-    id: item.bloodId,
-    code: item.code,
-  };
-  setCurrentBloodUnit(editableData);
-  setIsPopupOpen(true);
-};
-
-
-
-const handleSubmitBloodUnit = async (formData) => {
-  try {
-    const dto = {
-      bloodName: formData.bloodName,
-      volumeInML: Number(formData.volume),
-      collectedDate: formData.collectedDate,
-      expiryDate: formData.expiryDate || null,
+  const handleEdit = (item) => {
+    const editableData = {
+      donor: item.userName,
+      bloodName: item.bloodName,
+      volume: item.volume,
+      collectedDate: item.collectedDate ? item.collectedDate.split("T")[0] : "",
+      expiryDate: item.expiryDate ? item.expiryDate.split("T")[0] : "",
+      id: item.bloodId,
+      code: item.code,
     };
+    setCurrentBloodUnit(editableData);
+    setIsPopupOpen(true);
+  };
 
-    if (currentBloodUnit) {
-      // === CẬP NHẬT ===
-      const res = await api.put(`/Blood/${currentBloodUnit.id}`, dto);
-      setBloodUnits((prev) =>
-        prev.map((item) =>
-          item.bloodId === currentBloodUnit.id ? { ...item, ...res.data } : item
-        )
-      );
-    } else {
-      // === TẠO MỚI ===
-      const res = await api.post(`/Blood/create`, dto); // <-- sửa đúng endpoint tạo mới
-      setBloodUnits((prev) => [...prev, res.data.result]); // res.data.result phải là object máu vừa tạo
+
+
+  const handleSubmitBloodUnit = async (formData) => {
+    try {
+      const dto = {
+        bloodName: formData.bloodName,
+        volumeInML: Number(formData.volume),
+        collectedDate: formData.collectedDate,
+        expiryDate: formData.expiryDate || null,
+      };
+
+      if (currentBloodUnit) {
+        // === CẬP NHẬT ===
+        const res = await api.put(`/Blood/${currentBloodUnit.id}`, dto);
+        setBloodUnits((prev) =>
+          prev.map((item) =>
+            item.bloodId === currentBloodUnit.id ? { ...item, ...res.data } : item
+          )
+        );
+      } else {
+        // === TẠO MỚI ===
+        const res = await api.post(`/Blood/create`, dto); // <-- sửa đúng endpoint tạo mới
+        setBloodUnits((prev) => [...prev, res.data.result]); // res.data.result phải là object máu vừa tạo
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Submit error:", error);
+      return false;
     }
-
-    return true;
-  } catch (error) {
-    console.error("Submit error:", error);
-    return false;
-  }
-};
+  };
 
 
 
-const bloodFieldsConfig = [
- 
-  {
-    name: "bloodName",
-    label: "Nhóm máu",
-    type: "select",
-    options: [
-      { value: "O+", label: "O+" },
-      { value: "O-", label: "O-" },
-      { value: "A+", label: "A+" },
-      { value: "A-", label: "A-" },
-      { value: "B+", label: "B+" },
-      { value: "B-", label: "B-" },
-      { value: "AB+", label: "AB+" },
-      { value: "AB-", label: "AB-" },
-    ],
-    required: true,
-  },
-  {
-    name: "volume",
-    label: "Thể tích (ml)",
-    type: "number",
-    placeholder: "Nhập thể tích",
-    required: true,
-    min: 100,
-    max: 500,
-  },
-  {
-    name: "collectedDate",  // đổi từ 'date' thành 'collectedDate' cho đúng với dữ liệu
-    label: "Ngày hiến",
-    type: "date",
-    required: true,
-  },
-  {
-    name: "expiryDate",   // thêm trường ngày hết hạn
-    label: "Ngày hết hạn",
-    type: "date",
-    required: false,
-  },
-];
+  const bloodFieldsConfig = [
+
+    {
+      name: "bloodName",
+      label: "Nhóm máu",
+      type: "select",
+      options: [
+        { value: "O+", label: "O+" },
+        { value: "O-", label: "O-" },
+        { value: "A+", label: "A+" },
+        { value: "A-", label: "A-" },
+        { value: "B+", label: "B+" },
+        { value: "B-", label: "B-" },
+        { value: "AB+", label: "AB+" },
+        { value: "AB-", label: "AB-" },
+      ],
+      required: true,
+    },
+    {
+      name: "volume",
+      label: "Thể tích (ml)",
+      type: "number",
+      placeholder: "Nhập thể tích",
+      required: true,
+      min: 100,
+      max: 500,
+    },
+    {
+      name: "collectedDate",  // đổi từ 'date' thành 'collectedDate' cho đúng với dữ liệu
+      label: "Ngày hiến",
+      type: "date",
+      required: true,
+    },
+    {
+      name: "expiryDate",   // thêm trường ngày hết hạn
+      label: "Ngày hết hạn",
+      type: "date",
+      required: false,
+    },
+  ];
 
 
   return (
     <>
-      <Header pageTitle="Quản lý máu" />
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar
-          title="Doctor Panel"
-          version="v1.0.0"
-          menus={doctorMenus}
-          activeLabel="Manage Blood"
-        />
         <main className="flex-1 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <div>
@@ -267,14 +257,14 @@ const bloodFieldsConfig = [
                 </tr>
               </thead>
               <tbody>
-                {filteredList.length === 0 ? (
+                {paginatedList.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-8 text-slate-400">
                       Không tìm thấy đơn vị máu phù hợp.
                     </td>
                   </tr>
                 ) : (
-                  filteredList.map((item) => (
+                  paginatedList.map((item) => (
                     <tr
                       key={item.bloodId}
                       className="hover:bg-red-50 transition"
@@ -285,44 +275,43 @@ const bloodFieldsConfig = [
                       {/* <td className="px-6 py-4">{item.patientName}</td> */}
                       <td className="px-6 py-4">{item.bloodName}</td>
                       <td className="px-6 py-4">
-  {item.volumeInML && item.volumeInML !== 1 ? item.volumeInML : "Chưa hiến máu"}
-</td>
+                        {item.volumeInML && item.volumeInML !== 1 ? item.volumeInML : "Chưa hiến máu"}
+                      </td>
 
-                     <td className="px-6 py-4">
-  {item.collectedDate
-    ? new Date(item.collectedDate).toLocaleString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "-"}
-</td>
-<td className="px-6 py-4">
-  {item.expiryDate
-    ? new Date(item.expiryDate).toLocaleString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "-"}
-</td>
+                      <td className="px-6 py-4">
+                        {item.collectedDate
+                          ? new Date(item.collectedDate).toLocaleString("vi-VN", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {item.expiryDate
+                          ? new Date(item.expiryDate).toLocaleString("vi-VN", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                          : "-"}
+                      </td>
 
 
                       <td className="px-6 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            item.status === "PROCESSED"
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === "PROCESSED"
                               ? "bg-green-100 text-green-700"
                               : item.status === "PROCESSING"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : item.status === "ERROR"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-pink-100 text-pink-700"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-700"
+                                : item.status === "ERROR"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-pink-100 text-pink-700"
+                            }`}
                         >
                           {{
                             UNPROCESSED: "Chưa tách",
@@ -342,11 +331,11 @@ const bloodFieldsConfig = [
                         </button>
                         {item.status === "UNPROCESSED" ? (
                           <button
-  className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-1 rounded-lg font-semibold shadow hover:from-pink-500 hover:to-red-500 transition"
-  onClick={() => openSeparatePopup(item.bloodId)}
->
-  Tách máu
-</button>
+                            className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-1 rounded-lg font-semibold shadow hover:from-pink-500 hover:to-red-500 transition"
+                            onClick={() => openSeparatePopup(item.bloodId)}
+                          >
+                            Tách máu
+                          </button>
 
                         ) : item.status === "PROCESSING" ? (
                           <span className="text-yellow-500 italic">
@@ -367,19 +356,34 @@ const bloodFieldsConfig = [
             </table>
           </div>
 
-          <div className="mt-6 flex justify-end">
-            <nav className="inline-flex rounded-md shadow-sm">
-              <button className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-l hover:bg-red-50">
+          {/* Pagination mới: chỉ hiện khi >5 bản ghi */}
+          {totalPages > 1 && (
+            <div className="flex justify-end mt-6 gap-2">
+              <button
+                className="px-3 py-1 rounded-l border text-sm font-medium bg-white text-gray-700 border-gray-300 hover:bg-red-100 transition"
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
                 Trước
               </button>
-              <button className="px-3 py-1 bg-pink-500 text-white border-t border-b border-slate-200 font-semibold">
-                1
-              </button>
-              <button className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-r hover:bg-red-50">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`px-3 py-1 border text-sm font-medium ${currentPage === i + 1 ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-700 border-gray-300'} hover:bg-red-100 transition`}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                className="px-3 py-1 rounded-r border text-sm font-medium bg-white text-gray-700 border-gray-300 hover:bg-red-100 transition"
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
                 Sau
               </button>
-            </nav>
-          </div>
+            </div>
+          )}
 
           <PopupForm
             isOpen={isPopupOpen}
@@ -391,14 +395,16 @@ const bloodFieldsConfig = [
               currentBloodUnit ? "Chỉnh sửa đơn vị máu" : "Thêm đơn vị máu mới"
             }
             submitText={currentBloodUnit ? "Cập nhật" : "Tạo mới"}
+            popupEffect
           />
 
           <CreateSeparatedBloodComponentPopup
-  isOpen={isSeparatePopupOpen}
-  onClose={() => setIsSeparatePopupOpen(false)}
-  onSubmit={submitSeparatedComponents}
-  bloodId={separatingBloodId}
-/>
+            isOpen={isSeparatePopupOpen}
+            onClose={() => setIsSeparatePopupOpen(false)}
+            onSubmit={submitSeparatedComponents}
+            bloodId={separatingBloodId}
+            popupEffect
+          />
 
         </main>
       </div>
