@@ -12,6 +12,7 @@ const NewsPage = React.lazy(() => import("./pages/news/News"));
 const NewsDetail = React.lazy(() => import("./pages/news/NewsDetail"));
 const BlogPage = React.lazy(() => import("./pages/blog/Blog"));
 const LoginPage = React.lazy(() => import("./pages/login/login"));
+const Profile = React.lazy(() => import("./pages/profile/profile"));
 const RegisterPage = React.lazy(() => import("./pages/register/register"));
 const AboutUs = React.lazy(() => import("./pages/home/AboutUs"));
 const BloodTypePage = React.lazy(() => import("./pages/blood/blood"));
@@ -122,6 +123,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorBlood />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/profile",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Profile />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,

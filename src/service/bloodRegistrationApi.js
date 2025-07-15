@@ -20,6 +20,15 @@ export async function getUserBloodRegistrations() {
     return { isSuccess: false, message: error.message };
   }
 }
+// Lấy lịch sử hiến máu của user
+export async function getUserBloodDonationHistory() {
+  try {
+    const response = await api.get('BloodRegistrations/user');
+    return response.data;
+  } catch (error) {
+    return { isSuccess: false, message: error.message };
+  }
+}
 // Đăng ký hiến máu với eventId
 export const registerBloodDonation = async (eventId, data) => {
   try {

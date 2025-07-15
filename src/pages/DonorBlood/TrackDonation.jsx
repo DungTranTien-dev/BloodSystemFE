@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Layout from '../../components/ui/Layout';
-import api from '../../config/axios';
+import { getUserBloodDonationHistory } from '../../service/bloodRegistrationApi';
 
 const { Option } = Select;
 
@@ -20,9 +20,15 @@ const TrackDonation = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await api.get('BloodRegistrations/user');
-        if (response.data?.isSuccess && Array.isArray(response.data.result)) {
-          setRequests(response.data.result);
+        const res = await getUserBloodDonationHistory();
+        if (res.isSuccess && Array.isArray(res.result)) {
+          // Sắp xếp theo ngày đăng ký (createDate) từ mới nhất đến cũ nhất
+          const sorted = [...res.result].sort((a, b) => {
+            const dateA = a.createDate ? new Date(a.createDate) : new Date(0);
+            const dateB = b.createDate ? new Date(b.createDate) : new Date(0);
+            return dateB - dateA;
+          });
+          setRequests(sorted);
         } else {
           setRequests([]);
         }
