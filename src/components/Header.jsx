@@ -47,29 +47,26 @@ if (token) {
 
         {/* Lời chào & user */}
         <div className="flex items-center gap-4">
-          <div className="hidden md:block text-right">
-            <div className="font-semibold text-slate-700">
-              Xin chào,{" "}
-              <span className="text-pink-600">
-                {user ? user.name : "Người dùng"}
-              </span>
+          {/* Avatar + Xin chào */}
+          <div className="flex items-center gap-3">
+            {/* Avatar nền đỏ, chữ trắng */}
+            <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-lg shadow border-2 border-red-600 select-none">
+              {user && user.name ? user.name.charAt(0).toUpperCase() : "?"}
             </div>
-            <div className="text-xs text-slate-400">
-              {user ? user.role : ""}
+            {/* Xin chào, Tên */}
+            <div className="font-semibold text-slate-700 text-base">
+              Xin chào, <span className="text-red-600">{user ? user.name : "Người dùng"}</span>
             </div>
           </div>
-          {/* Avatar + Dropdown */}
+          {/* Dropdown */}
           <div className="relative">
             <button
               onClick={() => setOpen((o) => !o)}
               className="focus:outline-none"
               aria-label="Tài khoản"
             >
-              <img
-                src={user?.avatar || "https://i.pravatar.cc/100?img=3"}
-                alt="avatar"
-                className="w-10 h-10 rounded-full border-2 border-pink-400 shadow"
-              />
+              {/* Ẩn avatar ảnh, chỉ còn avatar nền đỏ */}
+              <span className="sr-only">Tài khoản</span>
             </button>
             {open && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 z-50">

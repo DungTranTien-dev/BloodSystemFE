@@ -1,5 +1,5 @@
-import React, {  } from 'react';
-import { Button, Input, Form, Checkbox} from "antd";
+import React, { } from 'react';
+import { Button, Input, Form, Checkbox } from "antd";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -21,31 +21,36 @@ function LoginForm() {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-   const onFinish = async (values) => {
-        console.log('Success:', values);
-        try {
-            const response = await api.post('Auth/login', values);
-            console.log(response);
-            toast.success("Login successful!");
-
-            dispatch(login(response.data.result));
-            localStorage.setItem("token", response.data.result.accessToken);
-
-
-
-            // const user = response.data.data;
-            // if (user.role === 'ADMIN') {
-            //     navigate("/dashboard");
-            // }
-            // else if (user.role === 'USER') {
-            //     navigate("/");
-            // }
-            navigate("/");
-        } catch (e) {
-            console.log(e);
-            toast.error(e.response.data);
-        }
-    };
+  const onFinish = async (values) => {
+    console.log('Success:', values);
+    try {
+      const response = await api.post('Auth/login', values);
+      console.log(response);
+      dispatch(login(response.data.result));
+      localStorage.setItem("token", response.data.result.accessToken);
+      const user = response.data.result.user;
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+        toast.success('Đăng nhập thành công!');
+        return;
+      } else if (user.role === 'STAFF') {
+        navigate('/staff');
+        toast.success('Đăng nhập thành công!');
+        return;
+      } else if (user.role === 'CUSTOMER') {
+        navigate('/');
+        toast.success('Đăng nhập thành công!');
+        return;
+      } else {
+        navigate('/');
+        toast.success('Đăng nhập thành công!');
+        return;
+      }
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data);
+    }
+  };
 
   return (
     // Div này không cần thay đổi, nó chỉ dùng để căn giữa

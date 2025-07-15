@@ -78,7 +78,7 @@ function Header() {
           </div>
 
           {/* Desktop Navigation (Giữ nguyên) */}
-             <nav className="hidden md:flex">
+          <nav className="hidden md:flex">
             <ul className="flex items-center space-x-8 bold">
               {navItems.map((item) => (
                 <NavLink key={item.path} onClick={() => navigate(item.path)}>
@@ -94,19 +94,16 @@ function Header() {
               // Giao diện khi ĐÃ ĐĂNG NHẬP
               <Dropdown menu={userMenu} placement="bottomRight" arrow>
                 <div className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  {/* Avatar nền đỏ, chữ trắng, chữ cái đầu userName */}
                   <Avatar
                     size={48}
-                    src={user?.avatarUrl || undefined}
+                    style={{ backgroundColor: '#dc2626', color: '#fff', fontWeight: 'bold', fontSize: '1.5rem' }}
                   >
-                    {!user?.avatarUrl
-                      ? (user?.userName
-                          ? user.userName.charAt(0).toUpperCase()
-                          : <UserOutlined />)
-                      : null}
+                    {user?.user?.userName ? user.user.userName.charAt(0).toUpperCase() : <UserOutlined />}
                   </Avatar>
-                  {/* Giả sử API trả về có trường `fullName` */}
+                  {/* Xin chào, Tên */}
                   <span className="font-semibold text-slate-700 hidden sm:block ml-3">
-                    {user.userName || "Tài khoản"}
+                    {`Xin chào, ${user.medical.fullName || user.user.userName || "Tài khoản"}`}
                   </span>
                 </div>
               </Dropdown>
