@@ -148,7 +148,7 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/donation-confirmation",
+      path: "/donate-confirm",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonateConfirm />

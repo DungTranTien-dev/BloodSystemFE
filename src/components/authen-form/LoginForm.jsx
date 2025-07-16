@@ -11,8 +11,8 @@ import api from '../../config/axios';
 const Logo = () => (
   <div className="text-center mb-8">
     <img src="https://cdn-icons-png.flaticon.com/512/2928/2928921.png" alt="LifeStream Logo" className="h-20 w-20 mx-auto mb-4" />
-    <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Welcome to LifeStream</h1>
-    <p className="text-gray-600 mt-2">Sign in to continue saving lives</p>
+    <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Chào mừng đến với LifeStream</h1>
+    <p className="text-gray-600 mt-2">Đăng nhập để tiếp tục cứu sống nhiều người</p>
   </div>
 );
 
@@ -76,8 +76,8 @@ function LoginForm() {
           <Form.Item
             name="email"
             rules={[
-              { required: true, message: "Please input your email!" },
-              { type: 'email', message: "Please enter a valid email!" }
+              { required: true, message: "Vui lòng nhập email!" },
+              { type: 'email', message: "Vui lòng nhập đúng định dạng email!" }
             ]}
           >
             <Input
@@ -91,12 +91,12 @@ function LoginForm() {
 
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
           >
             <Input.Password
               // THAY ĐỔI 4: Icon màu xám, bỏ hết style nền tối
               prefix={<FaLock className="mr-3 text-gray-400 text-lg" />}
-              placeholder="Password"
+              placeholder="Mật khẩu"
               size="large"
               className="!h-14 !text-base" // Giữ lại kích thước
             />
@@ -107,14 +107,14 @@ function LoginForm() {
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 {/* THAY ĐỔI 5: Chữ Checkbox màu tối, bỏ style tùy chỉnh */}
                 <Checkbox>
-                  <span className="text-base text-gray-700">Remember me</span>
+                  <span className="text-base text-gray-700">Ghi nhớ đăng nhập</span>
                 </Checkbox>
               </Form.Item>
               <span
                 className="font-medium text-red-600 hover:text-red-500 hover:underline cursor-pointer"
                 onClick={() => navigate('/forgot-password')}
               >
-                Forgot password?
+                Quên mật khẩu?
               </span>
 
             </div>
@@ -128,16 +128,16 @@ function LoginForm() {
               size="large"
               className="w-full !bg-gradient-to-r !from-red-500 !to-pink-600 !text-white !font-bold hover:!opacity-90 transition-all duration-300 transform hover:scale-105 !h-14 !text-lg !border-none"
             >
-              Sign In
+              Đăng nhập
             </Button>
           </Form.Item>          <div className="text-center">
             <p className="text-gray-700 text-base">
-              Don't have an account?{" "}
+              Chưa có tài khoản?{" "}
               <span
                 onClick={() => navigate('/register')}
                 className="font-medium text-red-600 hover:text-red-500 hover:underline cursor-pointer"
               >
-                Create Account
+                Đăng ký ngay
               </span>
             </p>
           </div>

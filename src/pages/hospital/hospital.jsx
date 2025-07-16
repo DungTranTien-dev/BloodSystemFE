@@ -594,7 +594,7 @@ const Hospitals = () => {
       // Ở đây chỉ cần truyền object rỗng hoặc thông tin cần thiết nếu backend không yêu cầu
       const registerRes = await registerBloodDonation(hospital.donationEventId, {});
       if (registerRes.success) {
-        navigate("/donation-confirmation?status=success");
+        navigate("/donate-confirm?status=success");
       } else {
         window.toast?.error(registerRes.error || "Đăng ký thất bại!");
       }
@@ -619,7 +619,7 @@ const Hospitals = () => {
         const registerRes = await registerBloodDonation(selectedHospital.donationEventId, formData);
         if (registerRes.success) {
           setModalVisible(false);
-          navigate("/donation-confirmation?status=success");
+          navigate("/donate-confirm?status=success");
         } else {
           window.toast?.error(registerRes.error || "Đăng ký thất bại!");
         }

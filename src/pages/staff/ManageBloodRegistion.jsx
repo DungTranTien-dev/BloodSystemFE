@@ -33,11 +33,14 @@ function ManageBloodRegistion() {
       if (res.data?.isSuccess) {
         const mapped = res.data.result.map((item) => ({
           id: item.bloodRegistrationId,
+          bloodRegistrationId: item.bloodRegistrationId, // thêm trường này
           eventName: item.eventTitle,
-          fullName: item.fullName || "Người dùng",
+          fullName: item.userMedical?.fullName || "Người dùng", // sửa lấy tên đúng
           date: item.createDate?.slice(0, 10),
           status: item.registerType,
           statusText: mapStatusText(item.registerType),
+          startTime: item.startTime, // thêm trường này
+          endTime: item.endTime, // thêm trường này
         }));
         setRegistrations(mapped);
       }
@@ -200,8 +203,11 @@ function ManageBloodRegistion() {
             <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg transition-all duration-300 transform scale-100 opacity-100">
               <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đăng ký hiến máu</h2>
               <div className="mb-2"><span className="font-semibold">Người đăng ký:</span> {detailReg.fullName}</div>
+              <div className="mb-2"><span className="font-semibold">Mã đăng ký:</span> {detailReg.bloodRegistrationId}</div>
               <div className="mb-2"><span className="font-semibold">Sự kiện:</span> {detailReg.eventName}</div>
               <div className="mb-2"><span className="font-semibold">Ngày đăng ký:</span> {detailReg.date}</div>
+              <div className="mb-2"><span className="font-semibold">Thời gian bắt đầu:</span> {detailReg.startTime}</div>
+              <div className="mb-2"><span className="font-semibold">Thời gian kết thúc:</span> {detailReg.endTime}</div>
               <div className="mb-2"><span className="font-semibold">Trạng thái:</span> {detailReg.statusText}</div>
               <div className="flex justify-end mt-6">
                 <button

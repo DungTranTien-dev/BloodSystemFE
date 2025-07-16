@@ -4,6 +4,7 @@ import { FaDroplet, FaHeart } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/ui/Layout';
 import api from '../../config/axios';
+import { toast } from 'react-toastify';
 
 const { Option } = Select;
 
@@ -14,16 +15,15 @@ const BloodRequest = () => {
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   const unitOptions = [
-    '1 Unit (450ml)', '2 Units (900ml)', 
-    '3 Units (1350ml)', '4 Units (1800ml)', 
-    '5+ Units (Contact for details)'
+    '1 Đơn vị (450ml)', '2 Đơn vị (900ml)', 
+    '3 Đơn vị (1350ml)', '4 Đơn vị (1800ml)', 
+    '5+ Đơn vị (Liên hệ để biết thêm)'
   ];
   const componentTypes = [
-  { label: 'Whole Blood', value: 'WHOLE_BLOOD' },
-  { label: 'Red Blood Cell', value: 'RED_BLOOD_CELL' },
-  { label: 'Plasma', value: 'PLASMA' },
-  { label: 'Platelet', value: 'PLATELET' },
-  { label: 'In Progress', value: 'IN_PROGESS' }
+  { label: 'Máu toàn phần', value: 'WHOLE_BLOOD' },
+  { label: 'Hồng cầu', value: 'RED_BLOOD_CELL' },
+  { label: 'Huyết tương', value: 'PLASMA' },
+  { label: 'Tiểu cầu', value: 'PLATELET' }
 ];
 
 
@@ -32,11 +32,11 @@ const BloodRequest = () => {
 
     try {
       const unitMap = {
-        '1 Unit (450ml)': 450,
-        '2 Units (900ml)': 900,
-        '3 Units (1350ml)': 1350,
-        '4 Units (1800ml)': 1800,
-        '5+ Units (Contact for details)': 2000
+        '1 Đơn vị (450ml)': 450,
+        '2 Đơn vị (900ml)': 900,
+        '3 Đơn vị (1350ml)': 1350,
+        '4 Đơn vị (1800ml)': 1800,
+        '5+ Đơn vị (Liên hệ để biết thêm)': 2000
       };
       const volumeInML = unitMap[values.units] || 450;
 
@@ -50,18 +50,20 @@ const BloodRequest = () => {
       };
 
       const response = await api.post('BloodRequest/create', requestDto);
+      console.log('API response:', response.data);
 
-      if (response?.data?.success) {
-        message.success('Blood request submitted successfully!');
+      if (response?.data?.isSuccess) {
+        toast.success('Gửi yêu cầu hiến máu thành công!');
         form.resetFields();
-        setTimeout(() => navigate('/'), 1500);
+        setTimeout(() => navigate('/donate-confirm?status=success'), 1500);
       } else {
-        message.error(response?.data?.message || 'Request failed.');
+        toast.error(response?.data?.message || 'Gửi yêu cầu thất bại.');
+        setTimeout(() => navigate('/donate-confirm?status=error'), 1500);
       }
 
     } catch (error) {
       console.error(error);
-      message.error('Something went wrong. Please try again.');
+      message.error('Đã xảy ra lỗi. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -77,10 +79,10 @@ const BloodRequest = () => {
               <FaDroplet className="text-2xl text-white" />
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-              Donate Blood Request
+              Yêu Cầu Hiến Máu
             </h1>
             <p className="text-gray-600 text-lg">
-              Help save lives by requesting blood donations for patients in need
+              Hãy giúp cứu sống những người bệnh bằng cách gửi yêu cầu hiến máu
             </p>
           </div>
 
@@ -90,18 +92,18 @@ const BloodRequest = () => {
               <Form form={form} layout="vertical" onFinish={handleSubmit} size="large" className="space-y-6">
                 
                 {/* Patient Name */}
-                <Form.Item name="patientName" label="Patient Name*" rules={[{ required: true }]}>
-                  <Input placeholder="Enter patient name" />
+                <Form.Item name="patientName" label="Tên bệnh nhân*" rules={[{ required: true, message: 'Vui lòng nhập tên bệnh nhân' }]}>
+                  <Input placeholder="Nhập tên bệnh nhân" />
                 </Form.Item>
 
                 {/* Hospital Name */}
-                <Form.Item name="hospitalName" label="Hospital Name*" rules={[{ required: true }]}>
-                  <Input placeholder="Enter hospital name" />
+                <Form.Item name="hospitalName" label="Tên bệnh viện*" rules={[{ required: true, message: 'Vui lòng nhập tên bệnh viện' }]}>
+                  <Input placeholder="Nhập tên bệnh viện" />
                 </Form.Item>
 
                 {/* Blood Group */}
-                <Form.Item name="bloodGroup" label="Blood Group*" rules={[{ required: true }]}>
-                  <Select placeholder="Select blood group">
+                <Form.Item name="bloodGroup" label="Nhóm máu*" rules={[{ required: true, message: 'Vui lòng chọn nhóm máu' }]}>
+                  <Select placeholder="Chọn nhóm máu">
                     {bloodGroups.map(bg => <Option key={bg} value={bg}>{bg}</Option>)}
                   </Select>
                 </Form.Item>
@@ -109,10 +111,10 @@ const BloodRequest = () => {
                 {/* Component Type */}
                 <Form.Item
   name="componentType"
-  label="Component Type*"
-  rules={[{ required: true, message: 'Please select component type' }]}
+  label="Thành phần máu*"
+  rules={[{ required: true, message: 'Vui lòng chọn thành phần máu' }]}
 >
-  <Select placeholder="Select component type">
+  <Select placeholder="Chọn thành phần máu">
     {componentTypes.map(({ label, value }) => (
       <Option key={value} value={value}>
         {label}
@@ -123,15 +125,15 @@ const BloodRequest = () => {
 
 
                 {/* Units */}
-                <Form.Item name="units" label="Blood Volume*" rules={[{ required: true }]}>
-                  <Select placeholder="Select units">
+                <Form.Item name="units" label="Thể tích máu*" rules={[{ required: true, message: 'Vui lòng chọn thể tích máu' }]}>
+                  <Select placeholder="Chọn thể tích">
                     {unitOptions.map(unit => <Option key={unit} value={unit}>{unit}</Option>)}
                   </Select>
                 </Form.Item>
 
                 {/* Reason */}
-                <Form.Item name="reason" label="Reason*" rules={[{ required: true }]}>
-                  <Input placeholder="e.g., Accident, Surgery, Transfusion..." />
+                <Form.Item name="reason" label="Lý do*" rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}>
+                  <Input placeholder="VD: Tai nạn, phẫu thuật, truyền máu..." />
                 </Form.Item>
 
                 {/* Submit */}
@@ -148,7 +150,7 @@ const BloodRequest = () => {
                   >
                     <div className="flex items-center justify-center">
                       <FaHeart className="mr-2" />
-                      {loading ? 'Submitting Request...' : 'Submit Blood Request'}
+                      {loading ? 'Đang gửi yêu cầu...' : 'Gửi Yêu Cầu Hiến Máu'}
                     </div>
                   </Button>
                 </Form.Item>

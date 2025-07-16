@@ -44,13 +44,19 @@ function ManageSeparatedBlood() {
   const mapComponentType = (type) => {
     switch (type) {
       case 0:
-        return "Plasma";
+      case "0":
+        return "Huyết tương";
       case 1:
-        return "Red Blood Cells";
+      case "1":
+        return "Hồng cầu";
       case 2:
-        return "Platelets";
+      case "2":
+        return "Tiểu cầu";
+      case 3:
+      case "3":
+        return "Bạch cầu";
       default:
-        return "Unknown";
+        return "Không xác định";
     }
   };
 
@@ -229,7 +235,7 @@ function ManageSeparatedBlood() {
                         {item.id}
                       </td>
                       <td className="px-6 py-4">{item.bloodUnitId}</td>
-                      <td className="px-6 py-4">{item.component}</td>
+                      <td className="px-6 py-4">{mapComponentType(item.component)}</td>
                       <td className="px-6 py-4">{item.volume}</td>
                       <td className="px-6 py-4">{item.separatedDate}</td>
                       <td className="px-6 py-4">

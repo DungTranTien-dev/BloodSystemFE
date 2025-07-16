@@ -65,9 +65,8 @@ function ManageBlood() {
   const BloodComponentType = {
     WHOLE_BLOOD: 0,
     RED_BLOOD_CELL: 1,
-    PLASMA: 2,
-    PLATELET: 3,
-    IN_PROGRESS: 4,
+    PLATELET: 2,
+    PLASMA: 3,
   };
 
   const BloodSeparationStatus = {
