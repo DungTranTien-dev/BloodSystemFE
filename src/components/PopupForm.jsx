@@ -44,13 +44,36 @@ function PopupForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
+    // Tự kiểm tra lỗi
+    const newErrors = {};
+    fieldsConfig.forEach(field => {
+      const value = formData[field.name];
+      if (field.required && (!value && value !== 0)) {
+        newErrors[field.name] = `${field.label} là bắt buộc!`;
+      }
+      if (field.type === "number") {
+        const num = Number(value);
+        if (field.min !== undefined && num < field.min) {
+          newErrors[field.name] = `${field.label} phải lớn hơn hoặc bằng ${field.min}`;
+        }
+        if (field.max !== undefined && num > field.max) {
+          newErrors[field.name] = `${field.label} phải nhỏ hơn hoặc bằng ${field.max}`;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Gọi hàm xử lý API từ component cha
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      // Xử lý lỗi từ API (có thể truyền lỗi cụ thể)
       setErrors(error.response?.data?.errors || {});
     } finally {
       setIsLoading(false);
@@ -76,7 +99,7 @@ function PopupForm({
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6" noValidate>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {fieldsConfig.map((field) => (
               <div key={field.name} className="mb-4">
@@ -130,6 +153,9 @@ function PopupForm({
                     className={`w-full border ${errors[field.name] ? "border-red-500" : "border-slate-300"} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300`}
                     placeholder={field.placeholder}
                     required={field.required}
+                    min={field.type === "number" && field.min !== undefined ? field.min : undefined}
+                    max={field.type === "number" && field.max !== undefined ? field.max : undefined}
+                    step={field.type === "number" ? 1 : undefined}
                   />
                 )}
                 

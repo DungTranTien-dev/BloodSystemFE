@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/axios";
+import { updateUserMedical } from "../../service/medicalApi";
 import Sidebar from "../../components/SideBar";
 // import PopupForm from "../../components/PopupForm";
 import Header from "../../components/Header";
@@ -133,6 +134,20 @@ const formatType = (type) => {
   }
 };
 
+// Hàm lấy class màu cho trạng thái
+const getTypeColor = (type) => {
+  switch (type) {
+    case "BLOCK":
+      return "bg-red-100 text-red-700";
+    case "PENDING":
+      return "bg-yellow-100 text-yellow-700";
+    case "AVAILABLE":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
+
 function ManageUserMedical() {
   const [search, setSearch] = useState("");
   const [medicalList, setMedicalList] = useState([]);
@@ -208,16 +223,70 @@ function ManageUserMedical() {
   ];
 
   const handleSubmitMedical = async (formData) => {
-    await new Promise((r) => setTimeout(r, 500));
     if (formData.id) {
-      setMedicalList((prev) =>
-        prev.map((item) => (item.id === formData.id ? { ...formData, statusColor: getStatusColor(formData.status) } : item))
-      );
+      // Map dữ liệu từ form sang đúng input API
+      const updatePayload = {
+        userMedicalId: formData.id,
+        fullName: formData.patient,
+        dateOfBirth: formData.dateOfBirth || formData.date || "2000-01-01T00:00:00.000Z", // Ưu tiên dateOfBirth, fallback sang date
+        gender: typeof formData.gender === 'number' ? formData.gender : 0, // Nếu có trường gender dạng số
+        citizenId: formData.citizenId,
+        phoneNumber: formData.phone,
+        email: formData.email,
+        currentAddress: formData.address,
+        hasDonatedBefore: formData.hasDonatedBefore ?? false,
+        donationCount: Number(formData.donationCount) || 0,
+        diseaseDescription: formData.diagnosis,
+        type: typeof formData.type === 'number' ? formData.type : 0,
+        createDate: formData.createDate || new Date().toISOString(),
+        userId: formData.userId || "",
+      };
+      const result = await updateUserMedical(updatePayload);
+      if (result.success) {
+        // Cập nhật lại danh sách bằng cách fetch lại từ API
+        try {
+          const res = await api.get("UserMedical");
+          if (res.data.isSuccess && Array.isArray(res.data.result)) {
+            const formatted = res.data.result.map((u) => {
+              const status = u.hasDonatedBefore ? "Đã từng hiến máu" : "Chưa từng hiến máu";
+              return {
+                id: u.userMedicalId,
+                patient: u.fullName,
+                age: new Date().getFullYear() - new Date(u.dateOfBirth).getFullYear(),
+                diagnosis: u.diseaseDescription || "Không rõ",
+                date: new Date().toISOString().split("T")[0],
+                status,
+                statusColor: getStatusColor(status),
+                email: u.email,
+                phone: u.phoneNumber,
+                address: u.currentAddress,
+                province: u.province || "Không rõ",
+                blood: u.bloodName,
+                gender: u.gender,
+                citizenId: u.citizenId,
+                donationCount: u.donationCount,
+                userId: u.userId,
+                latitude: u.latitude,
+                longitude: u.longitude,
+                type: u.type,
+              };
+            });
+            setMedicalList(formatted);
+          }
+        } catch (err) {
+          console.error("Lỗi khi gọi API GetAllUserMedical:", err);
+        }
+        return true;
+      } else {
+        alert(result.error || "Cập nhật thất bại!");
+        return false;
+      }
     } else {
+      // Giữ nguyên logic thêm mới local
       const newId = `MED${String(medicalList.length + 1).padStart(3, "0")}`;
       setMedicalList((prev) => [...prev, { ...formData, id: newId, statusColor: getStatusColor(formData.status) }]);
+      return true;
     }
-    return true;
   };
 
   const handleDetail = (item) => {
@@ -302,7 +371,7 @@ function ManageUserMedical() {
                       <td className="px-6 py-4">{item.age}</td>
                       <td className="px-6 py-4">{item.date}</td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getTypeColor(item.type)}`}>
                           {formatType(item.type)}
                         </span>
                       </td>

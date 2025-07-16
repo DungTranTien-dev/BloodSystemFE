@@ -41,7 +41,7 @@ function LoginForm() {
         toast.success('Đăng nhập thành công!');
         return;
       } else if (user.role === 'STAFF') {
-        navigate('/staff');
+        navigate('/DashboardS');
         toast.success('Đăng nhập thành công!');
         return;
       } else if (user.role === 'CUSTOMER') {

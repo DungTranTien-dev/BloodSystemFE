@@ -18,8 +18,10 @@ import {
   Activity
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../../components/Header";
+import { logout } from "../../redux/features/userSlice";
+import { toast } from "react-toastify";
 
 const menuItems = [
   {
@@ -66,6 +68,7 @@ const menuItems = [
   }
 ];
 
+
 const DashboardS = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("overview");
@@ -73,6 +76,7 @@ const DashboardS = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const pathSegments = location.pathname.split('/');
@@ -97,7 +101,8 @@ const DashboardS = () => {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    // Thêm logic đăng xuất ở đây
+    dispatch(logout());
+    toast.success("Đăng xuất thành công!");
     navigate("/");
   };
 
@@ -173,14 +178,14 @@ const DashboardS = () => {
                   <img src={user.avatarUrl} alt="Avatar" className="h-full w-full rounded-full object-cover" />
                 ) : (
                   <span className="text-white font-semibold">
-                    {user?.userName ? user.userName.charAt(0) : <User className="h-5 w-5" />}
+                    {user?.user?.userName ? user?.user?.userName.charAt(0) : <User className="h-5 w-5" />}
                   </span>
                 )}
               </div>
               {!collapsed && (
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-white font-semibold truncate">{user?.userName || 'Staff'}</p>
-                  <p className="text-white/70 text-sm truncate">{user?.role}</p>
+                  <p className="text-white font-semibold truncate">{user?.user?.userName || 'Staff'}</p>
+                  <p className="text-white/70 text-sm truncate">{user?.user?.role}</p>
                 </div>
               )}
             </button>

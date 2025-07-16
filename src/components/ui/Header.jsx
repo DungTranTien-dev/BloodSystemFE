@@ -103,7 +103,7 @@ function Header() {
                   </Avatar>
                   {/* Xin chào, Tên */}
                   <span className="font-semibold text-slate-700 hidden sm:block ml-3">
-                    {`Xin chào, ${user.medical?.fullName || user.user.userName || "Tài khoản"}`}
+                    {`Xin chào, ${user?.medical?.fullName || user?.user?.userName || "Tài khoản"}`}
                   </span>
                 </div>
               </Dropdown>

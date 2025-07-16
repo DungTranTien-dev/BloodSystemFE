@@ -141,17 +141,18 @@ function ManageBlood() {
       };
 
       if (currentBloodUnit) {
-        // === CẬP NHẬT ===
-        const res = await api.put(`/Blood/${currentBloodUnit.id}`, dto);
-        setBloodUnits((prev) =>
-          prev.map((item) =>
-            item.bloodId === currentBloodUnit.id ? { ...item, ...res.data } : item
-          )
-        );
+        await api.put(`/Blood/${currentBloodUnit.id}`, dto);
+        // Fetch lại danh sách máu
+        const res = await api.get("Blood");
+        setBloodUnits(res.data.result);
+        setIsPopupOpen(false);
+        setCurrentBloodUnit(null);
       } else {
-        // === TẠO MỚI ===
-        const res = await api.post(`/Blood/create`, dto); // <-- sửa đúng endpoint tạo mới
-        setBloodUnits((prev) => [...prev, res.data.result]); // res.data.result phải là object máu vừa tạo
+        await api.post(`/Blood/create`, dto);
+        const listRes = await api.get("Blood");
+        setBloodUnits(listRes.data.result);
+        setIsPopupOpen(false);
+        setCurrentBloodUnit(null);
       }
 
       return true;
@@ -187,8 +188,8 @@ function ManageBlood() {
       type: "number",
       placeholder: "Nhập thể tích",
       required: true,
-      min: 100,
-      max: 500,
+      min: 50,
+      max: 1000,
     },
     {
       name: "collectedDate",  // đổi từ 'date' thành 'collectedDate' cho đúng với dữ liệu
@@ -341,8 +342,8 @@ function ManageBlood() {
             </table>
           </div>
 
-          {/* Pagination mới: chỉ hiện khi >5 bản ghi */}
-          {totalPages > 1 && (
+          {/* Pagination: chỉ hiện khi tổng số bản ghi > itemsPerPage */}
+          {filteredList.length > itemsPerPage && (
             <div className="flex justify-end mt-6 gap-2">
               <button
                 className="px-3 py-1 rounded-l border text-sm font-medium bg-white text-gray-700 border-gray-300 hover:bg-red-100 transition"
