@@ -18,14 +18,11 @@ const AboutUs = React.lazy(() => import("./pages/home/AboutUs"));
 const BloodTypePage = React.lazy(() => import("./pages/blood/blood"));
 const Dashboard = React.lazy(() => import("./pages/admin/Dashboard"));
 const BloodDonationAdminDashboard = React.lazy(() => import("./components/admin/BloodDonationAdminDashboard"));
-const SimpleDashboard = React.lazy(() =>
-  import("./components/SimpleDashboard")
-);
-const DonorList = React.lazy(() => import("./pages/admin/DonorList"));
-const AddDonor = React.lazy(() => import("./pages/admin/AddDonor"));
-const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
+// const DonorList = React.lazy(() => import("./pages/admin/DonorList"));
+// const AddDonor = React.lazy(() => import("./pages/admin/AddDonor"));
+// const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
 const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
-const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
+// const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
 // Loading component for suspense fallback
@@ -180,59 +177,59 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    {
-      path: "/admin/donors",
-      element: (
-        <ProtectedRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <DonorList />
-          </Suspense>
-        </ProtectedRoute>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/admin/add-donor",
-      element: (
-        <ProtectedRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <AddDonor />
-          </Suspense>
-        </ProtectedRoute>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/admin/blood-requests",
-      element: (
-        <ProtectedRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <BloodRequests />
-          </Suspense>
-        </ProtectedRoute>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/admin/donor-details/:id",
-      element: (
-        <ProtectedRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <DonorDetails />
-          </Suspense>
-        </ProtectedRoute>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/donor-details",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <DonorDetails />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
+    // {
+    //   path: "/admin/donors",
+    //   element: (
+    //     <ProtectedRoute>
+    //       <Suspense fallback={<LoadingSpinner />}>
+    //         <DonorList />
+    //       </Suspense>
+    //     </ProtectedRoute>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/admin/add-donor",
+    //   element: (
+    //     <ProtectedRoute>
+    //       <Suspense fallback={<LoadingSpinner />}>
+    //         <AddDonor />
+    //       </Suspense>
+    //     </ProtectedRoute>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/admin/blood-requests",
+    //   element: (
+    //     <ProtectedRoute>
+    //       <Suspense fallback={<LoadingSpinner />}>
+    //         <BloodRequests />
+    //       </Suspense>
+    //     </ProtectedRoute>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/admin/donor-details/:id",
+    //   element: (
+    //     <ProtectedRoute>
+    //       <Suspense fallback={<LoadingSpinner />}>
+    //         <DonorDetails />
+    //       </Suspense>
+    //     </ProtectedRoute>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/donor-details",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <DonorDetails />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
     // {
     //   path: "/create-sample-data",
     //   element: (
