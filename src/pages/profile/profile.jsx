@@ -14,6 +14,7 @@ import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import { useSelector } from 'react-redux';
 import { getUserBloodDonationHistory } from '../../service/bloodRegistrationApi';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   // Lấy dữ liệu từ redux
@@ -36,6 +37,7 @@ const Profile = () => {
   // Avatar: lấy chữ cái đầu của fullName
   const avatarText = fullName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,3);
 
+  const navigate = useNavigate();
   // Lịch sử hiến máu
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -110,11 +112,11 @@ const Profile = () => {
       <div className="flex justify-between items-start px-6 pt-6 md:px-10">
         <h1 className="text-white text-2xl md:text-3xl font-bold">Hồ sơ cá nhân</h1>
         <div className="flex gap-2 mt-1">
-          <button className="bg-white px-4 py-1 rounded-lg text-sm font-medium text-gray-700 shadow hover:bg-gray-100 flex items-center gap-1">
+          <button
+            className="bg-white px-4 py-1 rounded-lg text-sm font-medium text-gray-700 shadow hover:bg-gray-100 flex items-center gap-1"
+            onClick={() => navigate('/update-profile')}
+          >
             <EditOutlined /> Chỉnh sửa
-          </button>
-          <button className="bg-white px-4 py-1 rounded-lg text-sm font-medium text-gray-700 shadow hover:bg-gray-100 flex items-center gap-1">
-            <SettingOutlined /> Cài đặt
           </button>
         </div>
       </div>

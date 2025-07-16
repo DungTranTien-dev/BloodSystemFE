@@ -3,6 +3,7 @@ import { Modal, Form, Input, Typography, Button, Space, message } from "antd";
 import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/axios";
+import { toast } from "react-toastify";
 
 const { Title } = Typography;
 
@@ -26,7 +27,7 @@ const RegistrationPopup = () => {
 
     const response = await api.post("Auth/register", data);
     const resData = response.data;
-
+    toast.success("Đăng ký thành công");
     if (resData.isSuccess) {
       message.success(resData.message || "Đăng ký thành công!");
       setVisible(false);

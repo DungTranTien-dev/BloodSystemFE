@@ -6,6 +6,7 @@ import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
 import QAPage from "./pages/Q&A/Q&A";
 import DashboardS from "./pages/dashboard-staff";
+import UpdateProfile from "./pages/profile/updateProfile";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -133,6 +134,15 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <Profile />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/update-profile",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <UpdateProfile />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
