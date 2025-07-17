@@ -6,13 +6,16 @@ import { store, persistor } from './redux/store'
 import './index.css'
 import App from './App.jsx'
 import { ToastContainer } from 'react-toastify'
+import { AIProvider } from './context/AIContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <App />
-        <ToastContainer />
+        <AIProvider>
+          <App />
+          <ToastContainer />
+        </AIProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,

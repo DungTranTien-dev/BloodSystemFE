@@ -14,6 +14,9 @@ import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { Button, Card, DatePicker, Popover } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
+import ChatBox from '../../components/ai/ChatBox';
+import { MessageCircle } from 'lucide-react';
+
 const FeatureCard = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-3 hover:bg-red-50 text-center">
     <div className="inline-block p-5 bg-gradient-to-br from-red-100 to-pink-100 rounded-full mb-6">
@@ -43,6 +46,7 @@ const Homepage = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const { RangePicker } = DatePicker;
+  const [showChat, setShowChat] = useState(false);
 
   const handleSearch = () => {
     if (!startDate || !endDate) {
@@ -58,38 +62,38 @@ const Homepage = () => {
   };
   const donationMethods = [
     {
-      title: "Direct Hospital Donation",
+      title: "Hiến máu trực tiếp tại bệnh viện",
       icon: <FaHospital />,
-      description: "Visit your nearest hospital to donate blood directly.",
+      description: "Đến bệnh viện gần nhất để hiến máu trực tiếp.",
     },
     {
-      title: "Mobile Blood Donation Camps",
+      title: "Xe hiến máu lưu động",
       icon: <FaTruck />,
-      description: "Find mobile camps in your area for convenient donation.",
+      description: "Tìm các điểm hiến máu lưu động thuận tiện gần bạn.",
     },
     {
-      title: "Community Donation Centers",
+      title: "Trung tâm hiến máu cộng đồng",
       icon: <FaBuilding />,
-      description: "Dedicated centers for safe and efficient blood donation.",
+      description: "Các trung tâm chuyên biệt đảm bảo an toàn và hiệu quả cho việc hiến máu.",
     },
   ];
 
   const collaborators = [
     {
       name: "NCC",
-      description: "National Civic Council",
+      description: "Hội đồng Công dân Quốc gia",
       image:
         "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2940&auto=format&fit=crop",
     },
     {
       name: "NSS",
-      description: "National Service Scheme",
+      description: "Chương trình Dịch vụ Quốc gia",
       image:
         "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop",
     },
     {
       name: "YMCA",
-      description: "Young Men's Christian Association",
+      description: "Hiệp hội Thanh niên Cơ đốc",
       image:
         "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2940&auto=format&fit=crop",
     },
@@ -105,24 +109,23 @@ const Homepage = () => {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />{" "}
         <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4 drop-shadow-lg">
-            Be a <span className="text-red-500">Hero</span>. Give{" "}
-            <span className="text-pink-400">Blood</span>.
+            Hãy là <span className="text-red-500">Người hùng</span>. Hãy <span className="text-pink-400">hiến máu</span>.
           </h1>
           <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-8">
-            Your blood can save lives. Join the movement today.
+            Máu của bạn có thể cứu sống nhiều người. Hãy tham gia cùng chúng tôi ngay hôm nay.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={() => navigate("/blood-request")}
               className="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold rounded-full hover:shadow-xl hover:shadow-red-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
             >
-              Request Blood Now
+              Yêu cầu nhận máu ngay
             </button>
             <button
               onClick={() => navigate("/register")}
               className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold rounded-full border-2 border-white/30 hover:bg-white/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
             >
-              Become a Donor
+              Đăng ký làm người hiến máu
             </button>
           </div>
         </div>
@@ -132,7 +135,7 @@ const Homepage = () => {
         <div className="container mx-auto px-6 md:px-12">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">
-              Bạn cần đặt lịch vào thời gian nào?
+              Bạn muốn đặt lịch hiến máu vào thời gian nào?
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Chọn khoảng thời gian phù hợp với lịch trình của bạn
@@ -165,7 +168,6 @@ const Homepage = () => {
                        border-0 shadow-lg hover:shadow-xl
                        transform transition-all duration-300 ease-in-out
                        hover:-translate-y-1 active:scale-95"
-                  // Thêm icon vào nút bấm của Ant Design
                   icon={<SearchOutlined />}
                 >
                   Tìm kiếm
@@ -178,18 +180,12 @@ const Homepage = () => {
 
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6 md:px-12 text-center">
-          <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
+          <h2 className="text-4xl font-bold mb-4">Sứ mệnh của chúng tôi</h2>
           <p className="text-lg text-slate-400 mb-12">
-            Building a Healthier Future, Together
+            Chung tay xây dựng tương lai khỏe mạnh hơn
           </p>
           <p className="max-w-4xl mx-auto text-xl text-slate-600 leading-relaxed">
-            We strive to create a{" "}
-            <span className="font-semibold text-pink-600">sustainable</span> and{" "}
-            <span className="font-semibold text-pink-600">efficient</span> blood
-            donation ecosystem. Through community engagement and advanced
-            partnerships, we ensure timely access to{" "}
-            <span className="font-semibold text-red-600">safe blood</span> for
-            all in need.
+            Chúng tôi nỗ lực tạo ra một hệ sinh thái hiến máu <span className="font-semibold text-pink-600">bền vững</span> và <span className="font-semibold text-pink-600">hiệu quả</span>. Thông qua sự gắn kết cộng đồng và hợp tác tiên tiến, chúng tôi đảm bảo mọi người đều được tiếp cận <span className="font-semibold text-red-600">nguồn máu an toàn</span> kịp thời khi cần thiết.
           </p>
         </div>
       </section>
@@ -198,10 +194,10 @@ const Homepage = () => {
         <div className="container mx-auto px-6 md:px-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              Simple Ways to Contribute
+              Những cách đơn giản để đóng góp
             </h2>
             <p className="text-lg text-slate-500">
-              Your journey to saving lives starts here.
+              Hành trình cứu người bắt đầu từ đây.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
@@ -216,10 +212,10 @@ const Homepage = () => {
         <div className="container mx-auto px-6 md:px-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              Our Trusted Collaborators
+              Đối tác đồng hành
             </h2>
             <p className="text-lg text-slate-500">
-              Working together to build a healthier future.
+              Chung tay xây dựng cộng đồng khỏe mạnh hơn.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -229,6 +225,26 @@ const Homepage = () => {
           </div>
         </div>{" "}
       </section>
+
+      {/* Floating AI Chat Button & Box */}
+      <div>
+        {/* Floating Button */}
+        <button
+          onClick={() => setShowChat((v) => !v)}
+          className="fixed z-50 bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-pink-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Mở chat AI"
+        >
+          <MessageCircle className="w-8 h-8 text-white" />
+        </button>
+        {/* ChatBox Floating */}
+        {showChat && (
+          <div className="fixed z-50 bottom-24 right-6 animate-fade-in">
+            <div className="shadow-2xl rounded-2xl">
+              <ChatBox />
+            </div>
+          </div>
+        )}
+      </div>
     </Layout>
   );
 };

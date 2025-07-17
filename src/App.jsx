@@ -6,6 +6,14 @@ import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
 import DonateConfirm from "./pages/DonorBlood/DonateConfirm";
 import TrackDonation from "./pages/DonorBlood/TrackDonation";
+import QAPage from "./pages/Q&A/Q&A";
+import StaffBloodRequests from "./pages/dashboard-staff/StaffBloodRequests";
+import StaffDonorRequests from "./pages/dashboard-staff/StaffDonorRequests";
+import DashboardS from "./components/dashboard";
+import CreateHospital from "./pages/dashboard-staff/CreateHospital";
+import BloodManagement from "./pages/dashboard-staff/BloodManagement";
+import BloodSeparation from "./pages/dashboard-staff/BloodSeparation";
+import MedicalRequest from "./pages/dashboard-staff/MedicalRequest";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -23,6 +31,7 @@ const BloodDonationAdminDashboard = React.lazy(() => import("./components/admin/
 // const DonorDetails = React.lazy(() => import("./pages/admin/DonorDetails"));
 const BloodRequest = React.lazy(() => import("./pages/blood/BloodRequest"));
 // const BloodRequests = React.lazy(() => import("./pages/admin/BloodRequests"));
+const BlogDetail = React.lazy(() => import("./pages/blog/BlogDetail"));
 // const SampleDataCreator = React.lazy(() => import('./components/SampleDataCreator'));
 
 // Loading component for suspense fallback
@@ -56,6 +65,15 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
+      path: "/Q&A",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <QAPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
       path: "/news/:id",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -74,7 +92,16 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
-      path: "/donorblood",
+      path: "/blog/:id",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <BlogDetail />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/donor-blood",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonorBlood />
@@ -91,8 +118,8 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
-      path: "/donation-confirmation",
+    {
+      path: "/donate-confirm",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <DonateConfirm />
@@ -100,7 +127,7 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-     {
+    {
       path: "/track-donation",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -154,7 +181,24 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    
+    {
+      path: "/staff-request-blood",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffBloodRequests />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/staff-request-donor",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StaffDonorRequests />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
     {
       path: "/admin",
       element: (
@@ -252,6 +296,52 @@ function App() {
     {
       path: "*",
       element: <SimpleErrorFallback />,
+    },
+    {
+      path: "/DashboardS",
+      element: <DashboardS />,
+      children: [
+        {
+          path: "", // Default route - overview
+          element: <div>Trang tổng quan</div>,
+        },
+        {
+          path: "overview",
+          element: <div>Trang tổng quan</div>,
+        },
+        {
+          path: "donor-blood",
+          element: <StaffDonorRequests />,
+        },
+        {
+          path: "blood-request",
+          element: <StaffBloodRequests />,
+        },
+        {
+          path: "blood",
+          element: <BloodManagement/>,
+        },
+        {
+          path: "create-hospital",
+          element: <CreateHospital />,
+        },
+        {
+          path: "create-user",
+          element: <div>Tạo user</div>,
+        },
+        {
+          path: "blood-separation",
+          element: (
+            <Suspense fallback={<LoadingSpinner />}>
+              <BloodSeparation />
+            </Suspense>
+          ),
+        },
+        {
+          path: "medical-request",
+          element: <MedicalRequest />,
+        },
+      ],
     },
   ]);
 
