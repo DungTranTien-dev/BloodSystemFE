@@ -15,10 +15,15 @@ import navigation from "./Navigation";
 // Component NavLink không thay đổi
 const NavLink = ({ children, onClick }) => (
   <li
-    className="font-medium text-slate-700 hover:text-red-600 transition-colors duration-300 cursor-pointer"
+    className="group relative font-medium text-slate-700 hover:text-red-600 transition-colors duration-300 cursor-pointer px-1"
     onClick={onClick}
   >
-    {children}
+    <span className="transition-colors duration-300 group-hover:font-bold">
+      {children}
+    </span>
+    <span
+      className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-full transition-all duration-300 group-hover:w-full"
+    />
   </li>
 );
 
@@ -64,8 +69,8 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+      <div className="w-full px-6">
+        <div className="flex items-center justify-between h-18">
           {/* Logo Section (Giữ nguyên) */}
           <div
             className="flex items-center cursor-pointer"
@@ -79,7 +84,7 @@ function Header() {
 
           {/* Desktop Navigation (Giữ nguyên) */}
           <nav className="hidden md:flex">
-            <ul className="flex items-center space-x-8 bold">
+            <ul className="flex items-center space-x-15 bold">
               {navItems.map((item) => (
                 <NavLink key={item.path} onClick={() => navigate(item.path)}>
                   {item.label}

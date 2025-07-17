@@ -87,7 +87,7 @@ const FAQ = () => {
     return (
     <>
       {/* Section tiêu đề với gradient */}
-      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-20">
+      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-15.5">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight">Lưu ý quan trọng</h1>
         </div>

@@ -85,10 +85,9 @@ const BlogPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-14.5 text-center">
+      <section className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-15.5 text-center">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-5xl font-extrabold tracking-tight">Blog & Tin Tức</h1>
-          <p className="mt-4 text-lg text-pink-200">Cập nhật những kiến thức, câu chuyện và sự kiện mới nhất từ cộng đồng.</p>
         </div>
       </section>
 

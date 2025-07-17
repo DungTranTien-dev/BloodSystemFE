@@ -186,9 +186,8 @@ const BloodTypePage = () => {
       <Header />
       <div className="min-h-screen bg-white relative overflow-hidden">
         {/* Tiêu đề với nền chuyển sắc giống Q&A */}
-        <div className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-15.5 text-center">
+        <div className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-14.5 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2">Nhóm máu & Tương thích</h1>
-          <p className="mt-2 text-lg text-pink-100">Tìm hiểu về các nhóm máu và khả năng truyền nhận</p>
         </div>
         {/* Nội dung chính của trang */}
         <div className="relative z-10 py-8 px-2 sm:px-4 lg:px-8 max-w-5xl mx-auto">
