@@ -4,6 +4,7 @@ import { FaArrowRight, FaCalendarAlt, FaUser } from 'react-icons/fa';
 import Header from "../../components/ui/Header";
 import ChatBox from '../../components/ai/ChatBox';
 import { MessageCircle } from 'lucide-react';
+import Footer from '../../components/ui/Footer';
 
 // Dữ liệu mẫu cho các bài blog
 const blogPosts = [
