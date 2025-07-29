@@ -1,240 +1,277 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/SideBar";
 import Header from "../../components/Header";
-import PopupForm from "../../components/PopupForm"; // Đường dẫn tuỳ dự án
+import PopupForm from "../../components/PopupForm";
+import api from "../../config/axios";
+import { Row, Col, Card, Typography, Form } from "antd";
+import BloodRequestForm from "../../components/BloodRequestForm";
+import { Modal, message  } from 'antd';
+
+const { Title, Text } = Typography;
 
 const staffMenus = [
-  { label: "Staff Page", href: "/staff" },
-  { label: "Manage Event", href: "/staff/manage-event" },
-  { label: "Manage News", href: "/staff/manage-news" },
-  { label: "Manage Blood Requests", href: "/staff/manage-blood-requests" },
+{ label: "Trang Nhân Viên", href: "/staff" },
+{ label: "Quản Lý Sự Kiện", href: "/staff/manage-event" },
+// { label: "Quản Lý Tin Tức", href: "/staff/manage-news" },
+{ label: "Quản Lý Yêu Cầu Máu", href: "/staff/manage-blood-requests" },
+{ label: "Quản Lý Hồ Sơ Y Tế", href: "/doctor/manage-medical" },
+{ label: "Quản Lý Đơn Vị Máu", href: "/doctor/manage-blood" },
+{ label: "Quản Lý Máu Đã Phân Tách", href: "/doctor/manage-separated" },
+{ label: "Quản Lý Đăng Ký Hiến Máu", href: "/staff/manage-registion" },
+{ label: "Trang Chủ", href: "/" },
+
+
+
 ];
 
-// Dữ liệu mẫu
-const bloodRequestsSample = [
-  {
-    id: "REQ001",
-    patient: "Nguyễn Văn A",
-    bloodGroup: "O+",
-    volume: 350,
-    date: "2025-06-25",
-    status: "Chờ xử lý",
-    note: "Cần gấp cho ca cấp cứu.",
-  },
-  {
-    id: "REQ002",
-    patient: "Trần Thị B",
-    bloodGroup: "A-",
-    volume: 450,
-    date: "2025-06-24",
-    status: "Đã duyệt",
-    note: "",
-  },
-];
+const mapStatusText = (status) => {
+  switch (status) {
+    case "PENDING": return "Chờ xử lý";
+    case "APPROVED": return "Đã duyệt";
+    case "WAITING_PAYMENT": return "Chờ thanh toán";
+    case "REJECTED": return "Đã từ chối";
+    case "FULFILLED": return "Đã cấp máu";
+    default: return status;
+  }
+};
 
 function ManageBloodRequest() {
   const [search, setSearch] = useState("");
-  const [requestList, setRequestList] = useState(bloodRequestsSample);
+  const [requestList, setRequestList] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentRequest, setCurrentRequest] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [activeStatus, setActiveStatus] = useState("all");
 
-  // Lọc theo tên bệnh nhân hoặc nhóm máu
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await api.get("BloodRequest/all");
+        if (res.data?.isSuccess) {
+          const mapped = res.data.result.map((item) => ({
+            id: item.bloodRequestId,
+            patient: item.patientName,
+            bloodGroup: item.bloodGroup,
+            volume: item.volumeInML,
+            date: item.requestedDate.slice(0, 10),
+            status: item.status,
+            statusText: mapStatusText(item.status),
+            note: item.reason,
+          }));
+          setRequestList(mapped);
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu:", err);
+        message.error("Lỗi khi tải dữ liệu:", err);
+      }
+    };
+    fetchRequests();
+  }, []);
+
   const filteredList = requestList.filter(
     (item) =>
-      item.patient.toLowerCase().includes(search.toLowerCase()) ||
-      item.bloodGroup.toLowerCase().includes(search.toLowerCase())
+      (activeStatus === "all" || item.status === activeStatus) &&
+      (item.patient.toLowerCase().includes(search.toLowerCase()) ||
+        item.bloodGroup.toLowerCase().includes(search.toLowerCase()))
   );
 
-  // Cấu hình field cho form Request
+  const getStatusCounts = () => {
+    const counts = {
+      total: requestList.length,
+      PENDING: 0,
+      APPROVED: 0,
+      WAITING_PAYMENT: 0,
+      REJECTED: 0,
+      FULFILLED: 0,
+    };
+    requestList.forEach((req) => {
+      if (counts[req.status] !== undefined) counts[req.status]++;
+    });
+    return counts;
+  };
+
+  const counts = getStatusCounts();
+
   const requestFields = [
-    {
-      name: "patient",
-      label: "Tên bệnh nhân",
-      type: "text",
-      placeholder: "Nhập tên bệnh nhân",
-      required: true
-    },
-    {
-      name: "bloodGroup",
-      label: "Nhóm máu",
-      type: "select",
-      options: [
-        { value: "O+", label: "O+" },
-        { value: "O-", label: "O-" },
-        { value: "A+", label: "A+" },
-        { value: "A-", label: "A-" },
-        { value: "B+", label: "B+" },
-        { value: "B-", label: "B-" },
-        { value: "AB+", label: "AB+" },
-        { value: "AB-", label: "AB-" },
-      ],
-      required: true
-    },
-    {
-      name: "volume",
-      label: "Thể tích (ml)",
-      type: "number",
-      placeholder: "Nhập thể tích",
-      required: true,
-      min: 100,
-      max: 500
-    },
-    {
-      name: "date",
-      label: "Ngày yêu cầu",
-      type: "date",
-      required: true
-    },
-    {
-      name: "status",
-      label: "Trạng thái",
-      type: "select",
-      options: [
-        { value: "Chờ xử lý", label: "Chờ xử lý" },
-        { value: "Đã duyệt", label: "Đã duyệt" },
-        { value: "Đã từ chối", label: "Đã từ chối" }
-      ],
-      required: true
-    },
-    {
-      name: "note",
-      label: "Ghi chú",
-      type: "textarea",
-      placeholder: "Nhập ghi chú (nếu có)"
-    }
+    { name: "patient", label: "Tên bệnh nhân", type: "text", required: true },
+    { name: "bloodGroup", label: "Nhóm máu", type: "select", required: true,
+      options: ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map(v => ({ value: v, label: v })) },
+    { name: "volume", label: "Thể tích (ml)", type: "number", required: true, min: 100, max: 500 },
+    { name: "date", label: "Ngày yêu cầu", type: "date", required: true },
+    { name: "status", label: "Trạng thái", type: "select", required: true,
+      options: ["PENDING", "APPROVED", "WAITING_PAYMENT", "REJECTED", "FULFILLED"].map(v => ({ value: v, label: mapStatusText(v) })) },
+    { name: "note", label: "Ghi chú", type: "textarea" }
   ];
 
-  // Xử lý submit form (thêm/sửa)
   const handleSubmitRequest = async (formData) => {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise((res) => setTimeout(res, 500));
     if (formData.id) {
-      // Cập nhật
-      setRequestList(prev =>
-        prev.map(item => item.id === formData.id ? formData : item)
-      );
+      setRequestList((prev) => prev.map((item) => item.id === formData.id ? { ...formData, statusText: mapStatusText(formData.status) } : item));
     } else {
-      // Thêm mới
-      const newId = `REQ${String(requestList.length + 1).padStart(3, '0')}`;
-      setRequestList(prev => [
-        ...prev,
-        { ...formData, id: newId }
-      ]);
+      const newId = `REQ${String(requestList.length + 1).padStart(3, "0")}`;
+      setRequestList((prev) => [...prev, { ...formData, id: newId, statusText: mapStatusText(formData.status) }]);
     }
     return true;
   };
 
-  // Xem chi tiết
-  const handleDetail = (item) => {
-    setCurrentRequest(item);
-    setIsDetailOpen(true);
+  const handleDetail = async (item) => {
+    try {
+      const res = await api.get(`BloodRequest/${item.id}`);
+      if (res.data?.isSuccess) {
+        const data = res.data.result;
+        setCurrentRequest({
+          id: data.bloodRequestId,
+          patient: data.patientName,
+          bloodGroup: data.bloodGroup,
+          volume: data.volumeInML,
+          date: data.requestedDate.slice(0, 10),
+          status: mapStatusText(data.status),
+          note: data.reason
+        });
+        setIsDetailOpen(true);
+      }
+    } catch (err) {
+      console.error("Lỗi lấy chi tiết đơn:", err);
+    }
   };
 
-  // Mở popup thêm mới
-  const handleCreate = () => {
-    setCurrentRequest(null);
-    setIsPopupOpen(true);
-  };
+  const [showCreateModal, setShowCreateModal] = useState(false);
+const [createForm] = Form.useForm();
 
-  // Mở popup sửa
-  const handleEdit = (item) => {
-    setCurrentRequest(item);
-    setIsPopupOpen(true);
-  };
+const handleCreateBloodRequest = async (values) => {
+  try {
+    const unitMap = {
+      '1 Unit (450ml)': 450,
+      '2 Units (900ml)': 900,
+      '3 Units (1350ml)': 1350,
+      '4 Units (1800ml)': 1800,
+      '5+ Units (Contact for details)': 2000
+    };
+    const requestDto = {
+      patientName: values.patientName,
+      hospitalName: values.hospitalName || 'Unknown',
+      bloodGroup: values.bloodGroup,
+      componentType: values.componentType,
+      volumeInML: unitMap[values.units] || 450,
+      reason: values.reason || 'Không rõ'
+    };
+    const res = await api.post("BloodRequest/create", requestDto);
+    if (res.data?.isSuccess) {
+      message.success(res.data.message || "Tạo yêu cầu thành công!");
+
+      // 👉 Sau khi tạo xong, gọi lại API để load danh sách mới
+      await fetchRequests(); // <-- gọi lại API load danh sách
+
+      createForm.resetFields();
+      setShowCreateModal(false);
+    } else {
+      message.error(res.data?.message || "Tạo yêu cầu thất bại.");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    message.error("Đã có lỗi xảy ra.");
+  }
+};
+
+
 
   return (
     <>
       <Header pageTitle="Quản lý đơn nhận máu" />
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar
-          title="Staff Panel"
-          version="v1.0.0"
-          menus={staffMenus}
-          activeLabel="Manage Blood Requests"
-        />
+        <Sidebar title="Staff Panel" version="v1.0.0" menus={staffMenus} activeLabel="Manage Blood Requests" />
         <main className="flex-1 p-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-red-600 mb-1">Quản lý đơn nhận máu</h1>
-              <p className="text-slate-600">Tạo, chỉnh sửa và theo dõi các đơn nhận máu của bệnh nhân.</p>
-            </div>
-            <button
-              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-red-600 hover:to-pink-600 transition"
-              onClick={handleCreate}
-            >
-              + Thêm đơn nhận máu
-            </button>
-          </div>
+          <Row gutter={[24, 24]} className="mb-8">
+            {["total", "PENDING", "APPROVED", "WAITING_PAYMENT", "REJECTED", "FULFILLED"].map((key) => (
+              <Col xs={12} md={8} lg={4} key={key}>
+                <Card
+                  className="cursor-pointer hover:shadow-xl transition-shadow"
+                  onClick={() => setActiveStatus(key === "total" ? "all" : key)}>
+                  <div className="text-center">
+                    <Title level={3}>{counts[key]}</Title>
+                    <Text>{key === "total" ? "Tất cả" : mapStatusText(key)}</Text>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-          {/* Search */}
-          <div className="mb-6">
+          <div className="mb-4">
             <input
               type="text"
               placeholder="Tìm theo tên bệnh nhân hoặc nhóm máu..."
-              className="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+              className="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:outline-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          {/* Table */}
+          <div className="flex justify-end mb-4">
+  <button
+    className="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-semibold"
+    onClick={() => setShowCreateModal(true)}
+  >
+    + Tạo mới đơn nhận máu
+  </button>
+</div>
+
+
           <div className="overflow-x-auto bg-white rounded-xl shadow">
             <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-gradient-to-r from-red-200 to-pink-100">
+              <thead className="bg-red-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Mã đơn</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Bệnh nhân</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Nhóm máu</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Thể tích (ml)</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Ngày yêu cầu</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Hành động</th>
+                  {["Bệnh nhân", "Nhóm máu", "Thể tích", "Ngày", "Trạng thái", "Hành động"].map((h, i) => (
+                    <th key={i} className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-700">{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredList.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-slate-400">
-                      Không tìm thấy đơn phù hợp.
-                    </td>
+                    <td colSpan={7} className="text-center py-6 text-slate-400">Không tìm thấy đơn phù hợp.</td>
                   </tr>
                 ) : (
                   filteredList.map((item) => (
-                    <tr key={item.id} className="hover:bg-red-50 transition">
-                      <td className="px-6 py-4 font-mono text-slate-700">{item.id}</td>
+                    <tr key={item.id} className="hover:bg-red-50">
+                      {/* <td className="px-6 py-4 font-mono">{item.id}</td> */}
                       <td className="px-6 py-4">{item.patient}</td>
                       <td className="px-6 py-4">{item.bloodGroup}</td>
                       <td className="px-6 py-4">{item.volume}</td>
                       <td className="px-6 py-4">{item.date}</td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold
-                            ${
-                              item.status === "Chờ xử lý"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : item.status === "Đã duyệt"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-pink-100 text-pink-700"
-                            }
-                          `}
-                        >
-                          {item.status}
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold
+                          ${item.status === "PENDING"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : item.status === "APPROVED"
+                            ? "bg-green-100 text-green-700"
+                            : item.status === "REJECTED"
+                            ? "bg-pink-100 text-pink-700"
+                            : "bg-slate-100 text-slate-600"}`}>
+                          {item.statusText}
                         </span>
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
-                        <button
-                          className="text-pink-600 hover:underline"
-                          onClick={() => handleDetail(item)}
-                        >
-                          Xem chi tiết
-                        </button>
-                        <button
-                          className="text-pink-600 hover:text-pink-800"
-                          onClick={() => handleEdit(item)}
-                        >
-                          Sửa
-                        </button>
+                      <td className="px-6 py-4 space-y-1">
+                        <button className="text-pink-600 hover:underline mr-2" onClick={() => handleDetail(item)}>Chi tiết</button>
+                        <button className="text-blue-600 hover:underline mr-2" onClick={() => handleEdit(item)}>Sửa</button>
+                        {item.status === "PENDING" && (
+                          <div className="mt-1 flex gap-2">
+                            <button
+                              className="px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-xs"
+                              onClick={() => handleUpdateStatus(item.id, "APPROVED")}
+                            >
+                              Đồng ý
+                            </button>
+                            <button
+                              className="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs"
+                              onClick={() => handleUpdateStatus(item.id, "REJECTED")}
+                            >
+                              Từ chối
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 space-x-2">
+                        <button className="text-pink-600 hover:underline" onClick={() => handleDetail(item)}>Chi tiết</button>
                       </td>
                     </tr>
                   ))
@@ -243,16 +280,6 @@ function ManageBloodRequest() {
             </table>
           </div>
 
-          {/* Pagination mẫu */}
-          <div className="mt-6 flex justify-end">
-            <nav className="inline-flex rounded-md shadow-sm">
-              <button className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-l hover:bg-red-50">Trước</button>
-              <button className="px-3 py-1 bg-pink-500 text-white border-t border-b border-slate-200 font-semibold">1</button>
-              <button className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-r hover:bg-red-50">Sau</button>
-            </nav>
-          </div>
-
-          {/* PopupForm dùng chung cho thêm/sửa */}
           <PopupForm
             isOpen={isPopupOpen}
             onClose={() => setIsPopupOpen(false)}
@@ -263,23 +290,34 @@ function ManageBloodRequest() {
             submitText={currentRequest ? "Cập nhật" : "Tạo mới"}
           />
 
-          {/* Popup xem chi tiết */}
+          <Modal
+  open={showCreateModal}
+  onCancel={() => setShowCreateModal(false)}
+  footer={null}
+  title="Tạo đơn nhận máu mới"
+  width={600}
+>
+  <BloodRequestForm
+    form={createForm}
+    onSubmit={handleCreateBloodRequest}
+    loading={false}
+  />
+</Modal>
+
+
           {isDetailOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg">
                 <h2 className="text-xl font-bold mb-4 text-red-600">Chi tiết đơn nhận máu</h2>
-                <div className="mb-2"><span className="font-semibold">Mã đơn:</span> {currentRequest.id}</div>
-                <div className="mb-2"><span className="font-semibold">Bệnh nhân:</span> {currentRequest.patient}</div>
-                <div className="mb-2"><span className="font-semibold">Nhóm máu:</span> {currentRequest.bloodGroup}</div>
-                <div className="mb-2"><span className="font-semibold">Thể tích:</span> {currentRequest.volume} ml</div>
-                <div className="mb-2"><span className="font-semibold">Ngày yêu cầu:</span> {currentRequest.date}</div>
-                <div className="mb-2"><span className="font-semibold">Trạng thái:</span> {currentRequest.status}</div>
-                <div className="mb-4"><span className="font-semibold">Ghi chú:</span> {currentRequest.note}</div>
+                {/* <div className="mb-2"><b>Mã đơn:</b> {currentRequest.id}</div> */}
+                <div className="mb-2"><b>Bệnh nhân:</b> {currentRequest.patient}</div>
+                <div className="mb-2"><b>Nhóm máu:</b> {currentRequest.bloodGroup}</div>
+                <div className="mb-2"><b>Thể tích:</b> {currentRequest.volume} ml</div>
+                <div className="mb-2"><b>Ngày yêu cầu:</b> {currentRequest.date}</div>
+                <div className="mb-2"><b>Trạng thái:</b> {currentRequest.status}</div>
+                <div className="mb-2"><b>Ghi chú:</b> {currentRequest.note}</div>
                 <div className="flex justify-end">
-                  <button
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
-                    onClick={() => setIsDetailOpen(false)}
-                  >
+                  <button className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white" onClick={() => setIsDetailOpen(false)}>
                     Đóng
                   </button>
                 </div>

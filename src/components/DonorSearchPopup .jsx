@@ -1,21 +1,133 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTimes, FaHeart, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 import Map, { Marker, Source, Layer } from 'react-map-gl';
+import api from '../config/axios';
 
 const DonorSearchPopup = ({
   isOpen,
   onClose,
-  selectedBloodType,
-  setSelectedBloodType,
-  handleSearchDonors,
-  donors,
   selectedDonor,
   handleContactDonor,
   userLocation,
+  setUserLocation,
   donorCoords,
+  setDonors,
+  setRoute,
+  donors,
   route,
-  MAPBOX_TOKEN
+  MAPBOX_TOKEN,
 }) => {
+  const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  // const [searchLocation, setSearchLocation] = useState(null); // tách riêng
+
+  // Lấy vị trí người dùng khi mở popup
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (err) => {
+          console.warn('Không lấy được vị trí người dùng:', err);
+        }
+      );
+    }
+  }, [setUserLocation]);
+
+  useEffect(() => {
+    if (!address) {
+      setSuggestions([]);
+      return;
+    }
+
+    const fetchSuggestions = async () => {
+      try {
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?autocomplete=true&access_token=${MAPBOX_TOKEN}`
+        );
+        const data = await res.json();
+        setSuggestions(data.features || []);
+      } catch (err) {
+        console.error('Lỗi khi gợi ý địa chỉ:', err);
+      }
+    };
+
+    const debounce = setTimeout(fetchSuggestions, 400);
+    return () => clearTimeout(debounce);
+  }, [address, MAPBOX_TOKEN]);
+
+  const searchDonorsFromAddress = async () => {
+    if (!address) return;
+    setLoading(true);
+
+    try {
+      const geoRes = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_TOKEN}`
+      );
+      const geoData = await geoRes.json();
+      const location = geoData.features[0];
+      if (!location) {
+        alert('Không tìm thấy địa chỉ');
+        return;
+      }
+
+      const [lng, lat] = location.center;
+      // setSearchLocation({ lat, lng }); // dùng để tìm người hiến máu
+
+      const donorRes = await api.get(
+        `UserMedical/nearest-available?latitude=${lat}&longitude=${lng}`
+      );
+      const { statusCode, result } = donorRes.data;
+
+      if (statusCode === 200 && Array.isArray(result)) {
+        const mappedDonors = result.map((d) => ({
+          id: d.userMedicalId,
+          name: d.fullName,
+          bloodType: d.bloodName,
+          phone: d.phoneNumber,
+          address: d.currentAddress,
+          lat: d.latitue,
+          lng: d.longtitue,
+          lastDonation: d.donationCount > 0 ? `${d.donationCount} lần` : 'Chưa rõ',
+          distance: null,
+        }));
+        setDonors(mappedDonors);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tìm người hiến máu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+  const fetchRoute = async () => {
+    if (!selectedDonor || !userLocation || !donorCoords) return;
+
+    try {
+      const res = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${userLocation.lng},${userLocation.lat};${donorCoords.lng},${donorCoords.lat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`
+      );
+      const data = await res.json();
+
+      if (data.routes && data.routes.length > 0) {
+        const geojson = data.routes[0].geometry;
+        if (typeof setRoute === 'function') {
+          setRoute(geojson);
+        }
+      }
+    } catch (err) {
+      console.error('Lỗi khi gọi directions API:', err);
+    }
+  };
+
+  fetchRoute();
+}, [selectedDonor, userLocation, donorCoords, MAPBOX_TOKEN]);
+
+
   if (!isOpen) return null;
 
   return (
@@ -27,63 +139,66 @@ const DonorSearchPopup = ({
             <FaTimes className="text-slate-500 hover:text-slate-700 text-xl" />
           </button>
         </div>
-        
+
         <div className="p-6">
-          {/* Form tìm kiếm */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-gray-700 mb-2">Nhóm máu cần</label>
-              <select
+            <div className="md:col-span-2 relative">
+              <label className="block text-gray-700 mb-2">Nhập địa chỉ của bạn</label>
+              <input
+                type="text"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-                value={selectedBloodType}
-                onChange={(e) => setSelectedBloodType(e.target.value)}
-              >
-                <option value="">Chọn nhóm máu</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="VD: 123 Lý Thường Kiệt, Quận 10, TP.HCM"
+              />
+              {suggestions.length > 0 && (
+                <ul className="absolute z-10 bg-white border rounded-lg mt-1 max-h-60 overflow-y-auto w-full shadow-md">
+                  {suggestions.map((s) => (
+                    <li
+                      key={s.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setAddress(s.place_name);
+                        setSuggestions([]);
+                      }}
+                    >
+                      {s.place_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            
             <div className="flex items-end">
               <button
                 className="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
-                onClick={handleSearchDonors}
-                disabled={!selectedBloodType}
+                onClick={searchDonorsFromAddress}
+                disabled={loading || !address}
               >
-                Tìm kiếm
+                {loading ? 'Đang tìm...' : 'Tìm kiếm'}
               </button>
             </div>
           </div>
-          
-          {/* Kết quả tìm kiếm */}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Danh sách người hiến máu */}
             <div className="space-y-4">
               {donors.length > 0 && (
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Tìm thấy {donors.length} người hiến máu phù hợp
+                  Tìm thấy {donors.length} người hiến máu gần bạn
                 </h3>
               )}
-              
+
               {donors.map((donor) => (
-                <div 
+                <div
                   key={donor.id}
                   className={`border rounded-lg p-4 cursor-pointer ${
-                    selectedDonor?.id === donor.id 
-                      ? "border-red-500 bg-red-50" 
-                      : "border-gray-200 hover:shadow-md"
+                    selectedDonor?.id === donor.id
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-200 hover:shadow-md'
                   }`}
                   onClick={() => handleContactDonor(donor)}
                 >
                   <div className="flex items-start">
                     <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                    
                     <div className="ml-4 flex-1">
                       <div className="flex justify-between">
                         <h3 className="text-xl font-bold text-gray-800">{donor.name}</h3>
@@ -92,81 +207,86 @@ const DonorSearchPopup = ({
                           <span className="font-semibold">{donor.bloodType}</span>
                         </div>
                       </div>
-                      
                       <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div className="flex items-center text-gray-600">
                           <FaMapMarkerAlt className="mr-2" />
-                          <span>Cách {donor.distance} km</span>
+                          <span>{donor.distance ? `Cách ${donor.distance} km` : donor.address}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
                           <FaPhone className="mr-2" />
                           <span>{donor.phone}</span>
                         </div>
-                        <div className="text-gray-600">
-                          Hiến máu lần cuối: {donor.lastDonation}
-                        </div>
+                        <div className="text-gray-600">Hiến máu: {donor.lastDonation}</div>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
-            {/* Bản đồ chỉ đường */}
+
             <div>
               <h4 className="text-lg font-semibold mb-2">
                 {selectedDonor && donorCoords
                   ? `Chỉ đường đến ${selectedDonor.name}`
-                  : "Chọn người hiến máu để xem chỉ đường"}
+                  : 'Chọn người hiến máu để xem chỉ đường'}
               </h4>
-              
-              {selectedDonor && donorCoords && (
+
+              {selectedDonor && donorCoords && userLocation && (
                 <div className="border rounded-lg overflow-hidden">
                   <Map
                     initialViewState={{
                       latitude: userLocation.lat,
                       longitude: userLocation.lng,
-                      zoom: 12
+                      zoom: 12,
                     }}
                     style={{ width: '100%', height: 300 }}
                     mapStyle="mapbox://styles/mapbox/streets-v11"
                     mapboxAccessToken={MAPBOX_TOKEN}
                   >
-                    <Marker 
-                      longitude={userLocation.lng} 
-                      latitude={userLocation.lat} 
-                      color="blue" 
-                    />
-                    <Marker 
-                      longitude={donorCoords.lng} 
-                      latitude={donorCoords.lat} 
-                      color="red" 
-                    />
-                    
+                    <Marker longitude={userLocation.lng} latitude={userLocation.lat} color="blue" />
+                    <Marker longitude={donorCoords.lng} latitude={donorCoords.lat} color="red" />
+
                     {route && (
-                      <Source id="route" type="geojson" data={{
-                        type: 'Feature',
-                        geometry: route
-                      }}>
+                      <Source
+                        id="route"
+                        type="geojson"
+                        data={{
+                          type: 'Feature',
+                          geometry: route,
+                        }}
+                      >
                         <Layer
                           id="route"
                           type="line"
                           paint={{
                             'line-color': '#f43f5e',
-                            'line-width': 5
+                            'line-width': 5,
                           }}
                         />
                       </Source>
                     )}
                   </Map>
-                  
+
                   <div className="p-4 bg-gray-50">
                     <button
                       className="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition"
-                      onClick={() => window.open(
-                        `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${donorCoords.lat},${donorCoords.lng}&travelmode=driving`,
-                        '_blank'
-                      )}
+                      onClick={() => {
+                        if (navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition(
+                            (pos) => {
+                              const { latitude, longitude } = pos.coords;
+                              const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${donorCoords.lat},${donorCoords.lng}&travelmode=driving`;
+                              window.open(googleMapsUrl, '_blank');
+                            },
+                            (err) => {
+                              console.error('Không thể lấy vị trí người dùng:', err);
+                              alert('Không thể truy cập vị trí hiện tại. Vui lòng cho phép quyền truy cập vị trí.');
+                            }
+                          );
+                        } else {
+                          alert('Trình duyệt của bạn không hỗ trợ định vị vị trí.');
+                        }
+                      }}
                     >
                       Mở trong Google Maps
                     </button>

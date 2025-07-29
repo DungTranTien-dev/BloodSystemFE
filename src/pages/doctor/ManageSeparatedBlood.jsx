@@ -5,10 +5,17 @@ import Header from "../../components/Header";
 import api from "../../config/axios";
 
 const doctorMenus = [
-  { label: "Doctor Page", href: "/doctor" },
-  { label: "Manage Medical", href: "/doctor/manage-medical" },
-  { label: "Manage Blood", href: "/doctor/manage-blood" },
-  { label: "Manage Blood đã phân tách", href: "/doctor/manage-separated" },
+{ label: "Trang Nhân Viên", href: "/staff" },
+{ label: "Quản Lý Sự Kiện", href: "/staff/manage-event" },
+// { label: "Quản Lý Tin Tức", href: "/staff/manage-news" },
+{ label: "Quản Lý Yêu Cầu Máu", href: "/staff/manage-blood-requests" },
+{ label: "Quản Lý Hồ Sơ Y Tế", href: "/doctor/manage-medical" },
+{ label: "Quản Lý Đơn Vị Máu", href: "/doctor/manage-blood" },
+{ label: "Quản Lý Máu Đã Phân Tách", href: "/doctor/manage-separated" },
+{ label: "Quản Lý Đăng Ký Hiến Máu", href: "/staff/manage-registion" },
+{ label: "Trang Chủ", href: "/" },
+
+
 ];
 
 function ManageSeparatedBlood() {

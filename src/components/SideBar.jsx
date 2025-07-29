@@ -3,12 +3,13 @@ import React from "react";
 function Sidebar({ title, version, menus, activeLabel }) {
   return (
     <aside className="w-64 bg-white shadow-xl text-slate-800 flex flex-col border-r border-slate-200 min-h-screen">
-      {/* Header */}
+      {/* Tiêu đề sidebar */}
       <header className="bg-gradient-to-r from-red-500 to-pink-600 text-white p-4 border-b">
         <h1 className="text-lg font-bold leading-tight truncate">{title}</h1>
         {version && <p className="text-xs text-red-100 mt-1">{version}</p>}
       </header>
-      {/* Menu */}
+
+      {/* Menu điều hướng */}
       <nav className="flex-1 py-4">
         <ul className="space-y-1">
           {menus.map((item, idx) => (
@@ -30,13 +31,14 @@ function Sidebar({ title, version, menus, activeLabel }) {
           ))}
         </ul>
       </nav>
-      {/* Footer */}
+
+      {/* Phần cuối sidebar */}
       <div className="p-4 border-t border-slate-200 bg-slate-50 mt-auto">
         <div className="text-xs text-slate-500">
-          Comprehensive blood bank management solution
+          Giải pháp quản lý ngân hàng máu toàn diện
         </div>
         <div className="text-xs text-slate-400 mt-1">
-          Last updated: Jun 25, 2025
+          Cập nhật lần cuối: 25/06/2025
         </div>
       </div>
     </aside>

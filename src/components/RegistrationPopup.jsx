@@ -22,6 +22,8 @@ import {
   EnvironmentOutlined,
 } from "@ant-design/icons";
 import api from "../config/axios";
+import { useWatch } from "antd/es/form/Form";
+
 
 const { Title } = Typography;
 const MAPBOX_TOKEN =
@@ -42,6 +44,8 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
   const [addressFetching, setAddressFetching] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedDiseases, setSelectedDiseases] = useState([]);
+  const hasDonatedBefore = useWatch("hasDonatedBefore", form);
+
 
   useEffect(() => {
     if (visible) {
@@ -149,6 +153,8 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
                 />
               </Form.Item>
             </Col>
+
+
           </Row>
           <Row gutter={16}>
             <Col xs={24} md={12}>
@@ -272,6 +278,21 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
+                        {hasDonatedBefore === true && (
+  <Col xs={24} md={12}>
+    <Form.Item
+      name="lastDonorDate"
+      label="Ngày hiến máu gần nhất"
+      rules={[{ required: true, message: "Chọn ngày!" }]}
+    >
+      <DatePicker
+        format="DD/MM/YYYY"
+        style={{ width: "100%" }}
+        placeholder="Chọn ngày"
+      />
+    </Form.Item>
+  </Col>
+)}
           </Row>
 
 <Col xs={24} md={12}>

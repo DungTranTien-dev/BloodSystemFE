@@ -233,6 +233,9 @@ const handleRegisterEvent = async (event) => {
       chronicDiseaseIds: values.chronicDiseaseIds ?? [],
       latitude: values.latitude ?? 0,
       longitude: values.longitude ?? 0,
+      lastDonorDate : values.lastDonorDate
+      ? dayjs(values.lastDonorDate).toISOString()
+        : null,
     };
 
     // Tạo hồ sơ

@@ -6,8 +6,7 @@ import { UserOutlined, LogoutOutlined, ProfileOutlined } from '@ant-design/icons
 import { toast } from 'react-toastify';
 import { jwtDecode } from "jwt-decode";
 
-
-// Component NavLink
+// Component điều hướng
 const NavLink = ({ children, onClick }) => (
   <li
     className="font-medium text-slate-700 hover:text-red-600 transition-colors duration-300 cursor-pointer"
@@ -30,10 +29,11 @@ function Header() {
           userId: decoded.UserId,
           email: decoded.Email,
           userName: decoded.UserName,
-          avatarUrl: decoded.AvatarUrl || null, // nếu có
+          avatarUrl: decoded.AvatarUrl || null,
+          role: decoded.Role,
         });
       } catch (err) {
-        console.error("Invalid token:", err);
+        console.error("Token không hợp lệ:", err);
         setUser(null);
       }
     }
@@ -72,18 +72,20 @@ function Header() {
             </span>
           </div>
 
-          {/* Navigation */}
+          {/* Menu điều hướng */}
           <nav className="hidden md:flex">
             <ul className="flex items-center space-x-8 bold">
-              <NavLink onClick={() => navigate("/")}>Home</NavLink>
-              <NavLink onClick={() => navigate("/blog")}>Blog</NavLink>
-              <NavLink onClick={() => navigate("/donorblood")}>Donor Blood</NavLink>
-              <NavLink onClick={() => navigate("/bloodtype")}>Blood Group</NavLink>
-              <NavLink onClick={() => navigate("/blood-request")}>Request Blood</NavLink>
+              <NavLink onClick={() => navigate("/")}>Trang chủ</NavLink>
+              <NavLink onClick={() => navigate("/track-donation")}>Lịch sử hiến máu</NavLink>
+              <NavLink onClick={() => navigate("/bloodtype")}>Nhóm máu</NavLink>
+              {/* <NavLink onClick={() => navigate("/blood-request")}>Yêu cầu máu</NavLink> */}
+              {user?.role === "STAFF" && (
+                <NavLink onClick={() => navigate("/staff")}>Quản lý</NavLink>
+              )}
             </ul>
           </nav>
 
-          {/* Auth */}
+          {/* Khu vực đăng nhập/đăng xuất */}
           <div className="flex items-center">
             {user ? (
               <Dropdown overlay={userMenu} placement="bottomRight" arrow>
@@ -100,13 +102,13 @@ function Header() {
                   className="px-6 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/login")}
                 >
-                  Login
+                  Đăng nhập
                 </button>
                 <button
                   className="px-3.5 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/register")}
                 >
-                  Register
+                  Đăng ký
                 </button>
               </div>
             )}

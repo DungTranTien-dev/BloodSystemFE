@@ -44,6 +44,8 @@ const StaffPage = React.lazy(() => import("./pages/staff/StaffPage"));
 const ManageEvent = React.lazy(() => import("./pages/staff/ManageEvent"));
 const ManageNews = React.lazy(() => import("./pages/staff/ManageNews"));
 const ManageBloodRequest = React.lazy(() => import("./pages/staff/ManageBloodRequest"));
+const ManageBloodRegistion = React.lazy(() => import("./pages/staff/ManageBloodRegistion"));
+
 
 //PAYMENT
 const CallBackVNPay = React.lazy(() => import("./pages/payment/CallBackVNPay"));
@@ -304,6 +306,16 @@ function App() {
       element: (
         <Suspense fallback={<LoadingSpinner />}>
           <StaffPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    
+    {
+      path: "/staff/manage-registion",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ManageBloodRegistion />
         </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,

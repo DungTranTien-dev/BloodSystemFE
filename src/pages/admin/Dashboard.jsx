@@ -94,61 +94,7 @@ const MENU_ITEMS = [
     path: '/admin/dashboard',
     description: 'Main dashboard overview with key metrics and system status',
     category: 'main'
-  },  { 
-    icon: FaUsers, 
-    label: 'Blood Group', 
-    path: '/admin/blood-group',
-    description: 'Manage blood group types, compatibility, and inventory categories',
-    category: 'main'
-  },
-  { 
-    icon: FaUser, 
-    label: 'Donor List', 
-    path: '/admin/donors',
-    description: 'View and manage registered blood donors, their information and history',
-    category: 'main'  },
-  { 
-    icon: FaBell, 
-    label: 'Blood Requests', 
-    path: '/admin/blood-requests',
-    description: 'Manage incoming blood donation requests from patients',
-    category: 'main'
-  },
-  { 
-    icon: FaSearch, 
-    label: 'Manage Contactus Query', 
-    path: '/admin/contactus',
-    description: 'Handle contact form queries, support requests, and customer communications',
-    category: 'main'
-  },
-  { 
-    icon: FaEdit, 
-    label: 'Manage Pages', 
-    path: '/admin/pages',
-    description: 'Content management system for website pages and public information',
-    category: 'main'
-  },
-  { 
-    icon: FaEdit, 
-    label: 'Update Contact Info', 
-    path: '/admin/contact-info',
-    description: 'Update organization contact details, addresses, and communication channels',
-    category: 'settings'
-  },
-  { 
-    icon: FaEnvelope, 
-    label: 'Request Received By Donar', 
-    path: '/admin/requests',
-    description: 'Manage blood donation requests from donors and coordinate collection',
-    category: 'main'
-  },
-  { 
-    icon: FaCog, 
-    label: 'Settings', 
-    path: '/admin/settings',
-    description: 'System configuration, user preferences, and administrative controls',
-    category: 'settings'
-  }
+  }, 
 ];
 
 // ============================================

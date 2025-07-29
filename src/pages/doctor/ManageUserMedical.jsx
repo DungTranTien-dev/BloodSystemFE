@@ -6,11 +6,20 @@ import Header from "../../components/Header";
 
 // Menu cho sidebar
 const doctorMenus = [
-  { label: "Doctor Page", href: "/doctor" },
-  { label: "Manage Medical", href: "/doctor/manage-medical" },
-  { label: "Manage Blood", href: "/doctor/manage-blood" },
-  { label: "Manage Blood đã phân tách", href: "/doctor/manage-separated" },
+{ label: "Trang Nhân Viên", href: "/staff" },
+{ label: "Quản Lý Sự Kiện", href: "/staff/manage-event" },
+// { label: "Quản Lý Tin Tức", href: "/staff/manage-news" },
+{ label: "Quản Lý Yêu Cầu Máu", href: "/staff/manage-blood-requests" },
+{ label: "Quản Lý Hồ Sơ Y Tế", href: "/doctor/manage-medical" },
+{ label: "Quản Lý Đơn Vị Máu", href: "/doctor/manage-blood" },
+{ label: "Quản Lý Máu Đã Phân Tách", href: "/doctor/manage-separated" },
+{ label: "Quản Lý Đăng Ký Hiến Máu", href: "/staff/manage-registion" },
+{ label: "Trang Chủ", href: "/" },
+
+
+
 ];
+
 
 // Màu trạng thái
 const getStatusColor = (status) => {
@@ -141,7 +150,7 @@ function ManageUserMedical() {
               patient: u.fullName,
               age: new Date().getFullYear() - new Date(u.dateOfBirth).getFullYear(),
               diagnosis: u.diseaseDescription || "Không rõ",
-              date: new Date().toISOString().split("T")[0],
+              date: new Date(u.createDate).toISOString().split("T")[0],
               status,
               statusColor: getStatusColor(status),
               email: u.email,
@@ -156,6 +165,8 @@ function ManageUserMedical() {
               latitude: u.latitude,
               longitude: u.longitude,
               type: u.type,
+              lastDonorDate: u.lastDonorDate ? new Date(u.lastDonorDate).toISOString().split("T")[0] : null,
+
             };
           });
           setMedicalList(formatted);
@@ -178,6 +189,8 @@ function ManageUserMedical() {
     { name: "age", label: "Tuổi", type: "number", required: true },
     { name: "diagnosis", label: "Chẩn đoán", type: "textarea", required: true },
     { name: "date", label: "Ngày tạo", type: "date", required: true },
+    { name: "lastDonordate", label: "Ngày hien mau gan day", type: "date", required: true },
+
     { name: "email", label: "Email", type: "email" },
     { name: "phone", label: "Số điện thoại", type: "text" },
     { name: "address", label: "Địa chỉ", type: "text" },
@@ -261,6 +274,8 @@ function ManageUserMedical() {
             </button>
           </div>
 
+          
+
           <div className="mb-6">
             <input
               type="text"
@@ -278,6 +293,8 @@ function ManageUserMedical() {
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Bệnh nhân</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Tuổi</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Ngày tạo</th>
+                  {/* <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Ngày hien mau gan day</th> */}
+
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Trạng thái</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">Hành động</th>
                 </tr>
@@ -293,6 +310,8 @@ function ManageUserMedical() {
                       <td className="px-6 py-4">{item.patient}</td>
                       <td className="px-6 py-4">{item.age}</td>
                       <td className="px-6 py-4">{item.date}</td>
+                      {/* <td className="px-6 py-4">{item.lastDonorDate}</td> */}
+
                       <td className="px-6 py-4">
                         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
                           {formatType(item.type)}
@@ -343,6 +362,8 @@ function ManageUserMedical() {
                   <Info label="🆔 CMND/CCCD" value={currentMedical.citizenId} />
                   <Info label="📝 Chẩn đoán" value={currentMedical.diagnosis} />
                   <Info label="📅 Ngày tạo" value={currentMedical.date} />
+                  <Info label="📅 Ngày hien mau gan day" value={currentMedical.lastDonorDate} />
+
                   <Info label="💉 Lần hiến máu" value={currentMedical.donationCount} />
                   <Info label="📂 Loại hồ sơ" value={formatType(currentMedical.type)} />
                   <div className="col-span-1 md:col-span-2 flex items-center">

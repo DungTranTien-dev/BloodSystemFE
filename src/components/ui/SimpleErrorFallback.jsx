@@ -1,30 +1,30 @@
 import React from 'react';
 
-// Simple functional fallback component since ErrorBoundary must be a class
+// Component fallback đơn giản (phải dùng function vì ErrorBoundary yêu cầu class)
 const SimpleErrorFallback = ({ error, resetError }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full text-center p-6">
         <h1 className="text-3xl font-bold text-red-500 mb-4">
-          Something went wrong
+          Đã xảy ra lỗi
         </h1>
         <p className="text-gray-600 mb-6">
-          An unexpected error occurred. Please refresh the page or try again later.
+          Có lỗi bất ngờ xảy ra. Vui lòng tải lại trang hoặc thử lại sau.
         </p>
         <button 
           onClick={() => window.location.reload()} 
           className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
         >
-          Refresh Page
+          Tải lại trang
         </button>
-        
+
         {import.meta.env.DEV && error && (
           <details className="mt-6 text-left">
             <summary className="cursor-pointer text-gray-700 font-medium">
-              Error Details (Development Only)
+              Chi tiết lỗi (Chỉ hiển thị ở chế độ phát triển)
             </summary>
             <div className="mt-2 p-4 bg-gray-100 rounded text-sm">
-              <p className="font-bold text-red-600">Error:</p>
+              <p className="font-bold text-red-600">Lỗi:</p>
               <pre className="whitespace-pre-wrap">{error.toString()}</pre>
             </div>
           </details>
@@ -34,6 +34,6 @@ const SimpleErrorFallback = ({ error, resetError }) => {
   );
 };
 
-// For compatibility, export both
+// Xuất cho tương thích
 export default SimpleErrorFallback;
 export { SimpleErrorFallback };

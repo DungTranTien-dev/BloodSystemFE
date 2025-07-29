@@ -2,17 +2,17 @@ import React from 'react';
 import { useRouteError, Link } from 'react-router-dom';
 
 /**
- * Error boundary component for React Router
- * Handles routing errors and provides user-friendly error pages
+ * Component hiển thị lỗi cho React Router
+ * Xử lý các lỗi điều hướng và cung cấp giao diện thân thiện với người dùng
  */
 const ErrorPage = () => {
   const error = useRouteError();
-  console.error('Route error:', error);
+  console.error('Lỗi định tuyến:', error);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-        {/* Error Icon */}
+        {/* Biểu tượng lỗi */}
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg
             className="w-8 h-8 text-red-500"
@@ -30,24 +30,24 @@ const ErrorPage = () => {
           </svg>
         </div>
 
-        {/* Error Title */}
+        {/* Tiêu đề lỗi */}
         <h1 className="text-2xl font-bold text-slate-800 mb-4">
-          Oops! Something went wrong
+          Ôi! Có lỗi xảy ra
         </h1>
 
-        {/* Error Message */}
+        {/* Thông báo lỗi */}
         <p className="text-slate-600 mb-6">
           {error?.status === 404 
-            ? "The page you're looking for doesn't exist."
-            : error?.statusText || error?.message || "An unexpected error occurred."
+            ? "Trang bạn đang tìm không tồn tại."
+            : error?.statusText || error?.message || "Đã xảy ra lỗi không xác định."
           }
         </p>
 
-        {/* Error Details (only in development) */}
+        {/* Chi tiết lỗi (chỉ hiển thị ở môi trường phát triển) */}
         {process.env.NODE_ENV === 'development' && error?.stack && (
           <details className="text-left mb-6 p-3 bg-slate-100 rounded-lg">
             <summary className="cursor-pointer text-sm font-medium text-slate-700 mb-2">
-              Error Details (Development)
+              Chi tiết lỗi (chế độ phát triển)
             </summary>
             <pre className="text-xs text-slate-600 overflow-auto max-h-32">
               {error.stack}
@@ -55,27 +55,27 @@ const ErrorPage = () => {
           </details>
         )}
 
-        {/* Action Buttons */}
+        {/* Các nút điều hướng */}
         <div className="space-y-3">
           <Link
             to="/"
             className="block w-full px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
           >
-            Go Home
+            Về trang chủ
           </Link>
           
           <button
             onClick={() => window.history.back()}
             className="block w-full px-6 py-3 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors"
           >
-            Go Back
+            Quay lại
           </button>
         </div>
 
-        {/* Status Code */}
+        {/* Mã trạng thái lỗi */}
         {error?.status && (
           <p className="text-xs text-slate-400 mt-4">
-            Error {error.status}
+            Mã lỗi {error.status}
           </p>
         )}
       </div>

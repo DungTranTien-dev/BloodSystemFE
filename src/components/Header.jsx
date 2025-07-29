@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import {jwtDecode} from "jwt-decode";
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+
 
 
 function getToday() {
@@ -13,6 +16,7 @@ function getToday() {
 
 function Header({ pageTitle = "Dashboard" }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Lấy user từ token trong localStorage
   let user = null;
@@ -35,6 +39,11 @@ if (token) {
     }
   
   }
+const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Đăng xuất thành công!");
+    navigate("/login"); // hoặc "/" nếu bạn muốn quay về home
+  };
 
   return (
     <header className="bg-white shadow-lg border-b border-slate-200 sticky top-0 z-40">
@@ -99,7 +108,7 @@ if (token) {
                   <li>
                     <button
                       className="w-full text-left px-4 py-2 hover:bg-pink-50 text-red-500"
-                      onClick={() => alert("Đăng xuất")}
+                      onClick={handleLogout}
                     >
                       Đăng xuất
                     </button>

@@ -7,6 +7,11 @@ const staffMenus = [
   { label: "Manage Event", href: "/staff/manage-event" },
   { label: "Manage News", href: "/staff/manage-news" },
   { label: "Manage Blood Requests", href: "/staff/manage-blood-requests" },
+  { label: "Manage Medical", href: "/doctor/manage-medical" },
+  { label: "Manage Blood", href: "/doctor/manage-blood" },
+  { label: "Manage Blood đã phân tách", href: "/doctor/manage-separated" },
+  { label: "Manage Blood Registion", href: "/staff/manage-registion" }, // sửa path đúng
+
 ];
 
 // Dữ liệu mẫu
