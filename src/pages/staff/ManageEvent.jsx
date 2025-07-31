@@ -1,24 +1,11 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/SideBar";
 import PopupForm from "../../components/PopupForm"; // Đường dẫn tuỳ dự án
 import Header from "../../components/Header";
 import { getCreatedHospitals, createHospital, updateHospital, deleteHospital } from '../../service/hospitalApi';
 
-const staffMenus = [
-  { label: "Trang Nhân Viên", href: "/staff" },
-{ label: "Quản Lý Sự Kiện", href: "/staff/manage-event" },
-// { label: "Quản Lý Tin Tức", href: "/staff/manage-news" },
-{ label: "Quản Lý Yêu Cầu Máu", href: "/staff/manage-blood-requests" },
-{ label: "Quản Lý Hồ Sơ Y Tế", href: "/doctor/manage-medical" },
-{ label: "Quản Lý Đơn Vị Máu", href: "/doctor/manage-blood" },
-{ label: "Quản Lý Máu Đã Phân Tách", href: "/doctor/manage-separated" },
-{ label: "Quản Lý Đăng Ký Hiến Máu", href: "/staff/manage-registion" },
-{ label: "Trang Chủ", href: "/" },
-
-];
 function ManageEvent() {
-
-const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [eventList, setEventList] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -197,15 +184,7 @@ const [search, setSearch] = useState("");
 
   return (
     <>
-    <Header pageTitle="Quản lý lịch hiến máu" />
     <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-      <Sidebar
-        title="Staff Panel"
-        version="v1.0.0"
-        menus={staffMenus}
-        activeLabel="Manage Event"
-      />
-      <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
       <main className="flex-1 p-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
@@ -330,7 +309,6 @@ const [search, setSearch] = useState("");
           <DetailModal isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} currentEvent={currentEvent} />
         )}
       </main>
-    </div>
     </div>
     </>
   );

@@ -223,7 +223,6 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
             rules={[{ required: true, message: "Nhập địa chỉ!" }]}
           >
             <AutoComplete
-              placeholder="Nhập địa chỉ đầy đủ"
               options={addressOptions}
               onSearch={handleSearchAddress}
               onSelect={handleSelectAddress}
@@ -382,14 +381,7 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
         {/* Nút */}
         <div className="text-center mt-8">
           <Space size="large" direction="vertical" className="w-full">
-            <Button
-              size="large"
-              onClick={() => navigate("/login")}
-              className="!h-12 !px-8 !bg-gradient-to-r !from-blue-500 !to-blue-600 !text-white !font-bold hover:!opacity-90 !border-none !shadow-lg hover:!shadow-xl !transform hover:!scale-105 !transition-all !duration-300"
-              icon={<UserOutlined />}
-            >
-              ← Về Trang Đăng Nhập
-            </Button>
+
 
             <Button
               type="primary"

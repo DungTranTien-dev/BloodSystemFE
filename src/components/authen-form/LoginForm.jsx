@@ -23,34 +23,39 @@ function LoginForm() {
   const dispatch = useDispatch();
 
   const onFinish = async (values) => {
+    console.log('Success:', values);
     try {
       const response = await api.post('Auth/login', values);
-      const result = response.data.result;
-
-      if (!result || !result.accessToken) {
-        toast.error("Không nhận được accessToken");
+      console.log(response);
+      dispatch(login(response.data.result));
+      localStorage.setItem("token", response.data.result.accessToken);
+      const user = response.data.result;
+      const redirectTo = location.state?.redirectTo;
+      if (redirectTo) {
+        navigate(redirectTo);
+        toast.success('Đăng nhập thành công!'); 
         return;
       }
-
-      toast.success("Đăng nhập thành công!");
-      dispatch(login(result));
-      localStorage.setItem("token", result.accessToken);
-
-      // ✅ Giải mã token để lấy role
-      const decoded = jwtDecode(result.accessToken);
-      const role = decoded.Role || decoded.role;
-
-      if (role === 'STAFF') {
-        navigate("/staff");
-      } else if (role === 'USER') {
-        navigate("/");
+      if (user.role === 'ADMIN') {
+        navigate('/Dashboard');
+        toast.success('Đăng nhập thành công!');
+        return;
+      } else if (user.role === 'STAFF') {
+        navigate('/DashboardS');
+        toast.success('Đăng nhập thành công!');
+        return;
+      } else if (user.role === 'CUSTOMER') {
+        navigate('/');
+        toast.success('Đăng nhập thành công!');
+        return;
       } else {
-        navigate("/"); // fallback nếu không xác định được role
+        navigate('/');
+        toast.success('Đăng nhập thành công!');
+        return;
       }
-
     } catch (e) {
-      console.error("Lỗi đăng nhập:", e);
-      toast.error(e?.response?.data?.message || "Đăng nhập thất bại");
+      console.log(e);
+      toast.error(e.response.data);
     }
   };
 

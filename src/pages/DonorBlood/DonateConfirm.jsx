@@ -8,7 +8,7 @@ const { Paragraph } = Typography;
 const DonateConfirm = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const status = queryParams.get("status"); // "success" | "error" | null
+  const status = queryParams.get("status"); 
 
   const isSuccess = status === "success";
 
@@ -30,18 +30,29 @@ const DonateConfirm = () => {
                   ? "Bạn có thể xem trạng thái yêu cầu tại trang “Theo dõi yêu cầu hiến máu”."
                   : "Nếu sự cố tiếp diễn, vui lòng kiểm tra lại thông tin hoặc gọi hotline hỗ trợ."}
               </Paragraph>,
-              isSuccess && (
-                <Link to="/track-donation" key="track">
-                  <Button type="primary" size="large" className="bg-purple-600 hover:bg-purple-700">
-                    Xem trạng thái yêu cầu
+              <div key="actions" className={`flex ${isSuccess ? 'flex-row gap-4 justify-center' : 'flex-col gap-2 items-center'} w-full`}>
+                {isSuccess && (
+                  <Link to="/track-donation">
+                    <Button
+                      type="primary"
+                      size="large"
+                      className="w-48 px-6 py-2.5 rounded-full font-semibold text-white !bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300 border-0"
+                      style={{ minWidth: 180 }}
+                    >
+                      Xem trạng thái yêu cầu
+                    </Button>
+                  </Link>
+                )}
+                <Link to="/">
+                  <Button
+                    size="large"
+                    className="w-48 px-6 py-2.5 rounded-full font-semibold !text-white !bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300 border-0"
+                    style={{ minWidth: 180 }}
+                  >
+                    Trở về Trang chủ
                   </Button>
                 </Link>
-              ),
-              <Link to="/" key="home">
-                <Button size="large" className="mt-2">
-                  Trở về Trang chủ
-                </Button>
-              </Link>,
+              </div>
             ]}
           />
         </Card>

@@ -3,16 +3,11 @@ import { Form, Input, Select, Button } from 'antd';
 
 const { Option } = Select;
 
-// Nhóm máu
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-// Số đơn vị máu
 const unitOptions = [
   '1 Đơn vị (450ml)', '2 Đơn vị (900ml)', '3 Đơn vị (1350ml)',
   '4 Đơn vị (1800ml)', '5+ Đơn vị (Liên hệ chi tiết)'
 ];
-
-// Loại thành phần máu
 const componentTypes = [
   { label: 'Máu toàn phần', value: 'WHOLE_BLOOD' },
   { label: 'Hồng cầu', value: 'RED_BLOOD_CELL' },
@@ -23,7 +18,6 @@ const componentTypes = [
 
 const BloodRequestForm = ({ onSubmit, loading, form }) => {
   useEffect(() => {
-    // ✅ Gán mặc định tên bệnh viện
     form.setFieldsValue({ hospitalName: 'MyHospital' });
   }, [form]);
 
@@ -37,7 +31,6 @@ const BloodRequestForm = ({ onSubmit, loading, form }) => {
         <Input placeholder="Nhập tên bệnh nhân" />
       </Form.Item>
 
-      {/* ✅ Trường tên bệnh viện bị ẩn nhưng vẫn gửi cùng form */}
       <Form.Item name="hospitalName" hidden>
         <Input />
       </Form.Item>
@@ -87,7 +80,12 @@ const BloodRequestForm = ({ onSubmit, loading, form }) => {
       </Form.Item>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit" block loading={loading}>
+        <Button
+          htmlType="submit"
+          block
+          loading={loading}
+          className="!bg-gradient-to-r from-red-500 to-pink-500 !text-white font-semibold rounded-lg shadow hover:from-red-600 hover:to-pink-600 transition"
+        >
           Gửi yêu cầu
         </Button>
       </Form.Item>

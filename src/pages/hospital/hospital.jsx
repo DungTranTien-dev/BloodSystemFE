@@ -11,6 +11,8 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import api from "../../config/axios";
+import Header from "../../components/ui/Header";
+import Footer from "../../components/ui/Footer";
 
 const { RangePicker } = DatePicker;
 
@@ -60,7 +62,7 @@ const EventCard = ({ event, onRegisterEvent }) => {
 
         <div className="flex-1 p-4 pt-0 sm:pt-4 text-center sm:text-left">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">
+            <h3 className="text-xl font-bold text-red-600 hover:underline cursor-pointer">
               {event.title}
             </h3>
           </div>
@@ -96,6 +98,12 @@ const EventCard = ({ event, onRegisterEvent }) => {
           <Button
             type="primary"
             onClick={() => onRegisterEvent(event)}
+            style={{
+              background:
+                "linear-gradient(to right, #ef4444, #db2777)",
+              color: "white",
+              border: "none",
+            }}
             className="w-full font-semibold rounded-lg"
           >
             Đăng ký tham gia
@@ -136,13 +144,21 @@ const Hospitals = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const response = await api.get("Event/range", {
-        params: {
-          start: searchParams.get("startDate"),
-          end: searchParams.get("endDate"),
-        },
-      });
-
+      const startDate = searchParams.get("startDate");
+      const endDate = searchParams.get("endDate");
+  
+      let response;
+  
+      if (startDate && endDate) {
+        // Trường hợp có chọn khoảng thời gian → lấy sự kiện trong khoảng
+        response = await api.get("Event/range", {
+          params: { start: startDate, end: endDate },
+        });
+      } else {
+        // Trường hợp không chọn khoảng thời gian → lấy tất cả
+        response = await api.get("Event/all");
+      }
+  
       if (response.data && response.data.isSuccess) {
         setEvents(response.data.result || []);
         setFilteredEvents(response.data.result || []);
@@ -166,6 +182,7 @@ const Hospitals = () => {
       setLoading(false);
     }
   };
+  
 
   
 
@@ -301,6 +318,8 @@ const handleRegisterEvent = async (event) => {
   };
 
   return (
+    <>
+    <Header/>
     <Layout className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
@@ -332,14 +351,20 @@ const handleRegisterEvent = async (event) => {
                 />
               </div>
               <div className="md:w-auto w-full">
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={handleDateSearch}
-                  className="w-full md:w-auto h-10"
-                >
-                  Tìm kiếm
-                </Button>
+              <Button
+                size="large"
+                icon={<SearchOutlined />}
+                onClick={handleDateSearch}
+                style={{
+                  background:
+                    "linear-gradient(to right, #ef4444, #db2777)",
+                  color: "white",
+                  border: "none",
+                }}
+                className="shadow-md hover:shadow-lg transition-all duration-200 hover:opacity-90"
+              >
+                Tìm kiếm
+              </Button>
               </div>
             </div>
           </Card>
@@ -356,7 +381,7 @@ const handleRegisterEvent = async (event) => {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-600">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-transparent">
             {loading ? "Đang tải..." : `${filteredEvents.length} Kết quả`}
           </h2>
         </div>
@@ -403,6 +428,8 @@ const handleRegisterEvent = async (event) => {
         />
       </div>
     </Layout>
+    <Footer/>
+    </>
   );
 };
 

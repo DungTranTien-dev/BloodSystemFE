@@ -4,19 +4,6 @@ import PopupForm from "../../components/PopupForm";
 import Header from "../../components/Header";
 import api from "../../config/axios";
 
-const doctorMenus = [
-{ label: "Trang Nhân Viên", href: "/staff" },
-{ label: "Quản Lý Sự Kiện", href: "/staff/manage-event" },
-// { label: "Quản Lý Tin Tức", href: "/staff/manage-news" },
-{ label: "Quản Lý Yêu Cầu Máu", href: "/staff/manage-blood-requests" },
-{ label: "Quản Lý Hồ Sơ Y Tế", href: "/doctor/manage-medical" },
-{ label: "Quản Lý Đơn Vị Máu", href: "/doctor/manage-blood" },
-{ label: "Quản Lý Máu Đã Phân Tách", href: "/doctor/manage-separated" },
-{ label: "Quản Lý Đăng Ký Hiến Máu", href: "/staff/manage-registion" },
-{ label: "Trang Chủ", href: "/" },
-
-
-];
 
 function ManageSeparatedBlood() {
   const [search, setSearch] = useState("");
@@ -24,6 +11,11 @@ function ManageSeparatedBlood() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentBlood, setCurrentBlood] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const paginatedList = separatedBlood.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(separatedBlood.length / itemsPerPage);
+  const handlePageChange = (page) => setCurrentPage(page);
 
   // Call API GET when component mounts
   useEffect(() => {
@@ -52,13 +44,19 @@ function ManageSeparatedBlood() {
   const mapComponentType = (type) => {
     switch (type) {
       case 0:
-        return "Plasma";
+      case "0":
+        return "Huyết tương";
       case 1:
-        return "Red Blood Cells";
+      case "1":
+        return "Hồng cầu";
       case 2:
-        return "Platelets";
+      case "2":
+        return "Tiểu cầu";
+      case 3:
+      case "3":
+        return "Bạch cầu";
       default:
-        return "Unknown";
+        return "Không xác định";
     }
   };
 
@@ -167,14 +165,7 @@ function ManageSeparatedBlood() {
 
   return (
     <>
-      <Header pageTitle="Quản lý máu đã phân tách" />
       <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <Sidebar
-          title="Doctor Panel"
-          version="v1.0.0"
-          menus={doctorMenus}
-          activeLabel="Manage Blood đã phân tách"
-        />
         <main className="flex-1 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <div>
@@ -238,13 +229,13 @@ function ManageSeparatedBlood() {
                     </td>
                   </tr>
                 ) : (
-                  filteredList.map((item) => (
+                  paginatedList.map((item) => (
                     <tr key={item.id} className="hover:bg-red-50 transition">
                       <td className="px-6 py-4 font-mono text-slate-700">
                         {item.id}
                       </td>
                       <td className="px-6 py-4">{item.bloodUnitId}</td>
-                      <td className="px-6 py-4">{item.component}</td>
+                      <td className="px-6 py-4">{mapComponentType(item.component)}</td>
                       <td className="px-6 py-4">{item.volume}</td>
                       <td className="px-6 py-4">{item.separatedDate}</td>
                       <td className="px-6 py-4">
@@ -266,7 +257,7 @@ function ManageSeparatedBlood() {
                           Xem chi tiết
                         </button>
                         <button
-                          className="text-pink-600 hover:text-pink-800"
+                          className="text-pink-600 hover:text-pink-800 hover:underline"
                           onClick={() => handleEdit(item)}
                         >
                           Sửa
@@ -277,6 +268,20 @@ function ManageSeparatedBlood() {
                 )}
               </tbody>
             </table>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4 gap-2">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 rounded border text-sm font-medium ${currentPage === i + 1 ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-700 border-gray-300'} hover:bg-red-100 transition`}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Popup Form */}
@@ -296,50 +301,69 @@ function ManageSeparatedBlood() {
 
           {/* Detail Popup */}
           {isDetailOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-lg">
-                <h2 className="text-xl font-bold mb-4 text-red-600">
-                  Chi tiết thành phần máu
-                </h2>
-                <div className="mb-2">
-                  <span className="font-semibold">Mã phân tách:</span>{" "}
-                  {currentBlood.id}
-                </div>
-                <div className="mb-2">
-                  <span className="font-semibold">Mã máu gốc:</span>{" "}
-                  {currentBlood.bloodUnitId}
-                </div>
-                <div className="mb-2">
-                  <span className="font-semibold">Thành phần:</span>{" "}
-                  {currentBlood.component}
-                </div>
-                <div className="mb-2">
-                  <span className="font-semibold">Thể tích:</span>{" "}
-                  {currentBlood.volume} ml
-                </div>
-                <div className="mb-2">
-                  <span className="font-semibold">Ngày tách:</span>{" "}
-                  {currentBlood.separatedDate}
-                </div>
-                <div className="mb-4">
-                  <span className="font-semibold">Trạng thái:</span>{" "}
-                  {currentBlood.status}
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
-                    onClick={() => setIsDetailOpen(false)}
-                  >
-                    Đóng
-                  </button>
-                </div>
-              </div>
-            </div>
+            <DetailModal isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} currentBlood={currentBlood} />
           )}
         </main>
       </div>
     </>
   );
 }
+
+// Popup chi tiết có hiệu ứng blur + scale+fade-in
+const DetailModal = ({ isOpen, onClose, currentBlood }) => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => setShow(true), 10);
+    } else {
+      setShow(false);
+    }
+  }, [isOpen]);
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className="relative flex items-center justify-center min-h-screen w-full">
+        <div className={`bg-white rounded-xl shadow-xl p-8 w-full max-w-lg transition-all duration-300 transform ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
+          <h2 className="text-xl font-bold mb-4 text-red-600">
+            Chi tiết thành phần máu
+          </h2>
+          <div className="mb-2">
+            <span className="font-semibold">Mã phân tách:</span>{" "}
+            {currentBlood.id}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold">Mã máu gốc:</span>{" "}
+            {currentBlood.bloodUnitId}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold">Thành phần:</span>{" "}
+            {currentBlood.component}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold">Thể tích:</span>{" "}
+            {currentBlood.volume} ml
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold">Ngày tách:</span>{" "}
+            {currentBlood.separatedDate}
+          </div>
+          <div className="mb-4">
+            <span className="font-semibold">Trạng thái:</span>{" "}
+            {currentBlood.status}
+          </div>
+          <div className="flex justify-end">
+            <button
+              className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow hover:from-red-600 hover:to-pink-600 transition"
+              onClick={onClose}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default ManageSeparatedBlood;

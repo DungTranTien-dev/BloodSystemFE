@@ -4,6 +4,13 @@ import SimpleErrorFallback from "./components/ui/SimpleErrorFallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DonorBlood from "./pages/DonorBlood/DonorBlood";
 import Hospitals from "./pages/hospital/hospital";
+import QAPage from "./pages/Q&A/Q&A";
+import ManageUserMedical from "./pages/doctor/ManageUserMedical";
+import ManageSeparatedBlood from "./pages/doctor/ManageSeparatedBlood";
+import DashboardS from "./pages/dashboard-staff";
+import DashboardA from "./pages/dashboard-admin/DashboardA";
+import ManageUser from "./pages/dashboard-admin/ManageUser";
+import UpdateProfile from "./pages/profile/updateProfile";
 
 // Lazy load components for code splitting
 const Homepage = React.lazy(() => import("./pages/home/Home"));
@@ -11,6 +18,7 @@ const NewsPage = React.lazy(() => import("./pages/news/News"));
 const NewsDetail = React.lazy(() => import("./pages/news/NewsDetail"));
 const BlogPage = React.lazy(() => import("./pages/blog/Blog"));
 const LoginPage = React.lazy(() => import("./pages/login/login"));
+const Profile = React.lazy(() => import("./pages/profile/profile"));
 const RegisterPage = React.lazy(() => import("./pages/register/register"));
 const AboutUs = React.lazy(() => import("./pages/home/AboutUs"));
 const BloodTypePage = React.lazy(() => import("./pages/blood/blood"));
@@ -162,6 +170,15 @@ function App() {
       errorElement: <SimpleErrorFallback />,
     },
     {
+      path: "/Q&A",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <QAPage />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
       path: "/about-us",
       element: (
         <Suspense fallback={<LoadingSpinner />}>
@@ -196,6 +213,24 @@ function App() {
             <Dashboard />
           </Suspense>
         </ProtectedRoute>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/profile",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <Profile />
+        </Suspense>
+      ),
+      errorElement: <SimpleErrorFallback />,
+    },
+    {
+      path: "/update-profile",
+      element: (
+        <Suspense fallback={<LoadingSpinner />}>
+          <UpdateProfile />
+        </Suspense>
       ),
       errorElement: <SimpleErrorFallback />,
     },
@@ -263,109 +298,143 @@ function App() {
       ),
       errorElement: <SimpleErrorFallback />,
     },
-    //DOCTOR
-    {
-      path: "/doctor",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <DoctorPage />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/doctor/manage-blood",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageBlood />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/doctor/manage-medical",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageMedical />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/doctor/manage-separated",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageSeparated />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    //STAFF
-    {
-      path: "/staff",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <StaffPage />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    
-    {
-      path: "/staff/manage-registion",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageBloodRegistion />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff/manage-event",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageEvent />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-    {
-      path: "/staff/manage-news",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageNews />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
-        {
-      path: "/staff/manage-blood-requests",
-      element: (
-        <Suspense fallback={<LoadingSpinner />}>
-          <ManageBloodRequest />
-        </Suspense>
-      ),
-      errorElement: <SimpleErrorFallback />,
-    },
+    // //DOCTOR
     // {
-    //   path: "/create-sample-data",
+    //   path: "/doctor",
     //   element: (
     //     <Suspense fallback={<LoadingSpinner />}>
-    //       <SampleDataCreator />
+    //       <DoctorPage />
     //     </Suspense>
     //   ),
     //   errorElement: <SimpleErrorFallback />,
     // },
     // {
-    //   path: "/debug",
-    //   element: <DebugRoute />,
+    //   path: "/doctor/manage-blood",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageBlood />
+    //     </Suspense>
+    //   ),
     //   errorElement: <SimpleErrorFallback />,
     // },
     // {
-    //   path: "/test",
-    //   element: <TestRoute />,
+    //   path: "/doctor/manage-medical",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageMedical />
+    //     </Suspense>
+    //   ),
     //   errorElement: <SimpleErrorFallback />,
     // },
+    // {
+    //   path: "/doctor/manage-separated",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageSeparated />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // //STAFF
+    // {
+    //   path: "/staff",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <StaffPage />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    
+    // {
+    //   path: "/staff/manage-registion",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageBloodRegistion />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/staff/manage-event",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageEvent />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    // {
+    //   path: "/staff/manage-news",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageNews />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    //     {
+    //   path: "/staff/manage-blood-requests",
+    //   element: (
+    //     <Suspense fallback={<LoadingSpinner />}>
+    //       <ManageBloodRequest />
+    //     </Suspense>
+    //   ),
+    //   errorElement: <SimpleErrorFallback />,
+    // },
+    {
+      path: "/DashboardS",
+      element: <DashboardS />,
+      children: [
+        {
+          path: "staff",
+          element: <StaffPage />,
+        },
+        {
+          path: "manage-registion",
+          element: <ManageBloodRegistion />,
+        },
+        {
+          path: "manage-blood-requests",
+          element: <ManageBloodRequest />,
+        },
+        {
+          path: "manage-blood",
+          element: <ManageBlood />,
+        },
+        {
+          path: "manage-event",
+          element: <ManageEvent />,
+        },
+        {
+          path: "create-user",
+          element: <div>Tạo user</div>,
+        },
+        {
+          path: "manage-separated",
+          element:
+            <ManageSeparatedBlood />
+        },
+        {
+          path: "medical-request",
+          element: <ManageUserMedical />,
+        },
+      ],
+    },    
+    {
+      path: "/DashboardA",
+      element: <DashboardA />,
+      children: [
+        {
+          path: "staff",
+          element: <StaffPage />,
+        },  
+        {
+          path: "manage-users",
+          element: <ManageUser />,
+        },
+      ],
+    },
     {
       path: "*",
       element: <SimpleErrorFallback />,

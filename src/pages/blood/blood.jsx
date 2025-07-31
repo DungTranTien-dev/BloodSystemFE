@@ -6,8 +6,36 @@ import {
 } from "react-icons/fa";
 import Layout from "../../components/ui/Layout";
 import DonorSearchPopup from "../../components/DonorSearchPopup ";
+import Header from '../../components/ui/Header';
+import Footer from '../../components/ui/Footer';
+import { motion } from 'framer-motion';
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZHVuZ2RldjExMyIsImEiOiJjbWNicWJnd2owYzF2MmtvbHRjbTI3c3Z6In0.GxTBXw4sDwC2RAzMpNPMRA"; // Replace with your real token
+
+// Animation variants giống Home/Blog/Q&A
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  }),
+};
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  }),
+};
 
 const BloodTypePage = () => {
   const [selectedType, setSelectedType] = useState(null);
@@ -23,15 +51,15 @@ const BloodTypePage = () => {
   const [donorCoords, setDonorCoords] = useState(null);
   const [route, setRoute] = useState(null);
 
-const bloodTypes = [
+  const bloodTypes = [
     { type: "A+", description: "Nhóm máu phổ biến thứ hai", percentage: "35.7%", canDonateTo: ["A+", "AB+"], canReceiveFrom: ["A+", "A-", "O+", "O-"] },
-    { type: "A-", description: "Người hiến huyết tương toàn diện", percentage: "6.3%", canDonateTo: ["A+", "A-", "AB+", "AB-"], canReceiveFrom: ["A-", "O-"] },
+    { type: "A-", description: "Người hiến huyết tương phổ quát", percentage: "6.3%", canDonateTo: ["A+", "A-", "AB+", "AB-"], canReceiveFrom: ["A-", "O-"] },
     { type: "B+", description: "Nhóm máu phổ biến thứ ba", percentage: "8.5%", canDonateTo: ["B+", "AB+"], canReceiveFrom: ["B+", "B-", "O+", "O-"] },
     { type: "B-", description: "Nhóm máu hiếm", percentage: "1.5%", canDonateTo: ["B+", "B-", "AB+", "AB-"], canReceiveFrom: ["B-", "O-"] },
-    { type: "AB+", description: "Người nhận toàn diện", percentage: "3.4%", canDonateTo: ["AB+"], canReceiveFrom: ["Tất cả các nhóm"] },
+    { type: "AB+", description: "Người nhận máu phổ quát", percentage: "3.4%", canDonateTo: ["AB+"], canReceiveFrom: ["Tất cả các nhóm"] },
     { type: "AB-", description: "Nhóm máu hiếm nhất", percentage: "0.6%", canDonateTo: ["AB+", "AB-"], canReceiveFrom: ["A-", "B-", "O-", "AB-"] },
     { type: "O+", description: "Nhóm máu phổ biến nhất", percentage: "37.4%", canDonateTo: ["O+", "A+", "B+", "AB+"], canReceiveFrom: ["O+", "O-"] },
-    { type: "O-", description: "Người hiến toàn diện", percentage: "6.6%", canDonateTo: ["Tất cả các nhóm"], canReceiveFrom: ["O-"] }
+    { type: "O-", description: "Người hiến máu phổ quát", percentage: "6.6%", canDonateTo: ["Tất cả các nhóm"], canReceiveFrom: ["O-"] }
   ];
 
   const componentCompatibility = {
@@ -68,10 +96,10 @@ const bloodTypes = [
   };
 
   const facts = [
-    "Someone needs blood every two seconds",
-    "One donation can save up to three lives",
-    "Less than 38% of the population is eligible to donate blood",
-    "Blood cannot be manufactured – it can only come from donors"
+    "Cứ mỗi 2 giây lại có một người cần truyền máu",
+    "Một lần hiến máu có thể cứu tới 3 người",
+    "Chỉ dưới 38% dân số đủ điều kiện hiến máu",
+    "Máu không thể sản xuất nhân tạo – chỉ có thể đến từ người hiến"
   ];
 
   const sampleDonors = [
@@ -116,13 +144,25 @@ const bloodTypes = [
               className={`px-4 py-2 rounded-lg ${componentMode === mode ? "bg-red-600 text-white" : "bg-gray-200 text-gray-700"}`}
               onClick={() => setComponentMode(mode)}
             >
-              {{ whole: "Truyền toàn phần", red: "Hồng cầu", plasma: "Huyết tương", platelet: "Tiểu cầu" }[mode] }
+              {{
+                whole: "Truyền toàn phần",
+                red: "Hồng cầu",
+                plasma: "Huyết tương",
+                platelet: "Tiểu cầu"
+              }[mode]}
             </button>
           ))}
         </div>
+
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Tương thích nhóm {selectedType.type} ({ { whole: "Truyền toàn phần", red: "Hồng cầu", plasma: "Huyết tương", platelet: "Tiểu cầu" }[componentMode] })
+          {selectedType.type} Compatibility ({{
+            "whole": "Truyền toàn phần",
+            "red": "Hồng cầu",
+            "plasma": "Huyết tương",
+            "platelet": "Tiểu cầu"
+          }[componentMode]})
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Có thể hiến cho:</h3>
@@ -168,15 +208,38 @@ const bloodTypes = [
   };
 
   return (
-    <Layout className="bg-gradient-to-r from-red-500 to-pink-600">
-      <div className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">Tìm hiểu về nhóm máu</h1>
-            <p className="text-xl text-white opacity-90">Khám phá các nhóm máu và khả năng tương thích của chúng</p>
+    <>
+      <Header />
+      <div className="min-h-screen bg-white relative overflow-hidden">
+        {/* Hero Section với hiệu ứng xuất hiện */}
+        <motion.section
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="bg-gradient-to-r from-red-700 to-pink-600 text-white py-14.5 text-center"
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+            className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2"
+          >
+            Nhóm máu & Tương thích
+          </motion.h1>
+        </motion.section>
+        {/* Nội dung chính của trang */}
+        <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="relative z-10 py-8 px-2 sm:px-4 lg:px-8 max-w-5xl mx-auto"
+        >
+          <div className="text-center mb-8">
+            {/* Đã chuyển phần title ra ngoài, không cần lặp lại ở đây */}
           </div>
 
-          <div className="mb-8 flex flex-col md:flex-row gap-4">
+          <div className="mb-6 flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -193,75 +256,56 @@ const bloodTypes = [
               onChange={(e) => setFilterType(e.target.value)}
             >
               <option value="all">Tất cả</option>
-              <option value="+">Nhóm dương</option>
-              <option value="-">Nhóm âm</option>
+              <option value="+">Nhóm máu dương (+)</option>
+              <option value="-">Nhóm máu âm (-)</option>
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {filteredBloodTypes.map((blood) => (
-              <div
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {filteredBloodTypes.map((blood, idx) => (
+              <motion.div
                 key={blood.type}
-                className="bg-white rounded-lg p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
+                custom={idx}
+                variants={fadeInUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                className="bg-white rounded-xl p-6 shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer border"
                 onClick={() => setSelectedType(blood)}
               >
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-3xl font-bold text-red-600">{blood.type}</span>
                   <FaTint className="text-2xl text-red-600" />
                 </div>
-                <p className="text-gray-600 mb-2">{blood.description}</p>
+                <p className="text-gray-600 mb-3">{blood.description}</p>
                 <div className="bg-gray-100 rounded-full h-2 mb-2">
                   <div className="bg-red-600 rounded-full h-2" style={{ width: blood.percentage }}></div>
                 </div>
                 <p className="text-sm text-gray-500">{blood.percentage} dân số</p>
-              </div>
+              </motion.div>
             ))}
           </div>
 
           {selectedType && renderCompatibility()}
+        </motion.div>
 
-          <div className="bg-white rounded-lg p-6 mb-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Thông tin nhanh về hiến máu</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {facts.map((fact, index) => (
-                <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <FaInfoCircle className="text-red-600 text-xl flex-shrink-0 mt-1" />
-                  <p className="text-gray-700">{fact}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <button
-              className="bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center mx-auto"
-              onClick={() => setIsDonorPopupOpen(true)}
-            >
-              <FaUser className="mr-2" />
-              Tìm người hiến gần bạn
-            </button>
-          </div>
-        </div>
+        <DonorSearchPopup
+          isOpen={isDonorPopupOpen}
+          onClose={() => setIsDonorPopupOpen(false)}
+          selectedBloodType={selectedBloodType}
+          setSelectedBloodType={setSelectedBloodType}
+          setDonors={setDonors}
+          donors={donors}
+          selectedDonor={selectedDonor}
+          userLocation={userLocation}
+          setUserLocation={setUserLocation}
+          donorCoords={donorCoords}
+          route={route}
+          MAPBOX_TOKEN={MAPBOX_TOKEN}
+        />
       </div>
-
-      <DonorSearchPopup
-        isOpen={isDonorPopupOpen}
-        onClose={() => setIsDonorPopupOpen(false)}
-        selectedBloodType={selectedBloodType}
-        setSelectedBloodType={setSelectedBloodType}
-        setDonors={setDonors}
-        handleSearchDonors={handleSearchDonors}
-        donors={donors}
-        selectedDonor={selectedDonor}
-        handleContactDonor={handleContactDonor}
-        userLocation={userLocation}
-        setUserLocation={setUserLocation}
-        donorCoords={donorCoords}
-        route={route}
-        setRoute={setRoute}
-        MAPBOX_TOKEN={MAPBOX_TOKEN}
-      />
-    </Layout>
+      <Footer />
+    </>
   );
 };
 

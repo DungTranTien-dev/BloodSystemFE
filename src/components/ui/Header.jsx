@@ -1,67 +1,77 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaHeartbeat } from 'react-icons/fa';
-import { Dropdown, Menu, Avatar } from 'antd';
-import { UserOutlined, LogoutOutlined, ProfileOutlined } from '@ant-design/icons';
-import { toast } from 'react-toastify';
-import { jwtDecode } from "jwt-decode";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { FaHeartbeat } from "react-icons/fa";
+import { Dropdown, Menu, Avatar, Space } from "antd";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
+} from "@ant-design/icons";
+import { logout } from "../../redux/features/userSlice";
+import { toast } from "react-toastify";
+import navigation from "./Navigation";
 
-// Component điều hướng
+// Component NavLink không thay đổi
 const NavLink = ({ children, onClick }) => (
   <li
-    className="font-medium text-slate-700 hover:text-red-600 transition-colors duration-300 cursor-pointer"
+    className="group relative font-medium text-slate-700 hover:text-red-600 transition-colors duration-300 cursor-pointer px-1"
     onClick={onClick}
   >
-    {children}
+    <span className="transition-colors duration-300 group-hover:font-bold">
+      {children}
+    </span>
+    <span
+      className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-full transition-all duration-300 group-hover:w-full"
+    />
   </li>
 );
 
 function Header() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({
-          userId: decoded.UserId,
-          email: decoded.Email,
-          userName: decoded.UserName,
-          avatarUrl: decoded.AvatarUrl || null,
-          role: decoded.Role,
-        });
-      } catch (err) {
-        console.error("Token không hợp lệ:", err);
-        setUser(null);
-      }
-    }
-  }, []);
+  // Lấy thông tin user từ Redux store
+  const user = useSelector((state) => state.user);
+  const role = user?.role || "user";
+  let navItems = navigation[role] || navigation["user"];
 
+  if (!user && role === "user") {
+    navItems = navItems.filter(
+      (item) =>
+        item.label !== "Lịch sử đặt hẹn" &&
+        item.label !== "Sự kiện"
+    );
+  }
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(logout());
     toast.success("Đăng xuất thành công!");
-    setUser(null);
     navigate("/");
   };
 
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="profile" icon={<ProfileOutlined />} onClick={() => navigate('/profile')}>
-        Trang cá nhân
-      </Menu.Item>
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
-  );
+  // Menu cho Dropdown khi người dùng đã đăng nhập
+  const userMenu = {
+    items: [
+      {
+        key: "profile",
+        icon: <ProfileOutlined />,
+        label: "Trang cá nhân",
+        onClick: () => navigate("/profile"),
+      },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "Đăng xuất",
+        onClick: handleLogout,
+      },
+    ],
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+      <div className="w-full px-6">
+        <div className="flex items-center justify-between h-18">
+          {/* Logo Section (Giữ nguyên) */}
           <div
             className="flex items-center cursor-pointer"
             onClick={() => navigate("/")}
@@ -72,47 +82,73 @@ function Header() {
             </span>
           </div>
 
-          {/* Menu điều hướng */}
+          {/* Desktop Navigation (Giữ nguyên) */}
           <nav className="hidden md:flex">
-            <ul className="flex items-center space-x-8 bold">
-              <NavLink onClick={() => navigate("/")}>Trang chủ</NavLink>
-              <NavLink onClick={() => navigate("/track-donation")}>Lịch sử hiến máu</NavLink>
-              <NavLink onClick={() => navigate("/bloodtype")}>Nhóm máu</NavLink>
-              {/* <NavLink onClick={() => navigate("/blood-request")}>Yêu cầu máu</NavLink> */}
-              {user?.role === "STAFF" && (
-                <NavLink onClick={() => navigate("/staff")}>Quản lý</NavLink>
-              )}
+            <ul className="flex items-center space-x-15 bold">
+              {navItems.map((item) => (
+                <NavLink key={item.path} onClick={() => navigate(item.path)}>
+                  {item.label}
+                </NavLink>
+              ))}
             </ul>
           </nav>
 
-          {/* Khu vực đăng nhập/đăng xuất */}
+          {/* === PHẦN ĐÃ ĐƯỢC THAY ĐỔI ĐỂ TRỞ NÊN ĐA NĂNG === */}
           <div className="flex items-center">
             {user ? (
-              <Dropdown overlay={userMenu} placement="bottomRight" arrow>
-                <div className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Avatar icon={<UserOutlined />} src={user.avatarUrl} />
-                  <span className="font-semibold text-slate-700 hidden sm:block">
-                    {user.userName || "Tài khoản"}
-                  </span>
-                </div>
-              </Dropdown>
+              // Giao diện khi ĐÃ ĐĂNG NHẬP
+              <Dropdown menu={userMenu} placement="bottomRight" arrow>
+  <div className="flex items-center space-x-3 cursor-pointer p-2 rounded-lg hover:bg-red-50 transition-all duration-300">
+    {/* Avatar bo tròn, border sáng và icon nền gradient */}
+    <div className="relative group">
+      <Avatar
+        size={48}
+        style={{
+          background: 'linear-gradient(135deg, #ef4444, #f43f5e)',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '1.4rem',
+          border: '2px solid #fef2f2',
+          boxShadow: '0 4px 10px rgba(239,68,68,0.3)',
+        }}
+      >
+        {user?.userName
+          ? user.userName.charAt(0).toUpperCase()
+          : <UserOutlined />}
+      </Avatar>
+
+      {/* Tooltip hiển thị tên user khi hover Avatar */}
+      <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded-lg px-2 py-1 opacity-0 group-hover:opacity-100 transition-all">
+        {user?.userMedical?.fullName || user?.userName || "Tài khoản"}
+      </span>
+    </div>
+
+    {/* Xin chào, tên */}
+    <span className="font-semibold text-slate-700 hidden sm:block ml-1 hover:text-red-600 transition-colors">
+      {`Xin chào, ${user?.userMedical?.fullName || user?.userName || "Tài khoản"}`}
+    </span>
+  </div>
+</Dropdown>
+
             ) : (
+              // Giao diện khi CHƯA ĐĂNG NHẬP (Giữ nguyên code cũ của bạn)
               <div className="flex items-center space-x-3">
                 <button
                   className="px-6 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/login")}
                 >
-                  Đăng nhập
+                  Login
                 </button>
                 <button
                   className="px-3.5 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/register")}
                 >
-                  Đăng ký
+                  Register
                 </button>
               </div>
             )}
           </div>
+          {/* === KẾT THÚC PHẦN THAY ĐỔI === */}
         </div>
       </div>
     </header>
