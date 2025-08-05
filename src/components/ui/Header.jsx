@@ -78,7 +78,7 @@ function Header() {
           >
             <FaHeartbeat className="h-8 w-8 text-red-600" />
             <span className="ml-3 text-2xl font-bold text-slate-800">
-              Life<span className="text-pink-600">Stream</span>
+            TráiTim<span className="text-pink-600">Đỏ</span>
             </span>
           </div>
 
@@ -137,13 +137,13 @@ function Header() {
                   className="px-6 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/login")}
                 >
-                  Login
+                  Đăng nhập
                 </button>
                 <button
                   className="px-3.5 py-2.5 rounded-full font-semibold text-white bg-gradient-to-r from-red-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/40 transform hover:-translate-y-0.5 transition-all duration-300"
                   onClick={() => navigate("/register")}
                 >
-                  Register
+                  Đăng ký
                 </button>
               </div>
             )}

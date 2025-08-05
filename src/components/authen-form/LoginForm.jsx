@@ -37,7 +37,7 @@ function LoginForm() {
         return;
       }
       if (user.role === 'ADMIN') {
-        navigate('/Dashboard');
+        navigate('/DashboardA');
         toast.success('Đăng nhập thành công!');
         return;
       } else if (user.role === 'STAFF') {
@@ -48,14 +48,10 @@ function LoginForm() {
         navigate('/');
         toast.success('Đăng nhập thành công!');
         return;
-      } else {
-        navigate('/');
-        toast.success('Đăng nhập thành công!');
-        return;
       }
     } catch (e) {
       console.log(e);
-      toast.error(e.response.data);
+      toast.error('Đăng nhập thất bại!');
     }
   };
 

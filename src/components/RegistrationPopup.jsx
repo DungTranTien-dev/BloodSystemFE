@@ -277,45 +277,45 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-                        {hasDonatedBefore === true && (
-  <Col xs={24} md={12}>
-    <Form.Item
-      name="lastDonorDate"
-      label="Ngày hiến máu gần nhất"
-      rules={[{ required: true, message: "Chọn ngày!" }]}
-    >
-      <DatePicker
-        format="DD/MM/YYYY"
-        style={{ width: "100%" }}
-        placeholder="Chọn ngày"
-      />
-    </Form.Item>
-  </Col>
-)}
+            {hasDonatedBefore === true && (
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="lastDonorDate"
+                  label="Ngày hiến máu gần nhất"
+                  rules={[{ required: true, message: "Chọn ngày!" }]}
+                >
+                  <DatePicker
+                    format="DD/MM/YYYY"
+                    style={{ width: "100%" }}
+                    placeholder="Chọn ngày"
+                  />
+                </Form.Item>
+              </Col>
+            )}
           </Row>
 
-<Col xs={24} md={12}>
-  <Form.Item
-    name="donationCount"
-    label="Số lần hiến máu"
-    rules={[
-      ({ getFieldValue }) => ({
-        validator(_, value) {
-          if (getFieldValue("hasDonatedBefore") === true) {
-            return value > 0
-              ? Promise.resolve()
-              : Promise.reject("Phải lớn hơn 0 nếu đã từng hiến");
-          }
-          return Promise.resolve();
-        },
-      }),
-    ]}
-    initialValue={0}
-    getValueFromEvent={(e) => Number(e.target.value)}
-  >
-    <Input type="number" min={0} placeholder="Nhập số lần đã hiến máu" />
-  </Form.Item>
-</Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="donationCount"
+              label="Số lần hiến máu"
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (getFieldValue("hasDonatedBefore") === true) {
+                      return value > 0
+                        ? Promise.resolve()
+                        : Promise.reject("Phải lớn hơn 0 nếu đã từng hiến");
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+              initialValue={0}
+              getValueFromEvent={(e) => Number(e.target.value)}
+            >
+              <Input type="number" min={0} placeholder="Nhập số lần đã hiến máu" />
+            </Form.Item>
+          </Col>
 
 
 
@@ -360,14 +360,30 @@ const RegistrationPopup = ({ visible, onClose, onFinish, form, navigate }) => {
 
           <Form.Item
             name="diseaseDescription"
-            label="Mô tả bệnh lý khác (nếu có)"
+            label="Mô tả bệnh lý khác"
+            rules={[
+              { required: true, message: "Vui lòng nhập mô tả bệnh lý khác!" },
+              {
+                min: 5,
+                message: "Mô tả phải có ít nhất 5 ký tự!",
+              },
+              {
+                validator: (_, value) => {
+                  if (value && value.trim().length < 5) {
+                    return Promise.reject("Không được chỉ nhập khoảng trắng hoặc dưới 5 ký tự!");
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
           >
             <Input.TextArea
-              placeholder="Mô tả chi tiết các bệnh lý khác..."
+              placeholder="Nhập ít nhất 5 ký tự mô tả..."
               rows={3}
               style={{ background: "#f9fafb", borderRadius: 8 }}
             />
           </Form.Item>
+
         </div>
 
         {/* Hidden tọa độ */}

@@ -44,17 +44,15 @@ function ManageSeparatedBlood() {
   const mapComponentType = (type) => {
     switch (type) {
       case 0:
-      case "0":
-        return "Huyết tương";
       case 1:
       case "1":
         return "Hồng cầu";
       case 2:
       case "2":
-        return "Tiểu cầu";
+        return "Huyết Tương";
       case 3:
       case "3":
-        return "Bạch cầu";
+        return "Tiểu cầu";
       default:
         return "Không xác định";
     }

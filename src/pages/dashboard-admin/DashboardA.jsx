@@ -72,7 +72,7 @@ const DashboardA = () => {
               <Heart className="h-6 w-6 text-white" />
             </div>
             {!collapsed && (
-              <h1 className="text-xl font-bold text-white">Admin</h1>
+              <h1 className="text-xl font-bold text-white">Trái Tim Đỏ</h1>
             )}
           </div>
           <button

@@ -155,7 +155,7 @@ const DashboardS = () => {
               <Heart className="h-6 w-6 text-white" />
             </div>
             {!collapsed && (
-              <h1 className="text-xl font-bold text-white">Hiến máu</h1>
+              <h1 className="text-xl font-bold text-white">Trái Tim Đỏ</h1>
             )}
           </div>
           <button
@@ -193,18 +193,7 @@ const DashboardS = () => {
             {/* Dropdown Menu */}
             {showDropdown && !collapsed && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-50 rounded-t-lg"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Hồ sơ
-                </button>
-                <button className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-50">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Cài đặt
-                </button>
-                <hr className="my-1" />
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-50 text-red-600 rounded-b-lg"

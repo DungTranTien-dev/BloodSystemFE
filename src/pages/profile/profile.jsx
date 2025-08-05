@@ -16,7 +16,7 @@ import { getUserBloodDonationHistory } from '../../service/bloodRegistrationApi'
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { user } = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
   const medical = user?.userMedical || {};
 
   const fullName = medical.fullName || user?.userName || 'Chưa cập nhật';
