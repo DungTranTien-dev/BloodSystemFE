@@ -22,6 +22,7 @@ import dayjs from "dayjs";
 import api from "../../config/axios";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
+import { toast } from "react-toastify";
 
 const { RangePicker } = DatePicker;
 
@@ -200,11 +201,11 @@ const Hospitals = () => {
       if (res.data?.isSuccess) {
         const registerRes = await api.post(`BloodRegistrations/${event.donationEventId}`);
         if (registerRes.data?.isSuccess) {
-          window.toast?.success("Đăng ký thành công!");
           navigate("/donation-confirmation?status=success");
+          toast.success("Đăng ký thành công!");
         } else {
-          window.toast?.error(registerRes.data?.message || "Đăng ký thất bại!");
           navigate("/donation-confirmation?status=error");
+          toast.error(registerRes.data?.message || "Đăng ký thất bại!");
         }
       } else {
         setSelectedEvent(event);

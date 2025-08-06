@@ -64,13 +64,13 @@ const RegistrationPopup = () => {
       >
         <Form.Item
           name="username"
-          label="Tên đăng nhập"
+          label="Họ và tên"
           rules={[
-            { required: true, message: "Vui lòng nhập tên đăng nhập!" },
-            { min: 3, message: "Tên đăng nhập phải có ít nhất 3 ký tự" },
+            { required: true, message: "Vui lòng nhập họ và tên!" },
+            { min: 3, message: "Họ và tên phải có ít nhất 3 ký tự" },
           ]}
         >
-          <Input prefix={<UserOutlined />} placeholder="Tên đăng nhập" />
+          <Input prefix={<UserOutlined />} placeholder="Họ và tên" />
         </Form.Item>
 
         <Form.Item

@@ -6,6 +6,7 @@ import api from "../../config/axios";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
 import { login } from "../../redux/features/userSlice";
+import { toast } from "react-toastify";
 
 const genderOptions = [
   { value: 0, label: "Nam" },
@@ -94,6 +95,18 @@ function UpdateProfile() {
     e.preventDefault();
     setLoading(true);
 
+    if (
+      !form.fullName?.trim() ||
+      !form.email?.trim() ||
+      !form.phoneNumber?.trim() ||
+      !form.citizenId?.trim() ||
+      !form.currentAddress?.trim() ||
+      !form.bloodName?.trim() ||
+      !form.diseaseDescription?.trim()
+    ) {
+      toast.error("Vui lòng điền đầy đủ tất cả các trường bắt buộc.");
+      // setLoading(false); 
+    }
     const genderMapToString = { 0: "MALE", 1: "FEMALE", 2: "OTHER" };
     let result = null;
     const dateOfBirthISO = form.dateOfBirth ? new Date(form.dateOfBirth).toISOString() : null;
