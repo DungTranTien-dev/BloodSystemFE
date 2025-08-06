@@ -3,7 +3,6 @@ import Header from "../../components/Header";
 import Sidebar from "../../components/SideBar";
 import PopupForm from "../../components/PopupForm";
 import api from "../../config/axios";
-import CreateSeparatedBloodComponentPopup from "../../components/CreateSeparatedBloodComponentPopup";
 
 const doctorMenus = [
   { label: "Trang Nhân Viên", href: "/staff" },
@@ -22,8 +21,6 @@ function ManageBlood() {
   const [userMedicals, setUserMedicals] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentBloodUnit, setCurrentBloodUnit] = useState(null);
-  const [isSeparatePopupOpen, setIsSeparatePopupOpen] = useState(false);
-  const [separatingBloodId, setSeparatingBloodId] = useState(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,21 +34,6 @@ function ManageBlood() {
     currentPage * itemsPerPage
   );
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-
-  const BloodComponentType = {
-    WHOLE_BLOOD: 0,
-    RED_BLOOD_CELL: 1,
-    PLASMA: 2,
-    PLATELET: 3,
-    IN_PROGRESS: 4,
-  };
-
-  const BloodSeparationStatus = {
-    UNPROCESSED: 0,
-    PROCESSING: 1,
-    PROCESSED: 2,
-    ERROR: 3,
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,37 +49,23 @@ function ManageBlood() {
     fetchData();
   }, []);
 
-  const openSeparatePopup = (bloodId) => {
-    setSeparatingBloodId(bloodId);
-    setIsSeparatePopupOpen(true);
-  };
+  const handleAutoSeparate = async (bloodId) => {
+    const confirmed = window.confirm("Bạn có chắc chắn muốn tách máu không?");
+    if (!confirmed) return;
 
-  const submitSeparatedComponents = async ({ bloodId, components }) => {
     try {
-      for (const comp of components) {
-        await api.post("SeparatedBloodComponent/create", {
-          bloodId,
-          componentType: BloodComponentType[comp.componentType],
-          volumeInML: comp.volumeInML,
-          expiryDate: comp.expiryDate || null,
-        });
-      }
+      const res = await api.post(`/SeparatedBloodComponent/autoseparateall/${bloodId}`);
+      const { message } = res.data;
 
-      await api.post(
-        `Blood/change-status?id=${bloodId}&status=${BloodSeparationStatus.PROCESSED}`
-      );
+      alert(message);
 
       setBloodUnits((prev) =>
         prev.map((item) =>
           item.bloodId === bloodId ? { ...item, status: "PROCESSED" } : item
         )
       );
-
-      alert("Tách máu thành công!");
-      setIsSeparatePopupOpen(false);
-      setSeparatingBloodId(null);
     } catch (error) {
-      alert("Lỗi khi tách thành phần máu");
+      alert("❌ Tách máu tự động thất bại");
       console.error(error);
     }
   };
@@ -114,7 +82,6 @@ function ManageBlood() {
       bloodName: item.bloodName,
       volume: item.volumeInML,
       collectedDate: item.collectedDate?.split("T")[0] || "",
-      expiryDate: item.expiryDate?.split("T")[0] || "",
     };
     setCurrentBloodUnit(editableData);
     setIsPopupOpen(true);
@@ -126,7 +93,6 @@ function ManageBlood() {
         bloodName: formData.bloodName,
         volumeInML: Number(formData.volume),
         collectedDate: formData.collectedDate,
-        expiryDate: formData.expiryDate || null,
         userMedicalId: formData.userMedicalId,
       };
 
@@ -136,7 +102,6 @@ function ManageBlood() {
         await api.post(`/Blood/create`, dto);
       }
 
-      // Refresh lại danh sách
       const res = await api.get("Blood");
       setBloodUnits(res.data.result);
       return true;
@@ -153,7 +118,7 @@ function ManageBlood() {
       type: "select",
       options: userMedicals.map((u) => ({
         value: u.userMedicalId,
-        label: `${u.fullName} - ${u.email} (${u.bloodName})`,
+        label: `${u.fullName} - ${u.email} `,
       })),
       required: true,
     },
@@ -187,194 +152,167 @@ function ManageBlood() {
       type: "date",
       required: true,
     },
-    {
-      name: "expiryDate",
-      label: "Ngày hết hạn",
-      type: "date",
-      required: false,
-    },
   ];
 
   return (
-    <>
-      <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-
-        <main className="flex-1 p-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-red-600 mb-1">
-                Đơn vị máu
-              </h1>
-              <p className="text-slate-600">
-                Kiểm tra, tìm kiếm và tách các đơn vị máu.
-              </p>
-            </div>
-            <button
-              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-red-600 hover:to-pink-600 transition"
-              onClick={handleCreate}
-            >
-              + Thêm đơn vị máu
-            </button>
+    <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
+      <main className="flex-1 p-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-red-600 mb-1">
+              Đơn vị máu
+            </h1>
+            <p className="text-slate-600">
+              Kiểm tra, tìm kiếm và tách các đơn vị máu.
+            </p>
           </div>
+          <button
+            className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-red-600 hover:to-pink-600 transition"
+            onClick={handleCreate}
+          >
+            + Thêm đơn vị máu
+          </button>
+        </div>
 
-          {/* Search box */}
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Tìm theo người hiến hoặc nhóm máu..."
-              className="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Tìm theo người hiến hoặc nhóm máu..."
+            className="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto bg-white rounded-xl shadow">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-gradient-to-r from-red-200 to-pink-100">
+        <div className="overflow-x-auto bg-white rounded-xl shadow">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-gradient-to-r from-red-200 to-pink-100">
+              <tr>
+                {[
+                  "Mã đơn vị",
+                  "Người hiến",
+                  "Nhóm máu",
+                  "Thể tích (ml)",
+                  "Ngày hiến",
+                  "Ngày hết hạn",
+                  "Trạng thái",
+                  "Hành động",
+                ].map((title) => (
+                  <th
+                    key={title}
+                    className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase"
+                  >
+                    {title}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedList.length === 0 ? (
                 <tr>
-                  {[
-                    "Mã đơn vị",
-                    "Người hiến",
-                    "Nhóm máu",
-                    "Thể tích (ml)",
-                    "Ngày hiến",
-                    "Ngày hết hạn",
-                    "Trạng thái",
-                    "Hành động",
-                  ].map((title) => (
-                    <th
-                      key={title}
-                      className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase"
-                    >
-                      {title}
-                    </th>
-                  ))}
+                  <td colSpan={8} className="text-center py-8 text-slate-400">
+                    Không tìm thấy đơn vị máu phù hợp.
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {paginatedList.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="text-center py-8 text-slate-400"
-                    >
-                      Không tìm thấy đơn vị máu phù hợp.
+              ) : (
+                paginatedList.map((item) => (
+                  <tr key={item.bloodId} className="hover:bg-red-50 transition">
+                    <td className="px-6 py-4 font-mono text-slate-700">
+                      {item.code}
+                    </td>
+                    <td className="px-6 py-4">{item.userName || "Ẩn danh"}</td>
+                    <td className="px-6 py-4">{item.bloodName}</td>
+                    <td className="px-6 py-4">{item.volumeInML || "Chưa hiến máu"}</td>
+                    <td className="px-6 py-4">
+                      {item.collectedDate
+                        ? new Date(item.collectedDate).toLocaleDateString("vi-VN")
+                        : "-"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.expiryDate
+                        ? new Date(item.expiryDate).toLocaleDateString("vi-VN")
+                        : "-"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          item.status === "PROCESSED"
+                            ? "bg-green-100 text-green-700"
+                            : item.status === "PROCESSING"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : item.status === "ERROR"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-pink-100 text-pink-700"
+                        }`}
+                      >
+                        {{
+                          UNPROCESSED: "Chưa tách",
+                          PROCESSING: "Đang xử lý",
+                          PROCESSED: "Đã tách",
+                          ERROR: "Lỗi",
+                        }[item.status] || "Không xác định"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 flex gap-2">
+                      <button
+                        className="text-pink-600 hover:text-pink-800 hover:underline"
+                        onClick={() => handleEdit(item)}
+                      >
+                        Sửa
+                      </button>
+                      {item.status === "UNPROCESSED" ? (
+                        <button
+                          className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-1 rounded-lg font-semibold shadow hover:from-pink-500 hover:to-red-500 transition"
+                          onClick={() => handleAutoSeparate(item.bloodId)}
+                        >
+                          Tách máu
+                        </button>
+                      ) : item.status === "PROCESSING" ? (
+                        <span className="text-yellow-500 italic">
+                          Đang xử lý...
+                        </span>
+                      ) : item.status === "PROCESSED" ? (
+                        <span className="text-slate-400 italic">Đã tách</span>
+                      ) : (
+                        <span className="text-red-500 italic">Lỗi khi tách</span>
+                      )}
                     </td>
                   </tr>
-                ) : (
-                  paginatedList.map((item) => (
-                    <tr key={item.bloodId} className="hover:bg-red-50 transition">
-                      <td className="px-6 py-4 font-mono text-slate-700">
-                        {item.code}
-                      </td>
-                      <td className="px-6 py-4">{item.userName || "Ẩn danh"}</td>
-                      <td className="px-6 py-4">{item.bloodName}</td>
-                      <td className="px-6 py-4">{item.volumeInML || "Chưa hiến máu"}</td>
-                      <td className="px-6 py-4">
-                        {item.collectedDate
-                          ? new Date(item.collectedDate).toLocaleDateString("vi-VN")
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4">
-                        {item.expiryDate
-                          ? new Date(item.expiryDate).toLocaleDateString("vi-VN")
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            item.status === "PROCESSED"
-                              ? "bg-green-100 text-green-700"
-                              : item.status === "PROCESSING"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : item.status === "ERROR"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-pink-100 text-pink-700"
-                          }`}
-                        >
-                          {{
-                            UNPROCESSED: "Chưa tách",
-                            PROCESSING: "Đang xử lý",
-                            PROCESSED: "Đã tách",
-                            ERROR: "Lỗi",
-                          }[item.status] || "Không xác định"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 flex gap-2">
-                        <button
-                          className="text-pink-600 hover:text-pink-800 hover:underline"
-                          onClick={() => handleEdit(item)}
-                        >
-                          Sửa
-                        </button>
-                        {item.status === "UNPROCESSED" ? (
-                          <button
-                            className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-1 rounded-lg font-semibold shadow hover:from-pink-500 hover:to-red-500 transition"
-                            onClick={() => openSeparatePopup(item.bloodId)}
-                          >
-                            Tách máu
-                          </button>
-                        ) : item.status === "PROCESSING" ? (
-                          <span className="text-yellow-500 italic">
-                            Đang xử lý...
-                          </span>
-                        ) : item.status === "PROCESSED" ? (
-                          <span className="text-slate-400 italic">Đã tách</span>
-                        ) : (
-                          <span className="text-red-500 italic">Lỗi khi tách</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                ))
+              )}
+            </tbody>
+          </table>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-4 gap-2">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    className={`px-3 py-1 rounded border text-sm font-medium ${
-                      currentPage === i + 1
-                        ? "bg-red-500 text-white border-red-500"
-                        : "bg-white text-gray-700 border-gray-300"
-                    } hover:bg-red-100 transition`}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`px-3 py-1 rounded border text-sm font-medium ${
+                    currentPage === i + 1
+                      ? "bg-red-500 text-white border-red-500"
+                      : "bg-white text-gray-700 border-gray-300"
+                  } hover:bg-red-100 transition`}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-          {/* Popup thêm/sửa đơn vị máu */}
-          <PopupForm
-            isOpen={isPopupOpen}
-            onClose={() => setIsPopupOpen(false)}
-            onSubmit={handleSubmitBloodUnit}
-            initialData={currentBloodUnit}
-            fieldsConfig={bloodFieldsConfig}
-            title={
-              currentBloodUnit ? "Chỉnh sửa đơn vị máu" : "Thêm đơn vị máu mới"
-            }
-            submitText={currentBloodUnit ? "Cập nhật" : "Tạo mới"}
-          />
-
-          {/* Popup tách máu */}
-          <CreateSeparatedBloodComponentPopup
-            isOpen={isSeparatePopupOpen}
-            onClose={() => setIsSeparatePopupOpen(false)}
-            onSubmit={submitSeparatedComponents}
-            bloodId={separatingBloodId}
-          />
-        </main>
-      </div>
-    </>
+        <PopupForm
+          isOpen={isPopupOpen}
+          onClose={() => setIsPopupOpen(false)}
+          onSubmit={handleSubmitBloodUnit}
+          initialData={currentBloodUnit}
+          fieldsConfig={bloodFieldsConfig}
+          title={currentBloodUnit ? "Chỉnh sửa đơn vị máu" : "Thêm đơn vị máu mới"}
+          submitText={currentBloodUnit ? "Cập nhật" : "Tạo mới"}
+        />
+      </main>
+    </div>
   );
 }
 

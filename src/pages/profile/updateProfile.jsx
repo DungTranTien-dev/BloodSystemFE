@@ -10,7 +10,6 @@ import { login } from "../../redux/features/userSlice";
 const genderOptions = [
   { value: 0, label: "Nam" },
   { value: 1, label: "Nữ" },
-  { value: 2, label: "Khác" }
 ];
 
 const bloodOptions = [
@@ -52,24 +51,27 @@ function UpdateProfile() {
   const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
-    setForm({
-      userMedicalId: medical.userMedicalId || "",
-      fullName: medical.fullName || user.userName || "",
-      dateOfBirth: medical.dateOfBirth ? medical.dateOfBirth.slice(0, 10) : "",
-      gender: medical.gender === "MALE" ? 0 : medical.gender === "FEMALE" ? 1 : 2,
-      citizenId: medical.citizenId || "",
-      phoneNumber: medical.phoneNumber || user.phoneNumber || "",
-      email: medical.email || user.email || "",
-      currentAddress: medical.currentAddress || "",
-      hasDonatedBefore: medical.hasDonatedBefore || false,
-      donationCount: medical.donationCount || 0,
-      diseaseDescription: medical.diseaseDescription || "",
-      type: medical.type === "PENDING" ? 0 : medical.type === "AVAILABLE" ? 1 : 2,
-      createDate: medical.createDate || "",
-      userId: medical.userId || user.userId || "",
-      bloodType: medical.bloodType || "",
-    });
-  }, [medical, user]);
+    if (medical && Object.keys(medical).length > 0) {
+      setForm({
+        userMedicalId: medical.userMedicalId || "",
+        fullName: medical.fullName || user.userName || "",
+        dateOfBirth: medical.dateOfBirth ? medical.dateOfBirth.slice(0, 10) : "",
+        gender: medical.gender === "MALE" ? 0 : medical.gender === "FEMALE" ? 1 : 2,
+        citizenId: medical.citizenId || "",
+        phoneNumber: medical.phoneNumber || user.phoneNumber || "",
+        email: medical.email || user.email || "",
+        currentAddress: medical.currentAddress || "",
+        hasDonatedBefore: medical.hasDonatedBefore || false,
+        donationCount: medical.donationCount || 0,
+        diseaseDescription: medical.diseaseDescription || "",
+        type: medical.type === "PENDING" ? 0 : medical.type === "AVAILABLE" ? 1 : 2,
+        createDate: medical.createDate || "",
+        userId: medical.userId || user.userId || "",
+        bloodType: medical.bloodType || "",
+      });
+    }
+  }, [medical]);
+  
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

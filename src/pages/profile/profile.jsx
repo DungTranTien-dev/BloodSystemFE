@@ -157,7 +157,7 @@ const Profile = () => {
                   {loadingHistory ? (
                     <div className="text-center text-gray-500">Đang tải dữ liệu...</div>
                   ) : history.length === 0 ? (
-                    <div className="text-center text-gray-500">Chưa có dữ liệu</div>
+                    <div className="text-center text-gray-500">Chưa hiến máu</div>
                   ) : (
                     paginatedHistory.map((item, idx) => (
                       <div key={item.bloodRegistrationId || idx} className="bg-white rounded-lg px-4 py-3 flex justify-between items-center">

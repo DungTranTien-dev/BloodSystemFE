@@ -24,11 +24,12 @@ function ManageSeparatedBlood() {
         const res = await api.get("SeparatedBloodComponent/all");
         if (res.data && res.data.isSuccess) {
           const mapped = res.data.result.map((item) => ({
-            id: item.code, // ✅ đúng key camelCase
+            id: item.code,
             bloodUnitId: item.blood.bloodName,
             component: item.componentType,
             volume: item.volumeInML,
             separatedDate: item.createdDate?.split("T")[0],
+            expiryDate: item.expiryDate?.split("T")[0],
             status: item.isAvailable ? "Sẵn sàng sử dụng" : "Đã sử dụng",
           }));
 
@@ -197,9 +198,6 @@ function ManageSeparatedBlood() {
               <thead className="bg-gradient-to-r from-red-200 to-pink-100">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
-                    Mã phân tách
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
                     Mã máu gốc
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
@@ -212,6 +210,9 @@ function ManageSeparatedBlood() {
                     Ngày tách
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
+                    Ngày hết hạn
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
                     Trạng thái
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-700 uppercase">
@@ -219,6 +220,7 @@ function ManageSeparatedBlood() {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredList.length === 0 ? (
                   <tr>
@@ -228,21 +230,18 @@ function ManageSeparatedBlood() {
                   </tr>
                 ) : (
                   paginatedList.map((item) => (
-                    <tr key={item.id} className="hover:bg-red-50 transition">
-                      <td className="px-6 py-4 font-mono text-slate-700">
-                        {item.id}
-                      </td>
-                      <td className="px-6 py-4">{item.bloodUnitId}</td>
-                      <td className="px-6 py-4">{mapComponentType(item.component)}</td>
-                      <td className="px-6 py-4">{item.volume}</td>
-                      <td className="px-6 py-4">{item.separatedDate}</td>
-                      <td className="px-6 py-4">
+                    <tr key={`${item.bloodUnitId}-${item.component}-${item.separatedDate}`}>
+  <td className="px-6 py-4">{item.bloodUnitId}</td>
+  <td className="px-6 py-4">{mapComponentType(item.component)}</td>
+  <td className="px-6 py-4">{item.volume}</td>
+  <td className="px-6 py-4">{item.separatedDate}</td>
+  <td className="px-6 py-4">{item.expiryDate}</td> {/* ✅ thêm cột mới */}
+  <td className="px-6 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            item.status === "Sẵn sàng sử dụng"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-pink-100 text-pink-700"
-                          }`}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === "Sẵn sàng sử dụng"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-pink-100 text-pink-700"
+                            }`}
                         >
                           {item.status}
                         </span>
