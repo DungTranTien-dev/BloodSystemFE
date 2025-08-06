@@ -380,7 +380,6 @@ function ManageUserMedical() {
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button className="text-pink-600 hover:underline" onClick={() => handleDetail(item)}>Xem</button>
-                        <button className="text-blue-600 hover:underline" onClick={() => { setCurrentMedical(item); setIsPopupOpen(true); }}>Sửa</button>
                         {item.type === "PENDING" && (
                           <>
                             <button className="text-green-600 hover:text-green-800" onClick={() => handleChangeStatus(item.id, "AVAILABLE")}>Duyệt</button>
