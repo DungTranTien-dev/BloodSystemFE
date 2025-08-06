@@ -30,12 +30,12 @@ function LoginForm() {
       dispatch(login(response.data.result));
       localStorage.setItem("token", response.data.result.accessToken);
       const user = response.data.result;
-      const redirectTo = location.state?.redirectTo;
-      if (redirectTo) {
-        navigate(redirectTo);
-        toast.success('Đăng nhập thành công!'); 
-        return;
-      }
+      // const redirectTo = location.state?.redirectTo;
+      // if (redirectTo) {
+      //   navigate(redirectTo);
+      //   toast.success('Đăng nhập thành công!'); 
+      //   return;
+      // }
       if (user.role === 'ADMIN') {
         navigate('/DashboardA');
         toast.success('Đăng nhập thành công!');
@@ -52,7 +52,7 @@ function LoginForm() {
     } catch (e) {
       console.log(e);
       toast.error('Đăng nhập thất bại!');
-    }
+    }   
   };
 
   return (

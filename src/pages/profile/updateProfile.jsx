@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUserMedical } from "../../service/medicalApi";
+import { createUserMedical, updateUserMedical } from "../../service/medicalApi";
 import api from "../../config/axios";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
@@ -27,8 +27,9 @@ function UpdateProfile() {
   const navigate = useNavigate();
   const userState = useSelector((state) => state.user);
   const user = userState?.user || {};
-  const medical = userState?.medical || {};
+  const medical = userState?.userMedical || {};
   const dispatch = useDispatch();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [form, setForm] = useState({
     userMedicalId: "",
@@ -45,14 +46,15 @@ function UpdateProfile() {
     type: 0,
     createDate: "",
     userId: "",
-    bloodType: "",
+    bloodName: "",
   });
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
-    if (medical && Object.keys(medical).length > 0) {
-      setForm({
+    if (!isInitialized && medical && Object.keys(medical).length > 0) {
+      setForm((prev) => ({
+        ...prev,
         userMedicalId: medical.userMedicalId || "",
         fullName: medical.fullName || user.userName || "",
         dateOfBirth: medical.dateOfBirth ? medical.dateOfBirth.slice(0, 10) : "",
@@ -67,11 +69,12 @@ function UpdateProfile() {
         type: medical.type === "PENDING" ? 0 : medical.type === "AVAILABLE" ? 1 : 2,
         createDate: medical.createDate || "",
         userId: medical.userId || user.userId || "",
-        bloodType: medical.bloodType || "",
-      });
+        bloodName: medical.bloodName ?? "",
+      }));
+      setIsInitialized(true);
     }
-  }, [medical]);
-  
+  }, [medical, user, isInitialized]);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -92,34 +95,93 @@ function UpdateProfile() {
     setLoading(true);
 
     const genderMapToString = { 0: "MALE", 1: "FEMALE", 2: "OTHER" };
-    // Tạo payload để gửi đi, đảm bảo gender là số
-    const apiPayload = {
-      ...form,
-      gender: Number(form.gender)
-    };
+    let result = null;
+    const dateOfBirthISO = form.dateOfBirth ? new Date(form.dateOfBirth).toISOString() : null;
+    try {
+      if (!form.userMedicalId) {
+        // ➕ Gọi API tạo mới
+        const createPayload = {
+          createUserMediCalDTO: {
+            FullName: form.fullName || "",
+            DateOfBirth: dateOfBirthISO,
+            Gender: Number(form.gender),
+            CitizenId: form.citizenId || "",
+            PhoneNumber: form.phoneNumber || "",
+            Email: form.email || "",
+            CurrentAddress: form.currentAddress || "",
+            HasDonatedBefore: form.hasDonatedBefore || false,
+            DonationCount: form.donationCount || 0,
+            DiseaseDescription: form.diseaseDescription || "",
+            ChronicDiseaseIds: [], // ✅ BẮT BUỘC: dù không có thì vẫn truyền mảng rỗng
+            BloodName: form.bloodName,
+            LastDonorDate: null,
+            Latitue: 0,
+            Longtitue: 0
+          }
+        };
 
-    const result = await updateUserMedical(apiPayload);
-    setLoading(false);
-    if (result.success) {
-      // Tạo payload để cập nhật Redux, đảm bảo gender là string
-      const reduxPayload = {
-        ...userState,
-        medical: {
-          ...form,
-          gender: genderMapToString[form.gender]
+        const { createUserMedical } = await import("../../service/medicalApi");
+        result = await createUserMedical(createPayload);
+
+        if (result.success) {
+          const newMedical = {
+            ...form,
+            userMedicalId: result.data?.result?.userMedicalId || "",
+            gender: genderMapToString[form.gender],
+          };
+          const updatedUser = {
+            ...userState,
+            userMedical: newMedical,
+          };
+          // console.log(updatedUser);
+          dispatch(login(updatedUser));
+          alert("Tạo hồ sơ y tế thành công!");
+          navigate("/profile");
+        } else {
+          alert(result.error || "Tạo hồ sơ thất bại!");
         }
-      };
-      dispatch(login(reduxPayload));
-      alert("Cập nhật thành công!");
-      navigate("/profile");
-    } else {
-      alert(result.error || "Cập nhật thất bại!");
+      } else {
+        // ✏️ Gọi API update
+        const updatePayload = {
+          ...form,
+          gender: Number(form.gender),
+          dateOfBirth: new Date(form.dateOfBirth).toISOString(),
+          lastDonorDate: null
+        };
+
+        result = await updateUserMedical(updatePayload);
+
+        if (result.success) {
+          // 🔁 Gọi lại API để lấy thông tin mới nhất từ backend
+          const getUserRes = await api.get(`/User/id`);
+          const userDto = getUserRes.data?.result?.userDTO;
+          const medicalDto = getUserRes.data?.result?.userMedicalDTO;
+
+          if (userDto && medicalDto) {
+            dispatch(login({
+              user: userDto,
+              userMedical: medicalDto
+            }));
+          }
+
+          alert("Cập nhật hồ sơ thành công!");
+          navigate("/profile");
+        } else {
+          alert(result.error || "Cập nhật hồ sơ thất bại!");
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi gửi form:", error);
+      alert("Đã xảy ra lỗi không xác định!");
+    } finally {
+      setLoading(false);
     }
   };
 
+
   return (
     <>
-      <Header/>
+      <Header />
       <div className="bg-gradient-to-br from-red-500 to-pink-500 min-h-screen pb-12">
         <div className="max-w-5xl mx-auto mt-0 bg-white rounded-2xl p-6 md:p-8 shadow-md">
           <button
@@ -191,16 +253,6 @@ function UpdateProfile() {
                       className="w-full border border-slate-300 rounded px-3 py-2 mb-2"
                     />
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="block font-semibold mb-1">Giới thiệu bản thân</label>
-                    <textarea
-                      name="diseaseDescription"
-                      value={form.diseaseDescription}
-                      onChange={handleChange}
-                      className="w-full border border-slate-300 rounded px-3 py-2"
-                      rows={2}
-                    />
-                  </div>
                 </div>
               </div>
               {/* Thông tin liên hệ */}
@@ -246,8 +298,8 @@ function UpdateProfile() {
                   <div>
                     <label className="block font-semibold mb-1">Nhóm máu hiện tại của bạn</label>
                     <select
-                      name="bloodType"
-                      value={form.bloodType || "O+"}
+                      name="bloodName"
+                      value={form.bloodName}
                       onChange={handleChange}
                       className="w-full border border-slate-300 rounded px-3 py-2 mb-2"
                     >
@@ -256,6 +308,16 @@ function UpdateProfile() {
                       ))}
                     </select>
                   </div>
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Mô tả bệnh lý</label>
+                  <textarea
+                    name="diseaseDescription"
+                    value={form.diseaseDescription}
+                    onChange={handleChange}
+                    className="w-full border border-slate-300 rounded px-3 py-2"
+                    rows={3}
+                  />
                 </div>
               </div>
               {/* Nút hành động */}
